@@ -133,93 +133,124 @@ jobs:
           # Public — obsah public/
           rsync -a public/ deploy-public/
 
-      - name: Deploy via lftp FTP
+      - name: Deploy app via lftp FTP
         run: |
           sudo apt-get install -y lftp > /dev/null 2>&1
 
+          # === APP deploy (vše mimo public/) → /tuptudu.cz/rajon/ ===
           LFTP_CMDS=$(mktemp)
-
           cat > "$LFTP_CMDS" << 'LFTPEOF'
           set ftp:passive-mode yes
           set ftp:ssl-allow no
-          set ftp:ssl-protect-data no
-          set net:max-retries 5
+          set net:max-retries 3
           set net:reconnect-interval-base 5
-          set net:timeout 60
-          set net:connection-limit 2
-          set ftp:use-feat no
+          set net:timeout 30
           LFTPEOF
+
+          # cd do cílového adresáře
+          echo "cd ${{ env.APP_DIR }}" >> "$LFTP_CMDS"
 
           if [ "${{ steps.changes.outputs.full_deploy }}" = "true" ]; then
-            echo "=== FULL DEPLOY ==="
-            cat >> "$LFTP_CMDS" << LFTPEOF
-
-          # App files → /tuptudu.cz/rajon/
-          mirror --reverse --no-perms --exclude storage/logs/ --exclude storage/framework/sessions/ --parallel=1 --verbose deploy-app/ ${{ env.APP_DIR }}/
-
-          # Public files → /tuptudu.cz/_sub/rajon/
-          mirror --reverse --no-perms --parallel=1 --verbose deploy-public/ ${{ env.PUBLIC_DIR }}/
-          LFTPEOF
+            echo "=== FULL DEPLOY — APP ==="
+            echo "mirror --reverse --no-perms --exclude storage/logs/ --exclude storage/framework/sessions/ --parallel=1 --verbose deploy-app/ ." >> "$LFTP_CMDS"
           else
-            echo "=== SMART DEPLOY ==="
-
-            # .env vždy do app
-            echo "put -O ${{ env.APP_DIR }}/ .env" >> "$LFTP_CMDS"
+            echo "=== SMART DEPLOY — APP ==="
+            echo "put .env" >> "$LFTP_CMDS"
 
             CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || true)
             for file in $CHANGED_FILES; do
+              # Přeskočit public/ soubory
+              [[ "$file" == public/* ]] && continue
+
               if [ ! -f "$file" ]; then
-                # Soubor smazán
-                if [[ "$file" == public/* ]]; then
-                  REMOTE_FILE="${{ env.PUBLIC_DIR }}/${file#public/}"
-                else
-                  REMOTE_FILE="${{ env.APP_DIR }}/$file"
-                fi
-                echo "rm -f $REMOTE_FILE" >> "$LFTP_CMDS"
-              elif [[ "$file" == public/* ]]; then
-                # Public soubory → _sub/rajon/
-                REL_PATH="${file#public/}"
-                REL_DIR=$(dirname "$REL_PATH")
-                if [ "$REL_DIR" != "." ]; then
-                  echo "mkdir -pf ${{ env.PUBLIC_DIR }}/$REL_DIR" >> "$LFTP_CMDS"
-                fi
-                echo "put -O ${{ env.PUBLIC_DIR }}/$REL_DIR/ $file" >> "$LFTP_CMDS"
-                echo "  Upload (public): $file"
+                echo "rm -f $file" >> "$LFTP_CMDS"
               else
-                # App soubory → rajon/
-                FILE_DIR=$(dirname "$file")
-                if [ "$FILE_DIR" != "." ]; then
-                  echo "mkdir -pf ${{ env.APP_DIR }}/$FILE_DIR" >> "$LFTP_CMDS"
+                dir=$(dirname "$file")
+                if [ "$dir" != "." ]; then
+                  echo "mkdir -pf $dir" >> "$LFTP_CMDS"
                 fi
-                echo "put -O ${{ env.APP_DIR }}/$FILE_DIR/ $file" >> "$LFTP_CMDS"
+                echo "put -O $dir/ $file" >> "$LFTP_CMDS"
                 echo "  Upload (app): $file"
               fi
             done
 
             if [ "${{ steps.changes.outputs.vendor_changed }}" = "true" ]; then
-              echo "  Syncing vendor/..."
-              echo "mirror --reverse --delete --no-perms --parallel=1 vendor ${{ env.APP_DIR }}/vendor" >> "$LFTP_CMDS"
+              echo "mirror --reverse --delete --no-perms --parallel=1 vendor vendor" >> "$LFTP_CMDS"
             fi
 
-            if [ "${{ steps.changes.outputs.assets_changed }}" = "true" ]; then
-              echo "  Syncing public/build/..."
-              echo "mirror --reverse --delete --no-perms --parallel=1 public/build ${{ env.PUBLIC_DIR }}/build" >> "$LFTP_CMDS"
-            fi
-
-            # Vždy aktualizovat autoloader
-            echo "put -O ${{ env.APP_DIR }}/vendor/ vendor/autoload.php" >> "$LFTP_CMDS"
-            echo "mirror --reverse --no-perms vendor/composer ${{ env.APP_DIR }}/vendor/composer" >> "$LFTP_CMDS"
+            echo "put -O vendor/ vendor/autoload.php" >> "$LFTP_CMDS"
+            echo "mirror --reverse --no-perms vendor/composer vendor/composer" >> "$LFTP_CMDS"
           fi
 
           echo "quit" >> "$LFTP_CMDS"
-
-          echo "--- lftp commands ---"
+          echo "--- APP lftp commands ---"
           cat "$LFTP_CMDS"
           echo "---"
 
-          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" "ftp://${{ secrets.FTP_SERVER }}" < "$LFTP_CMDS"
+          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" "${{ secrets.FTP_SERVER }}" < "$LFTP_CMDS"
           rm -f "$LFTP_CMDS"
-          echo "=== Deploy complete ==="
+          echo "=== APP deploy complete ==="
+
+      - name: Deploy public via lftp FTP
+        run: |
+          # === PUBLIC deploy (public/) → /tuptudu.cz/_sub/rajon/ ===
+          LFTP_CMDS=$(mktemp)
+          cat > "$LFTP_CMDS" << 'LFTPEOF'
+          set ftp:passive-mode yes
+          set ftp:ssl-allow no
+          set net:max-retries 3
+          set net:reconnect-interval-base 5
+          set net:timeout 30
+          LFTPEOF
+
+          echo "cd ${{ env.PUBLIC_DIR }}" >> "$LFTP_CMDS"
+
+          if [ "${{ steps.changes.outputs.full_deploy }}" = "true" ]; then
+            echo "=== FULL DEPLOY — PUBLIC ==="
+            echo "mirror --reverse --no-perms --parallel=1 --verbose deploy-public/ ." >> "$LFTP_CMDS"
+          else
+            echo "=== SMART DEPLOY — PUBLIC ==="
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || true)
+            HAS_PUBLIC=false
+
+            for file in $CHANGED_FILES; do
+              [[ "$file" != public/* ]] && continue
+              HAS_PUBLIC=true
+              REL_PATH="${file#public/}"
+
+              if [ ! -f "$file" ]; then
+                echo "rm -f $REL_PATH" >> "$LFTP_CMDS"
+              else
+                dir=$(dirname "$REL_PATH")
+                if [ "$dir" != "." ]; then
+                  echo "mkdir -pf $dir" >> "$LFTP_CMDS"
+                fi
+                echo "put -O $dir/ $file" >> "$LFTP_CMDS"
+                echo "  Upload (public): $REL_PATH"
+              fi
+            done
+
+            if [ "${{ steps.changes.outputs.assets_changed }}" = "true" ]; then
+              echo "mirror --reverse --delete --no-perms --parallel=1 public/build build" >> "$LFTP_CMDS"
+            fi
+
+            if [ "$HAS_PUBLIC" = "false" ] && [ "${{ steps.changes.outputs.assets_changed }}" != "true" ]; then
+              echo "  No public changes, skipping"
+              echo "quit" >> "$LFTP_CMDS"
+              cat "$LFTP_CMDS"
+              rm -f "$LFTP_CMDS"
+              exit 0
+            fi
+          fi
+
+          echo "quit" >> "$LFTP_CMDS"
+          echo "--- PUBLIC lftp commands ---"
+          cat "$LFTP_CMDS"
+          echo "---"
+
+          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" "${{ secrets.FTP_SERVER }}" < "$LFTP_CMDS"
+          rm -f "$LFTP_CMDS"
+          echo "=== PUBLIC deploy complete ==="
 
       - name: Post-deploy cache clear + migrate
         run: |
