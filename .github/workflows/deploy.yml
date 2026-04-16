@@ -142,21 +142,23 @@ jobs:
           cat > "$LFTP_CMDS" << 'LFTPEOF'
           set ftp:passive-mode yes
           set ftp:ssl-allow no
-          set net:max-retries 3
+          set ftp:ssl-protect-data no
+          set net:max-retries 5
           set net:reconnect-interval-base 5
-          set net:timeout 30
+          set net:timeout 60
+          set net:connection-limit 2
+          set ftp:use-feat no
           LFTPEOF
 
           if [ "${{ steps.changes.outputs.full_deploy }}" = "true" ]; then
             echo "=== FULL DEPLOY ==="
             cat >> "$LFTP_CMDS" << LFTPEOF
-          set net:connection-limit 3
 
           # App files → /tuptudu.cz/rajon/
-          mirror --reverse --delete --no-perms --exclude storage/logs/ --exclude storage/framework/sessions/ --parallel=3 --verbose deploy-app/ ${{ env.APP_DIR }}/
+          mirror --reverse --no-perms --exclude storage/logs/ --exclude storage/framework/sessions/ --parallel=1 --verbose deploy-app/ ${{ env.APP_DIR }}/
 
           # Public files → /tuptudu.cz/_sub/rajon/
-          mirror --reverse --delete --no-perms --parallel=3 --verbose deploy-public/ ${{ env.PUBLIC_DIR }}/
+          mirror --reverse --no-perms --parallel=1 --verbose deploy-public/ ${{ env.PUBLIC_DIR }}/
           LFTPEOF
           else
             echo "=== SMART DEPLOY ==="
@@ -196,12 +198,12 @@ jobs:
 
             if [ "${{ steps.changes.outputs.vendor_changed }}" = "true" ]; then
               echo "  Syncing vendor/..."
-              echo "mirror --reverse --delete --no-perms --parallel=3 vendor ${{ env.APP_DIR }}/vendor" >> "$LFTP_CMDS"
+              echo "mirror --reverse --delete --no-perms --parallel=1 vendor ${{ env.APP_DIR }}/vendor" >> "$LFTP_CMDS"
             fi
 
             if [ "${{ steps.changes.outputs.assets_changed }}" = "true" ]; then
               echo "  Syncing public/build/..."
-              echo "mirror --reverse --delete --no-perms --parallel=3 public/build ${{ env.PUBLIC_DIR }}/build" >> "$LFTP_CMDS"
+              echo "mirror --reverse --delete --no-perms --parallel=1 public/build ${{ env.PUBLIC_DIR }}/build" >> "$LFTP_CMDS"
             fi
 
             # Vždy aktualizovat autoloader
