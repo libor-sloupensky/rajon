@@ -12,7 +12,7 @@ env:
 
 jobs:
   deploy:
-    name: Build & Deploy via SFTP
+    name: Build & Deploy via FTP
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -125,7 +125,6 @@ jobs:
 
       - name: Prepare split deployment structure
         run: |
-          # Připravit app adresář (vše mimo public/)
           mkdir -p deploy-app deploy-public
 
           # App — vše kromě public/, node_modules/, .git/
@@ -134,22 +133,25 @@ jobs:
           # Public — obsah public/
           rsync -a public/ deploy-public/
 
-      - name: Deploy via lftp SFTP
+      - name: Deploy via lftp FTP
         run: |
           sudo apt-get install -y lftp > /dev/null 2>&1
 
           LFTP_CMDS=$(mktemp)
 
-          cat > "$LFTP_CMDS" << LFTPEOF
+          cat > "$LFTP_CMDS" << 'LFTPEOF'
+          set ftp:passive-mode yes
+          set ftp:ssl-allow no
           set net:max-retries 3
           set net:reconnect-interval-base 5
           set net:timeout 30
-          set sftp:connect-program "ssh -o StrictHostKeyChecking=no -p 222"
           LFTPEOF
 
           if [ "${{ steps.changes.outputs.full_deploy }}" = "true" ]; then
             echo "=== FULL DEPLOY ==="
             cat >> "$LFTP_CMDS" << LFTPEOF
+          set net:connection-limit 3
+
           # App files → /tuptudu.cz/rajon/
           mirror --reverse --delete --no-perms --exclude storage/logs/ --exclude storage/framework/sessions/ --parallel=3 --verbose deploy-app/ ${{ env.APP_DIR }}/
 
@@ -174,17 +176,20 @@ jobs:
                 echo "rm -f $REMOTE_FILE" >> "$LFTP_CMDS"
               elif [[ "$file" == public/* ]]; then
                 # Public soubory → _sub/rajon/
-                REMOTE_DIR="${{ env.PUBLIC_DIR }}/$(dirname "${file#public/}")"
-                echo "mkdir -pf $REMOTE_DIR" >> "$LFTP_CMDS"
-                echo "put -O $REMOTE_DIR/ $file" >> "$LFTP_CMDS"
+                REL_PATH="${file#public/}"
+                REL_DIR=$(dirname "$REL_PATH")
+                if [ "$REL_DIR" != "." ]; then
+                  echo "mkdir -pf ${{ env.PUBLIC_DIR }}/$REL_DIR" >> "$LFTP_CMDS"
+                fi
+                echo "put -O ${{ env.PUBLIC_DIR }}/$REL_DIR/ $file" >> "$LFTP_CMDS"
                 echo "  Upload (public): $file"
               else
                 # App soubory → rajon/
-                REMOTE_DIR="${{ env.APP_DIR }}/$(dirname "$file")"
-                if [ "$(dirname "$file")" != "." ]; then
-                  echo "mkdir -pf $REMOTE_DIR" >> "$LFTP_CMDS"
+                FILE_DIR=$(dirname "$file")
+                if [ "$FILE_DIR" != "." ]; then
+                  echo "mkdir -pf ${{ env.APP_DIR }}/$FILE_DIR" >> "$LFTP_CMDS"
                 fi
-                echo "put -O $REMOTE_DIR/ $file" >> "$LFTP_CMDS"
+                echo "put -O ${{ env.APP_DIR }}/$FILE_DIR/ $file" >> "$LFTP_CMDS"
                 echo "  Upload (app): $file"
               fi
             done
@@ -210,7 +215,7 @@ jobs:
           cat "$LFTP_CMDS"
           echo "---"
 
-          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" "sftp://${{ secrets.FTP_SERVER }}:222" < "$LFTP_CMDS"
+          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" "ftp://${{ secrets.FTP_SERVER }}" < "$LFTP_CMDS"
           rm -f "$LFTP_CMDS"
           echo "=== Deploy complete ==="
 
