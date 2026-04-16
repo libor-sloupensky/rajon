@@ -2,16 +2,27 @@
 
 /**
  * Deploy hook — post-deploy operace (cache clear, migrace).
- * Volá se z GitHub Actions po dokončení FTP deploye.
+ * Volá se z GitHub Actions po dokončení SFTP deploye.
+ *
+ * Struktura serveru:
+ *   /tuptudu.cz/rajon/       — Laravel app
+ *   /tuptudu.cz/_sub/rajon/  — public (tento soubor)
  */
 
-$token = $_GET['token'] ?? '';
-$expectedToken = trim(file_get_contents(__DIR__ . '/../.env') ? '' : '');
+// Na serveru: app je v ../../rajon/, lokálně: ../
+$appDir = file_exists(__DIR__ . '/../../rajon/artisan')
+    ? realpath(__DIR__ . '/../../rajon')
+    : realpath(dirname(__DIR__));
 
-// Načti MIGRATE_TOKEN z .env
-$envContent = file_get_contents(__DIR__ . '/../.env');
-if (preg_match('/^MIGRATE_TOKEN=(.+)$/m', $envContent, $matches)) {
-    $expectedToken = trim($matches[1]);
+$token = $_GET['token'] ?? '';
+$expectedToken = '';
+
+$envFile = $appDir . '/.env';
+if (file_exists($envFile)) {
+    $envContent = file_get_contents($envFile);
+    if (preg_match('/^MIGRATE_TOKEN=(.+)$/m', $envContent, $matches)) {
+        $expectedToken = trim($matches[1]);
+    }
 }
 
 if (empty($token) || $token !== $expectedToken) {
@@ -28,15 +39,24 @@ if (function_exists('opcache_reset')) {
     $results[] = 'OPcache cleared';
 }
 
-// Artisan cache:clear
-$results[] = shell_exec('cd ' . escapeshellarg(dirname(__DIR__)) . ' && php artisan cache:clear 2>&1');
-$results[] = shell_exec('cd ' . escapeshellarg(dirname(__DIR__)) . ' && php artisan config:clear 2>&1');
-$results[] = shell_exec('cd ' . escapeshellarg(dirname(__DIR__)) . ' && php artisan route:clear 2>&1');
-$results[] = shell_exec('cd ' . escapeshellarg(dirname(__DIR__)) . ' && php artisan view:clear 2>&1');
+$artisan = function (string $cmd) use ($appDir) {
+    return shell_exec('cd ' . escapeshellarg($appDir) . ' && php artisan ' . $cmd . ' 2>&1');
+};
 
-// Migrace
+$results[] = $artisan('cache:clear');
+$results[] = $artisan('config:clear');
+$results[] = $artisan('route:clear');
+$results[] = $artisan('view:clear');
+
 if (isset($_GET['migrate'])) {
-    $results[] = shell_exec('cd ' . escapeshellarg(dirname(__DIR__)) . ' && php artisan migrate --force 2>&1');
+    $results[] = $artisan('migrate --force');
+}
+
+if (isset($_GET['seed'])) {
+    $seeders = $_GET['seed'];
+    foreach (explode(',', $seeders) as $seeder) {
+        $results[] = $artisan('db:seed --class=' . escapeshellarg(trim($seeder)) . ' --force');
+    }
 }
 
 header('Content-Type: text/plain');

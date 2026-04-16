@@ -10,9 +10,14 @@
 
 ## Server
 - **Hosting:** Webglobe (vas-hosting.cz)
-- **Server:** gve08.vas-server.cz
+- **SFTP:** ftp.tuptudu.cz:222
 - **Doména:** rajon.tuptudu.cz
-- **DB:** MySQL, localhost
+- **DB:** MySQL, db.dw328.webglobe.com
+
+## Cesty na serveru (split deployment)
+- **App (Laravel root):** /tuptudu.cz/rajon/
+- **Public (web root):** /tuptudu.cz/_sub/rajon/
+- `index.php` a `deploy-hook.php` detekují cestu automaticky (lokálně ../, server ../../rajon/)
 
 ## GitHub Secrets (potřeba nastavit)
 - `APP_KEY` — Laravel app key
