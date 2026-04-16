@@ -1,0 +1,37 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+    --color-primary: #dd5500;
+    --color-primary-dark: #bb4400;
+    --color-primary-light: #ff7722;
+}
+
+body {
+    font-weight: 500;
+}
+
+main a:hover,
+footer a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+:root {
+    --c-primary: #dd5500;
+    --c-primary-dark: #bb4400;
+    --c-primary-light: #ff7722;
+    --c-primary-10: rgba(221, 85, 0, 0.08);
+    --c-primary-20: rgba(221, 85, 0, 0.18);
+    --c-bg: #f7f7f7;
+    --c-surface: #ffffff;
+    --c-text: #2a2a2a;
+    --c-text-secondary: #666666;
+    --c-text-muted: #aaaaaa;
+    --c-border: #dddddd;
+}
