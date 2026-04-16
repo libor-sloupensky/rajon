@@ -85,7 +85,7 @@ jobs:
           LOG_DEPRECATIONS_CHANNEL=null
           LOG_LEVEL=error
           DB_CONNECTION=mysql
-          DB_HOST=localhost
+          DB_HOST=db.dw328.webglobe.com
           DB_PORT=3306
           DB_DATABASE=${{ secrets.DB_DATABASE }}
           DB_USERNAME=${{ secrets.DB_USERNAME }}
