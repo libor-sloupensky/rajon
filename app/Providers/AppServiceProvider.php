@@ -11,9 +11,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Na serveru: public je v /_sub/rajon/, app je v /rajon/
-        // Detekce serverové struktury — symlink ../../_sub/rajon jako public path
-        $serverPublicPath = dirname(base_path(), 2) . '/_sub/rajon';
+        // Na serveru: public je v /tuptudu.cz/_sub/rajon/, app je v /tuptudu.cz/rajon/
+        $serverPublicPath = dirname(base_path()) . '/_sub/rajon';
         if (is_dir($serverPublicPath)) {
             $this->app->usePublicPath($serverPublicPath);
         }
