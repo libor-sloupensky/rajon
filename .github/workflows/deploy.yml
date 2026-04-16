@@ -141,7 +141,10 @@ jobs:
           LFTP_CMDS=$(mktemp)
           cat > "$LFTP_CMDS" << 'LFTPEOF'
           set ftp:passive-mode yes
-          set ftp:ssl-allow no
+          set ftp:ssl-allow yes
+          set ftp:ssl-force yes
+          set ssl:verify-certificate no
+          set ftp:ssl-protect-data yes
           set net:max-retries 3
           set net:reconnect-interval-base 5
           set net:timeout 30
@@ -197,7 +200,10 @@ jobs:
           LFTP_CMDS=$(mktemp)
           cat > "$LFTP_CMDS" << 'LFTPEOF'
           set ftp:passive-mode yes
-          set ftp:ssl-allow no
+          set ftp:ssl-allow yes
+          set ftp:ssl-force yes
+          set ssl:verify-certificate no
+          set ftp:ssl-protect-data yes
           set net:max-retries 3
           set net:reconnect-interval-base 5
           set net:timeout 30
