@@ -106,12 +106,12 @@ jobs:
           QUEUE_CONNECTION=sync
           CACHE_STORE=file
           MAIL_MAILER=smtp
-          MAIL_HOST=gve08.vas-server.cz
-          MAIL_PORT=465
+          MAIL_HOST=mail.webglobe.cz
+          MAIL_PORT=587
           MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
           MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
-          MAIL_ENCRYPTION=ssl
-          MAIL_FROM_ADDRESS=rajon@tuptudu.cz
+          MAIL_ENCRYPTION=tls
+          MAIL_FROM_ADDRESS=festivaly@wormup.com
           MAIL_FROM_NAME="Rajón"
           GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
