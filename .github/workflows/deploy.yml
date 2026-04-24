@@ -180,7 +180,7 @@ jobs:
             set net:timeout 30;
             set net:max-retries 3;
             set net:reconnect-interval-base 5;
-            open sftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@${{ secrets.FTP_SERVER }};
+            open sftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@ftp.tuptudu.cz;
             ${LFTP_SCRIPT}
             quit
           "
@@ -236,7 +236,7 @@ jobs:
             set net:timeout 30;
             set net:max-retries 3;
             set net:reconnect-interval-base 5;
-            open sftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@${{ secrets.FTP_SERVER }};
+            open sftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@ftp.tuptudu.cz;
             ${LFTP_SCRIPT}
             quit
           "
