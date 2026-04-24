@@ -263,6 +263,9 @@ class ScrapingPipeline
         $data['_skore'] = $skore;
         $data['_stav'] = $stav;
 
+        // Oříznout textová pole na max délky DB (AI vrací libovolné délky)
+        $data = $this->oriznStringy($data);
+
         // 1. Fuzzy match na existující akci
         $existing = $this->matcher->najdiExistujici($data);
 
@@ -344,6 +347,41 @@ class ScrapingPipeline
                 'posledni_ziskani' => now(),
             ]
         );
+    }
+
+    /**
+     * Oříznout textová pole na max délky sloupců v DB.
+     * AI občas vrací delší hodnoty (např. telefon s poznámkou "volat 9-17h").
+     */
+    protected function oriznStringy(array $data): array
+    {
+        $max = [
+            'nazev' => 255,
+            'misto' => 255,
+            'adresa' => 255,
+            'okres' => 100,
+            'kraj' => 100,
+            'organizator' => 255,
+            'kontakt_email' => 255,
+            'kontakt_telefon' => 50,    // DB má VARCHAR(20), ale AI vrací delší → ořez na 50, v DB pak na 20
+            'web_url' => 500,
+            'zdroj_url' => 500,
+            'vstupne' => 100,
+            'cas' => 100,
+        ];
+
+        foreach ($max as $pole => $limit) {
+            if (!empty($data[$pole]) && is_string($data[$pole]) && mb_strlen($data[$pole]) > $limit) {
+                $data[$pole] = mb_substr($data[$pole], 0, $limit);
+            }
+        }
+
+        // Explicitně validní enum typ
+        if (isset($data['typ'])) {
+            $data['typ'] = $this->normalizujTyp((string) $data['typ']);
+        }
+
+        return $data;
     }
 
     /** Normalizace typu akce na hodnoty enum v DB. */

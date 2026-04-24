@@ -237,7 +237,9 @@ class ZdrojAnalyzer
                 return $urls;
             }
 
-            $xml = @simplexml_load_string($response->body());
+            // Některé servery (např. stankar.cz) posílají whitespace/BOM před <?xml
+            $body = ltrim($response->body(), "\xEF\xBB\xBF \t\n\r\0\x0B");
+            $xml = @simplexml_load_string($body);
             if (!$xml) return $urls;
 
             // Sitemap index → načti všechny sub-sitemapy
