@@ -19,6 +19,15 @@ class Zdroj extends Model
     protected $fillable = [
         'nazev',
         'url',
+        'robots_url',
+        'sitemap_url',
+        'cms_typ',
+        'url_pattern_list',
+        'url_pattern_detail',
+        'struktura',
+        'frekvence_hodin',
+        'posledni_chyby',
+        'vyzaduje_login',
         'typ',
         'stav',
         'posledni_scraping',
@@ -32,12 +41,25 @@ class Zdroj extends Model
         return [
             'posledni_scraping' => 'datetime',
             'pocet_akci' => 'integer',
+            'frekvence_hodin' => 'integer',
+            'struktura' => 'array',
+            'vyzaduje_login' => 'boolean',
         ];
     }
 
     public function akce(): HasMany
     {
         return $this->hasMany(Akce::class, 'zdroj_id');
+    }
+
+    public function akceZdroje(): HasMany
+    {
+        return $this->hasMany(AkceZdroj::class, 'zdroj_id');
+    }
+
+    public function scrapingLog(): HasMany
+    {
+        return $this->hasMany(ScrapingLog::class, 'zdroj_id');
     }
 
     public function uzivatel(): BelongsTo

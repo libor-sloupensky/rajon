@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AkceController;
 use App\Http\Controllers\Admin\AkceController as AdminAkceController;
+use App\Http\Controllers\Admin\ScrapingController;
 use App\Http\Controllers\Admin\UzivateleController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\DashboardController;
@@ -36,4 +37,14 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\JeAdmin::class])->pr
     Route::delete('/akce/{akce}', [AdminAkceController::class, 'destroy'])->name('akce.destroy');
     Route::get('/zdroje', [AdminAkceController::class, 'zdroje'])->name('zdroje');
     Route::get('/uzivatele', [UzivateleController::class, 'index'])->name('uzivatele');
+
+    // Scraping — zdroje a běhy
+    Route::get('/scraping', [ScrapingController::class, 'index'])->name('scraping.index');
+    Route::get('/scraping/new', [ScrapingController::class, 'create'])->name('scraping.create');
+    Route::post('/scraping/analyzovat', [ScrapingController::class, 'analyzovat'])->name('scraping.analyzovat');
+    Route::post('/scraping', [ScrapingController::class, 'store'])->name('scraping.store');
+    Route::get('/scraping/{zdroj}/edit', [ScrapingController::class, 'edit'])->name('scraping.edit');
+    Route::put('/scraping/{zdroj}', [ScrapingController::class, 'update'])->name('scraping.update');
+    Route::post('/scraping/{zdroj}/spustit', [ScrapingController::class, 'spustit'])->name('scraping.spustit');
+    Route::get('/scraping/log/{log}', [ScrapingController::class, 'log'])->name('scraping.log');
 });

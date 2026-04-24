@@ -16,6 +16,17 @@ class Akce extends Model
     const CREATED_AT = 'vytvoreno';
     const UPDATED_AT = 'upraveno';
 
+    /** 7 krajů východní ČR (filtr pro scraping). */
+    public const KRAJE_VYCHOD = [
+        'Kraj Vysočina',
+        'Královéhradecký kraj',
+        'Pardubický kraj',
+        'Olomoucký kraj',
+        'Moravskoslezský kraj',
+        'Zlínský kraj',
+        'Jihomoravský kraj',
+    ];
+
     protected $fillable = [
         'nazev',
         'slug',
@@ -37,9 +48,17 @@ class Akce extends Model
         'zdroj_typ',
         'najem',
         'obrat',
+        'vstupne',
         'poznamka',
         'stav',
         'uzivatel_id',
+        'zdroj_id',
+        'externi_hash',
+        'propojena_s_akci_id',
+        'velikost_skore',
+        'velikost_stav',
+        'velikost_info',
+        'velikost_signaly',
     ];
 
     protected function casts(): array
@@ -51,6 +70,8 @@ class Akce extends Model
             'gps_lng' => 'float',
             'najem' => 'integer',
             'obrat' => 'integer',
+            'velikost_skore' => 'integer',
+            'velikost_signaly' => 'array',
         ];
     }
 
@@ -67,5 +88,26 @@ class Akce extends Model
     public function zdroj(): BelongsTo
     {
         return $this->belongsTo(Zdroj::class, 'zdroj_id');
+    }
+
+    public function propojenaSAkci(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'propojena_s_akci_id');
+    }
+
+    public function propojeneAkce(): HasMany
+    {
+        return $this->hasMany(self::class, 'propojena_s_akci_id');
+    }
+
+    public function akceZdroje(): HasMany
+    {
+        return $this->hasMany(AkceZdroj::class, 'akce_id');
+    }
+
+    /** Je kraj akce ve sledovaném regionu (východní ČR)? */
+    public function jeVRegionu(): bool
+    {
+        return in_array($this->kraj, self::KRAJE_VYCHOD, true);
     }
 }

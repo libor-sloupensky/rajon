@@ -1,0 +1,274 @@
+<?php
+
+namespace App\Services\Scraping;
+
+use App\Models\Akce;
+use App\Models\AkceZdroj;
+use App\Models\ScrapingLog;
+use App\Models\Zdroj;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+
+/**
+ * Orchestrace scrapingu — pro jeden zdroj:
+ * 1. Stáhne seznam URL ze sitemap
+ * 2. Pro každou URL extrahuje detail (AkceExtractor)
+ * 3. Filtruje podle regionu (7 krajů východní ČR)
+ * 4. Klasifikuje velikost akce
+ * 5. Dedupluje a ukládá do DB
+ * 6. Loguje výsledek
+ */
+class ScrapingPipeline
+{
+    public function __construct(
+        protected ZdrojAnalyzer $analyzer,
+        protected AkceExtractor $extractor,
+    ) {}
+
+    /**
+     * Spustí scraping pro daný zdroj.
+     * @param int|null $limit Maximální počet detailů (pro testování)
+     */
+    public function scrapujZdroj(Zdroj $zdroj, ?int $limit = null, bool $pouzeRegion = true): ScrapingLog
+    {
+        $log = ScrapingLog::create([
+            'zdroj_id' => $zdroj->id,
+            'zacatek' => now(),
+            'stav' => 'probiha',
+            'vytvoreno' => now(),
+        ]);
+
+        $chyby = [];
+        $statistiky = ['podle_kraje' => [], 'podle_typu' => [], 'podle_velikosti' => []];
+
+        try {
+            // 1. Sitemap → seznam URL
+            $urls = $this->ziskejUrls($zdroj);
+            $log->pocet_nalezenych = count($urls);
+
+            if ($limit) {
+                $urls = array_slice($urls, 0, $limit);
+            }
+
+            // 2. Pro každou URL
+            foreach ($urls as $url) {
+                try {
+                    $vysledek = $this->zpracujAkci($zdroj, $url, $pouzeRegion, $statistiky);
+
+                    match ($vysledek['stav']) {
+                        'novy' => $log->increment('pocet_novych'),
+                        'aktualizovany' => $log->increment('pocet_aktualizovanych'),
+                        'preskoceny' => $log->increment('pocet_preskocenych'),
+                        'chyba' => (function () use ($log, $vysledek, &$chyby) {
+                            $log->increment('pocet_chyb');
+                            $chyby[] = $vysledek['chyba'] ?? 'Unknown';
+                        })(),
+                        default => null,
+                    };
+                } catch (\Exception $e) {
+                    $log->increment('pocet_chyb');
+                    $chyby[] = "URL {$url}: {$e->getMessage()}";
+                    Log::warning("Scraping error {$url}: {$e->getMessage()}");
+                }
+            }
+
+            $log->stav = $log->pocet_chyb > 0 && $log->pocet_chyb === count($urls) ? 'chyba'
+                : ($log->pocet_chyb > 0 ? 'castecne' : 'uspech');
+
+            // Aktualizace zdroje
+            $zdroj->update([
+                'posledni_scraping' => now(),
+                'pocet_akci' => $zdroj->akce()->count(),
+                'posledni_chyby' => $chyby ? implode("\n", array_slice($chyby, 0, 10)) : null,
+            ]);
+        } catch (\Exception $e) {
+            $log->stav = 'chyba';
+            $chyby[] = "Fatal: {$e->getMessage()}";
+            Log::error("Scraping pipeline failed: {$e->getMessage()}");
+        } finally {
+            $log->konec = now();
+            $log->chyby_detail = $chyby ? implode("\n", array_slice($chyby, 0, 50)) : null;
+            $log->statistiky = $statistiky;
+            $log->save();
+        }
+
+        return $log;
+    }
+
+    /** Získej seznam URL ke scrapingu z sitemap. */
+    protected function ziskejUrls(Zdroj $zdroj): array
+    {
+        if ($zdroj->sitemap_url) {
+            return $this->analyzer->seznamUrlZSitemap(
+                $zdroj->sitemap_url,
+                $zdroj->url_pattern_detail ?: '*'
+            );
+        }
+
+        // Fallback: analyzovat listing URL a vytáhnout odkazy
+        $analyza = $this->analyzer->analyzuj($zdroj->url);
+        return $analyza['struktura']['odkazy_akci'] ?? [];
+    }
+
+    /** Zpracuj jednu akci — extrakce, filtry, uložení. */
+    protected function zpracujAkci(Zdroj $zdroj, string $url, bool $pouzeRegion, array &$statistiky): array
+    {
+        // 1. Fetch HTML
+        $html = $this->fetchHtml($url);
+        if (!$html) {
+            return ['stav' => 'chyba', 'chyba' => "Nelze stáhnout {$url}"];
+        }
+
+        // 2. AI extrakce
+        $data = $this->extractor->extrahuj($html, $url);
+        if (!$data) {
+            return ['stav' => 'chyba', 'chyba' => "AI extrakce selhala {$url}"];
+        }
+
+        // 3. Statistiky
+        $kraj = $data['kraj'] ?? 'neznámý';
+        $statistiky['podle_kraje'][$kraj] = ($statistiky['podle_kraje'][$kraj] ?? 0) + 1;
+
+        // 4. Region filter
+        if ($pouzeRegion && !in_array($kraj, Akce::KRAJE_VYCHOD, true)) {
+            return ['stav' => 'preskoceny', 'duvod' => "Mimo region: {$kraj}"];
+        }
+
+        // 5. Velikostní scoring
+        $skore = $this->extractor->vypocetVelikostSkore($data);
+        $stav = $this->extractor->urciStavVelikosti($skore);
+
+        $statistiky['podle_velikosti'][$stav] = ($statistiky['podle_velikosti'][$stav] ?? 0) + 1;
+        $statistiky['podle_typu'][$data['typ'] ?? 'jiny'] = ($statistiky['podle_typu'][$data['typ'] ?? 'jiny'] ?? 0) + 1;
+
+        // 6. Deduplikace + uložení
+        $akce = $this->ulozAkci($data, $url, $skore, $stav, $zdroj);
+        $novy = $akce->wasRecentlyCreated;
+
+        $this->ulozAkceZdroj($akce, $zdroj, $url, $data);
+
+        return ['stav' => $novy ? 'novy' : 'aktualizovany', 'akce_id' => $akce->id];
+    }
+
+    protected function fetchHtml(string $url): ?string
+    {
+        try {
+            $response = Http::withHeaders([
+                'User-Agent' => 'Mozilla/5.0 (compatible; RajonBot/1.0; +https://rajon.tuptudu.cz/)',
+                'Accept-Language' => 'cs,en;q=0.5',
+            ])->timeout(30)->get($url);
+
+            return $response->successful() ? $response->body() : null;
+        } catch (\Exception) {
+            return null;
+        }
+    }
+
+    /** Ulož nebo aktualizuj akci (deduplikace podle nazev + datum_od + misto/mesto). */
+    protected function ulozAkci(array $data, string $url, int $skore, string $stav, Zdroj $zdroj): Akce
+    {
+        $nazev = $data['nazev'] ?? 'Bez názvu';
+        $datumOd = $data['datum_od'] ?? null;
+        $mesto = $data['mesto'] ?? $data['misto'] ?? null;
+
+        // Deduplikace
+        $existing = Akce::query()
+            ->where('nazev', $nazev)
+            ->when($datumOd, fn ($q) => $q->whereDate('datum_od', $datumOd))
+            ->when($mesto, fn ($q) => $q->where(fn ($q2) => $q2->where('misto', 'like', "%{$mesto}%")->orWhere('adresa', 'like', "%{$mesto}%")))
+            ->first();
+
+        $hash = hash('sha256', json_encode($data));
+        $slug = $this->vytvorUnikatniSlug($nazev, $datumOd, $existing?->id);
+
+        $payload = [
+            'nazev' => $nazev,
+            'slug' => $existing?->slug ?? $slug,
+            'typ' => $this->normalizujTyp($data['typ'] ?? 'jiny'),
+            'popis' => $data['popis'] ?? null,
+            'datum_od' => $datumOd,
+            'datum_do' => $data['datum_do'] ?? null,
+            'misto' => $data['misto'] ?? null,
+            'adresa' => $data['adresa'] ?? null,
+            'gps_lat' => $data['gps_lat'] ?? null,
+            'gps_lng' => $data['gps_lng'] ?? null,
+            'okres' => $data['okres'] ?? null,
+            'kraj' => $data['kraj'] ?? null,
+            'organizator' => $data['organizator'] ?? null,
+            'kontakt_email' => $data['kontakt_email'] ?? null,
+            'kontakt_telefon' => $data['kontakt_telefon'] ?? null,
+            'web_url' => $data['web_url'] ?? null,
+            'zdroj_url' => $url,
+            'zdroj_typ' => 'scraping',
+            'zdroj_id' => $zdroj->id,
+            'vstupne' => $data['vstupne'] ?? null,
+            'externi_hash' => $hash,
+            'velikost_skore' => $skore,
+            'velikost_stav' => $stav,
+            'velikost_info' => $data['velikost_info'] ?? null,
+            'velikost_signaly' => $data['velikost_signaly'] ?? null,
+            'stav' => 'navrh',
+        ];
+
+        if ($existing) {
+            if ($existing->externi_hash !== $hash) {
+                $existing->update($payload);
+            }
+            return $existing;
+        }
+
+        return Akce::create($payload);
+    }
+
+    /** Ulož záznam do akce_zdroje (many-to-many). */
+    protected function ulozAkceZdroj(Akce $akce, Zdroj $zdroj, string $url, array $data): void
+    {
+        AkceZdroj::updateOrCreate(
+            ['zdroj_id' => $zdroj->id, 'url' => $url],
+            [
+                'akce_id' => $akce->id,
+                'externi_id' => $data['externi_id'] ?? null,
+                'surova_data' => $data,
+                'posledni_ziskani' => now(),
+            ]
+        );
+    }
+
+    /** Normalizace typu akce na hodnoty enum v DB. */
+    protected function normalizujTyp(string $typ): string
+    {
+        $mapping = [
+            'pout' => 'pout',
+            'food_festival' => 'food_festival',
+            'vinobrani' => 'vinobrani',
+            'dynobrani' => 'dynobrani',
+            'farmarske_trhy' => 'farmarske_trhy',
+            'vanocni_trhy' => 'vanocni_trhy',
+            'jarmark' => 'jarmark',
+            'festival' => 'festival',
+            'hudebni_festival' => 'festival',
+            'historicke_slavnosti' => 'slavnosti',
+            'folklor' => 'slavnosti',
+            'hody' => 'slavnosti',
+            'dny_mesta' => 'slavnosti',
+            'obecni_slavnosti' => 'slavnosti',
+            'velikonocni_trhy' => 'jarmark',
+        ];
+        return $mapping[$typ] ?? 'jiny';
+    }
+
+    protected function vytvorUnikatniSlug(string $nazev, ?string $datumOd, ?int $existingId): string
+    {
+        $rok = $datumOd ? date('Y', strtotime($datumOd)) : date('Y');
+        $base = Str::slug($nazev . '-' . $rok);
+        $slug = $base;
+        $counter = 2;
+
+        while (Akce::where('slug', $slug)->when($existingId, fn ($q) => $q->where('id', '!=', $existingId))->exists()) {
+            $slug = $base . '-' . $counter++;
+        }
+
+        return $slug;
+    }
+}

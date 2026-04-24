@@ -10,6 +10,8 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->call(ZdrojeSeeder::class);
+
         // Admin uživatel
         Uzivatel::firstOrCreate(
             ['email' => 'libor@tuptudu.cz'],
