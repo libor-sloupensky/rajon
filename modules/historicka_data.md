@@ -1,6 +1,88 @@
 # Historická data (XLS import)
 
-## Stav: Analýza hotová — čeká se rozhodnutí A/B, pak migrace + import
+## Stav: Implementováno — XLSX parser lokálně, data-seeder na produkci
+
+**Rozhodnutí:** strategie **B** (kanonická akce + ročníkový výkaz).
+XLSX se parsují **lokálně**, výsledek je JSON v repu, produkce běží přes
+seeder (ne přes parser na serveru — zdrojové soubory na server nepatří).
+
+## Pipeline
+
+```
+XLSX v temporary/ (necommitnuto)
+          ↓ lokálně: php artisan excel:import temporary --export=...
+database/data/historicka_data.json (commit)
+          ↓ GitHub Actions deploy
+server: ?migrate=1&seed=ImportHistorickychDatSeeder
+          ↓ transakce
+akce (1021) + akce_vykazy (529)
+```
+
+## Použití
+
+### Lokálně — regenerace JSON
+```bash
+php artisan excel:import temporary --export=database/data/historicka_data.json
+```
+
+### Diagnostika (bez ukládání, bez JSON)
+```bash
+php artisan excel:import temporary --dry-run
+php artisan excel:import temporary --dry-run -v           # top 30 duplicit
+php artisan excel:import temporary --dry-run --soubor="Měsíční přehled.xlsx"
+```
+
+### Produkce
+```
+GET https://rajon.tuptudu.cz/deploy-hook.php?token=XXX&migrate=1&seed=ImportHistorickychDatSeeder
+```
+
+## Výsledek posledního exportu (2026-04-24)
+
+- **1 021** kanonických akcí
+- **529** ročníkových výkazů (po deduplikaci `(akce, rok)`)
+- **0** orphan výkazů (každý ukazuje na existující akci)
+
+Zbývající duplicity (3–16 matchů pro generické názvy „Farmářské trhy" apod.)
+admin může ex-post sjednotit v admin UI.
+
+## Implementace
+
+### Třídy v `app/Services/ExcelImport/`
+| Třída | Odpovědnost |
+|---|---|
+| `ExcelImportCommand` (`app/Console/Commands/`) | Artisan entry point |
+| `FileSpec` | Pořadí + strategie per soubor |
+| `FileImporter` | Orchestrace importu, 8 strategií |
+| `XlsxReader` | Wrapper kolem openspout (eager-load všech sheetů) |
+| `HeaderMapper` | Mapa `nazev/Akce/název` → `nazev` apod. |
+| `DateParser` | DateTime + textové rozsahy, doplnění roku |
+| `MoneyParser` | Extrakce CZK z volného textu |
+| `PoznamkyParser` | `"2023: Prodej X Kč, Nájem Y"` → mikro-výkaz |
+| `NazevNormalizer` | Normalizace názvu pro fuzzy matching |
+| `AkceHistoricMatcher` | Hledání existující kanonické akce (bez data) |
+| `ImportStats` | Počítadla |
+| `ExportCollector` | Sběr do JSON (akce + výkazy s externím klíčem) |
+
+### Seeder
+| | |
+|---|---|
+| `database/seeders/ImportHistorickychDatSeeder.php` | Načte JSON → DB (idempotentně: match podle slug nebo (nazev, misto)) |
+| `database/data/historicka_data.json` | Vygenerovaný export (committnuto) |
+
+### Matcher — klíčové pravidlo
+Match prochází jen když obě strany mají/nemají místo. Pokud obě mají, musí
+být totožné nebo jedno substring druhého. **Nikdy** nematchne
+„Farmářské trhy" (bez místa) s „Farmářské trhy Pardubice".
+
+### DB
+- Migrace `2026_04_24_000002_create_akce_vykazy_table.php`
+- Migrace `2026_04_24_000003_akce_typ_pridat_sportovni.php` — enum rozšíření
+- Model `App\Models\AkceVykaz`, relace `Akce::vykazy()`
+
+## Balíček
+`openspout/openspout ^5.6` — PHP 8.4 ZTS nemá ext-gd, kvůli tomu se nepoužilo
+phpspreadsheet. Openspout je streamovací čtečka, bez obrazových závislostí.
 
 ## Účel
 V `temporary/` je 9 XLSX souborů se 4 lety provozu WormUP na akcích
