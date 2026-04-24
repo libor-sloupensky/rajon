@@ -9,7 +9,7 @@ Katalog akcí a festivalů (poutě, slavnosti, food festivaly, vinobraní...) pr
 - **AI:** Anthropic Claude API (Haiku) — scraping, extrakce dat z webů a e-mailů
 - **Mapy:** Mapy.cz REST API
 - **DB:** MySQL (produkce: localhost na Webglobe)
-- **Deploy:** GitHub Actions + lftp → gve08.vas-server.cz
+- **Deploy:** GitHub Actions + lftp → ftp.tuptudu.cz
 - **Doména:** rajon.tuptudu.cz
 
 ## Moduly

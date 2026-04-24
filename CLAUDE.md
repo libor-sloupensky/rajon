@@ -32,7 +32,7 @@
 ## Deploy
 - GitHub Actions + lftp (smart deploy — jen změněné soubory)
 - deploy-hook.php pro post-deploy operace (OPcache, cache clear, migrace)
-- Server: gve08.vas-server.cz (Webglobe, stejný jako TupTuDu)
+- Hosting: Webglobe (stejný jako TupTuDu)
 - Doména: rajon.tuptudu.cz
 - DB: MySQL na localhost
 - `SESSION_LIFETIME=10080` (7 dní)

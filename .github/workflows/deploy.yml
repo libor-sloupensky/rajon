@@ -133,7 +133,7 @@ jobs:
           # Public — obsah public/
           rsync -a public/ deploy-public/
 
-      - name: Deploy app via lftp SFTP
+      - name: Deploy app via lftp FTP
         run: |
           sudo apt-get install -y lftp > /dev/null 2>&1
 
@@ -175,18 +175,18 @@ jobs:
           echo "---"
 
           lftp -e "
-            set sftp:connect-program 'ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -p 222';
+            set ftp:ssl-allow no;
             set xfer:clobber on;
             set net:timeout 30;
             set net:max-retries 3;
             set net:reconnect-interval-base 5;
-            open sftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@ftp.tuptudu.cz;
+            open ftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@ftp.tuptudu.cz;
             ${LFTP_SCRIPT}
             quit
           "
           echo "=== APP deploy complete ==="
 
-      - name: Deploy public via lftp SFTP
+      - name: Deploy public via lftp FTP
         run: |
           # === PUBLIC deploy → /tuptudu.cz/_sub/rajon/ ===
           LFTP_SCRIPT=""
@@ -231,12 +231,12 @@ jobs:
           echo "---"
 
           lftp -e "
-            set sftp:connect-program 'ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -p 222';
+            set ftp:ssl-allow no;
             set xfer:clobber on;
             set net:timeout 30;
             set net:max-retries 3;
             set net:reconnect-interval-base 5;
-            open sftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@ftp.tuptudu.cz;
+            open ftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@ftp.tuptudu.cz;
             ${LFTP_SCRIPT}
             quit
           "
