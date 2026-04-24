@@ -63,3 +63,4 @@
 | email | `modules/email.md` | IMAP zpracování, notifikace |
 | deploy | `modules/deploy.md` | GitHub Actions, FTP, deploy-hook |
 | admin | `modules/admin.md` | Administrace akcí, zdrojů, uživatelů |
+| historicka_data | `modules/historicka_data.md` | XLS import 2022–2025, akce_vykazy, staging |

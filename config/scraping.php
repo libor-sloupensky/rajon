@@ -86,6 +86,24 @@ return [
 
         // Speciální "zdroje"
         'manual' => ['*' => 100],       // admin úprava — nikdy nepřepsat
+
+        // Web pořadatele akce — primární zdroj pravdy (nad všechny katalogy)
+        // Aktivuje se buď flagem je_web_poradatele na zdroji, nebo detekcí domény akce.web_url
+        'web_poradatele' => [
+            'kontakt_email' => 98,
+            'kontakt_telefon' => 98,
+            'organizator' => 98,
+            'web_url' => 100,
+            'vstupne' => 95,
+            'datum_od' => 95,
+            'datum_do' => 95,
+            'cas' => 95,
+            'popis' => 90,
+            'adresa' => 95,
+            'velikost_info' => 90,
+            '*' => 95,
+        ],
+
         'excel' => [                     // historie franšízantů z Excelu
             'najem' => 100,
             'obrat' => 100,
@@ -99,6 +117,13 @@ return [
             '*' => 65,
         ],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Práh pro auto-propojení ročníků
+    |--------------------------------------------------------------------------
+    */
+    'auto_propojeni_similarity' => 90,   // similarity >= 90% + stejný okres → automaticky propojit
 
     /*
     |--------------------------------------------------------------------------

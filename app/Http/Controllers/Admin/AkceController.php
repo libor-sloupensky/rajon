@@ -94,6 +94,7 @@ class AkceController extends Controller
             'najem' => ['nullable', 'integer'],
             'obrat' => ['nullable', 'integer'],
             'poznamka' => ['nullable', 'string'],
+            'admin_komentar' => ['nullable', 'string'],
             'stav' => ['required', 'string'],
         ]);
 

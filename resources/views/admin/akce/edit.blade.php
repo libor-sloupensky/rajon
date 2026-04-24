@@ -128,6 +128,14 @@
                 </div>
             @endforeach
 
+            {{-- Admin komentář — AI sem NIKDY nezasahuje --}}
+            <div class="rounded-lg border border-purple-200 bg-purple-50 p-3">
+                <label class="block text-sm font-medium text-purple-900 mb-1">
+                    📝 Admin komentář <span class="text-xs text-purple-600">(AI nezasahuje, jen ruční úpravy / XLS import)</span>
+                </label>
+                <textarea name="admin_komentar" rows="3" class="w-full rounded-lg border border-purple-300 bg-white px-3 py-2 text-sm">{{ old('admin_komentar', $akce->admin_komentar) }}</textarea>
+            </div>
+
             {{-- Velikost info (read-only display) --}}
             @if($akce->velikost_info)
                 <div class="rounded bg-gray-50 p-3 border border-gray-200">

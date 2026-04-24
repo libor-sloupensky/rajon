@@ -1,0 +1,192 @@
+
+### Analýza festivaly.xlsx
+  - [Sheet1] záznamů: 28
+  - [List 1] záznamů: 0
+  ==> celkem v souboru: 28
+
+### Festivaly 2022.xlsx
+  - [Březen] záznamů: 9
+    header: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'cena najmu', 'poznamky', 'Kdo pujde']
+  - [Duben] záznamů: 14
+    header: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'cena najmu', 'poznamky', 'kdo pujde']
+  - [Květen] záznamů: 38
+    header: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'cena najmu', 'poznamky', 'Kdo jde']
+  - [Červen] záznamů: 46
+    header: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'cena najmu', 'poznamky', 'Kdo jde']
+  - [Červenec] záznamů: 46
+    header: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'Kdo pujde']
+  - [Srpen] záznamů: 24
+    header: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'cena najmu', 'poznamky', 'kdo pujde']
+  - [Záři] záznamů: 40
+    header: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'cena najmu', 'poznamky', 'trzba cca', 'Kdo pujde']
+  - [Říjen] záznamů: 24
+    header: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'web/', 'cena najmu', 'poznámky', 'kdo pujde']
+  - [Listopad] záznamů: 20
+    header: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'web', 'cena najmu', 'poznámky', 'kdo pujde']
+  - [Prosinec] záznamů: 16
+    header: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'web', 'cena najmu', 'poznámky', 'kdo pujde', 'zatím s ?']
+  ==> celkem v souboru: 277
+
+### Festivaly 2023.xlsx
+  - [Leden] záznamů: 3
+    header: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'kdo půjde']
+  - [Únor] záznamů: 5
+    header: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'trzba cca']
+  - [Březen] záznamů: 7
+    header: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'web', 'cena najmu', 'poznámky', 'kdo pujde']
+  - [Duben] záznamů: 15
+    header: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'web', 'cena najmu', 'poznámky', 'kdo pujde']
+  - [Květen] záznamů: 35
+    header: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'kdo půjde']
+  - [Červen] záznamů: 23
+    header: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'web', 'cena najmu', 'poznamky', 'kdo půjde']
+  - [Červenec] záznamů: 25
+    header: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'kdo půjde', 'kdo půjde']
+  - [Srpen] záznamů: 29
+    header: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'cena najmu', 'poznamky', 'kdo pujde']
+  - [Září] záznamů: 30
+    header: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'cena najmu', 'poznamky', 'trzba cca']
+  - [Říjen] záznamů: 14
+    header: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'kdo půjde']
+  - [Listopad] záznamů: 11
+    header: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'kdo půjde']
+  - [Prosinec] záznamů: 8
+    header: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'kdo půjde']
+  - [Vánoční akce] záznamů: 13
+  ==> celkem v souboru: 218
+
+### Festivaly 2024 (1.část).xlsx
+  - [List1] záznamů: 25
+    header: ['název', 'datum', 'místo', 'kontakt', 'mail', 'mobil', 'kdo by jel', 'poznámka']
+  - [List4] záznamů: 0
+  - [List2] záznamů: 0
+  - [List3] záznamů: 0
+  ==> celkem v souboru: 25
+
+### Festivaly 2024 (2.část) - Trhy Aleš.xlsx
+  - [České festivaly vína 2024] záznamů: 22
+  - [Food festivaly 2024] záznamů: 6
+  - [Craft beer festy 2024] záznamů: 4
+  - [Řemeslné trhy a jarmarky 2024] záznamů: 13
+  ==> celkem v souboru: 45
+
+### Měsíční přehled.xlsx
+  - [Říjen 2024] záznamů: 18
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda']
+  - [Listopad 2024] záznamů: 27
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  - [Prosinec 2024] záznamů: 31
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  - [Leden 2025] záznamů: 1
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  - [Únor 2025] záznamů: 3
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  - [Březen 2025] záznamů: 9
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  - [Duben 2025] záznamů: 28
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  - [Květen 2025] záznamů: 35
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  - [Červen 2025] záznamů: 27
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  - [Červenec 2025] záznamů: 16
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  - [Srpen 2025] záznamů: 8
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  - [Září 2025] záznamů: 6
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  - [Říjen 2025] záznamů: 1
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  - [Listopad 2025] záznamů: 0
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  - [Prosinec 2025] záznamů: 2
+    header: ['Datum', 'Akce', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  ==> celkem v souboru: 212
+
+### Poutě 2025.xlsx
+  - [Únor] záznamů: 1
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Poznámky / nájem']
+  - [Březen] záznamů: 0
+  - [Duben] záznamů: 9
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  - [Květen] záznamů: 28
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  - [Červen] záznamů: 26
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  - [Červenec] záznamů: 19
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  - [Srpen] záznamů: 33
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  - [Září] záznamů: 17
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  - [Říjen] záznamů: 1
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  - [Listopad] záznamů: 1
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  - [Pochody] záznamů: 9
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  ==> celkem v souboru: 144
+
+### Příprava 2024 výkaz 2023.xlsx
+  - [Únor] záznamů: 5
+    header: ['Akce', 'datum', 'brigádník', 'POS', 'PRODÁNO', 'prodej', 'výplata', 'nájem na akci']
+  - [Březen] záznamů: 3
+    header: ['Akce', 'datum', 'brigádník', 'POS', 'PRODÁNO', 'prodej', 'výplata', 'nájem na akci']
+  - [Duben] záznamů: 17
+    header: ['Akce', 'datum', 'čas na stánku', 'brigádník', 'POS', 'PRODÁNO', 'obrat', 'výplata', 'nájem na akci']
+  - [Květen] záznamů: 30
+    header: ['Akce', 'datum', 'brigádník', 'POS', 'PRODÁNO', 'obrat 2024', 'výplata', 'nájem na akci']
+  - [Červen] záznamů: 31
+  - [Červenec] záznamů: 32
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'Poznámky z minulých let', 'Poznámky 2024', 'Odkaz na akci']
+  - [Srpen] záznamů: 28
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'nájem/prodej', 'Poznámky', 'Odkaz na akci']
+  - [Září] záznamů: 90
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Poznámky']
+  - [Říjen] záznamů: 71
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Poznámky']
+  - [Listopad] záznamů: 88
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'Prodej', 'Poznámka']
+  - [Prosinec] záznamů: 148
+    header: ['Akce', 'datum', 'Město', 'Účast', 'nájem na akci', 'Poznámka']
+  - [Rezervované akce] záznamů: 35
+  ==> celkem v souboru: 578
+
+### Příprava 2025 výkaz 2024 v1..xlsx
+  - [Leden] záznamů: 2
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Poznámky']
+  - [Únor] záznamů: 9
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  - [Březen] záznamů: 16
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  - [Duben] záznamů: 48
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  - [Květen] záznamů: 57
+    header: ['Akce', 'Město', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  - [Červen] záznamů: 46
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  - [Červenec] záznamů: 27
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  - [Srpen] záznamů: 31
+    header: ['Akce', 'Město', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  - [Září] záznamů: 37
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  - [Říjen] záznamů: 13
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  - [Listopad] záznamů: 14
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  - [Prosinec] záznamů: 13
+    header: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  ==> celkem v souboru: 313
+
+### CELKOVÝ SOUHRN
+  Analýza festivaly.xlsx: 28
+  Festivaly 2022.xlsx: 277
+  Festivaly 2023.xlsx: 218
+  Festivaly 2024 (1.část).xlsx: 25
+  Festivaly 2024 (2.část) - Trhy Aleš.xlsx: 45
+  Měsíční přehled.xlsx: 212
+  Poutě 2025.xlsx: 144
+  Příprava 2024 výkaz 2023.xlsx: 578
+  Příprava 2025 výkaz 2024 v1..xlsx: 313
+  TOTAL: 1840

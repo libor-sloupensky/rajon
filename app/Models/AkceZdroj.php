@@ -20,6 +20,7 @@ class AkceZdroj extends Model
         'zdroj_id',
         'url',
         'externi_id',
+        'je_od_poradatele',
         'surova_data',
         'posledni_ziskani',
     ];
@@ -29,6 +30,7 @@ class AkceZdroj extends Model
         return [
             'surova_data' => 'array',
             'posledni_ziskani' => 'datetime',
+            'je_od_poradatele' => 'boolean',
         ];
     }
 

@@ -33,7 +33,10 @@ class AkceMerger
 
     public function merge(Akce $existujici, array $noveData, Zdroj $zdroj, string $url): array
     {
-        $zdrojKey = $zdroj->cms_typ ?: 'custom';
+        // Detekce: je aktuální zdroj webem pořadatele této akce?
+        $jeOdPoradatele = $this->jeOdPoradatele($zdroj, $url, $existujici, $noveData);
+        $zdrojKey = $jeOdPoradatele ? 'web_poradatele' : ($zdroj->cms_typ ?: 'custom');
+
         $trust = config('scraping.trust');
         $mergeCfg = config('scraping.merge');
 
@@ -171,7 +174,9 @@ class AkceMerger
     /** Vyplnit pole_zdroje pro novou akci (všechna pole jsou ze zdroje). */
     public function inicializujZdroje(Akce $akce, Zdroj $zdroj): void
     {
-        $zdrojKey = $zdroj->cms_typ ?: 'custom';
+        // Detekce webu pořadatele i pro novou akci
+        $jeOdPoradatele = $this->jeOdPoradatele($zdroj, $akce->zdroj_url ?? '', $akce, []);
+        $zdrojKey = $jeOdPoradatele ? 'web_poradatele' : ($zdroj->cms_typ ?: 'custom');
         $zdroje = [];
 
         foreach ($this->mergovana as $pole) {
@@ -193,6 +198,36 @@ class AkceMerger
     {
         $zdrojovy = $trust[$zdrojKey] ?? ($trust['custom'] ?? ['*' => 50]);
         return (int) ($zdrojovy[$pole] ?? $zdrojovy['*'] ?? 50);
+    }
+
+    /**
+     * Detekuje, zda aktuální zdroj je webem pořadatele akce.
+     * Kritéria:
+     *   1. Zdroj má explicitní flag je_web_poradatele=true
+     *   2. Doména URL scrapingu se shoduje s doménou akce.web_url
+     */
+    protected function jeOdPoradatele(Zdroj $zdroj, string $url, Akce $akce, array $noveData): bool
+    {
+        if ($zdroj->je_web_poradatele) {
+            return true;
+        }
+
+        $webAkce = $noveData['web_url'] ?? $akce->web_url ?? null;
+        if (empty($webAkce) || empty($url)) {
+            return false;
+        }
+
+        return $this->stejnaDomena($url, $webAkce);
+    }
+
+    protected function stejnaDomena(string $url1, string $url2): bool
+    {
+        $h1 = parse_url($url1, PHP_URL_HOST);
+        $h2 = parse_url($url2, PHP_URL_HOST);
+        if (!$h1 || !$h2) return false;
+        $h1 = preg_replace('/^www\./', '', mb_strtolower($h1));
+        $h2 = preg_replace('/^www\./', '', mb_strtolower($h2));
+        return $h1 === $h2;
     }
 
     protected function jePrazdne(mixed $hodnota): bool

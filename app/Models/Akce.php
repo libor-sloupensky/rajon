@@ -50,6 +50,7 @@ class Akce extends Model
         'obrat',
         'vstupne',
         'poznamka',
+        'admin_komentar',
         'stav',
         'uzivatel_id',
         'zdroj_id',

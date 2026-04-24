@@ -1,0 +1,779 @@
+================================================================================
+FILE: Analýza festivaly.xlsx  (18597 B)
+================================================================================
+
+--- sheet: 'Sheet1'  rows=1000 cols=8 ---
+  r1: ['', '', 'dní', 'celkem', 'na den', 'FB vlastní stránka', 'FB příspěvek', '']
+  r2: ['Dětský den Blansko ', '2023-06-03 00:00:00', '1', '6480', '6480', '', 'první 15like, druhý 69 like', '']
+  r3: ['Slavnosti města Olomouc ', '2006-03-02 00:00:00', '1', '25733', '25733', '2,3tis.', '', '']
+  r4: ['Slavnosti břeclav ', '9-10.6.', '2', '55509', '27754.5', '8,3tis', '', '']
+  r5: ['Festival kávy a čaje ', '10.-11.6.', '2', '14817', '7408.5', '468 lidí zareagovalo', '', '']
+  r6: ['ROCK FOR PEOPLE ', '8.-11.6.', '4', '59822', '14955.5', '120tis sledujících', '', '']
+  r7: ['Vyznání růžím ', '10-11.6.', '2', '\xa0', '#VALUE!', '1tis', '', '']
+  r8: ['Slavnosti růžového vína - Třebíč ', '17.6 12-24h ', '1', '7930', '7930', '2,1tis', '', '']
+
+--- sheet: 'List 1'  rows=1 cols=1 ---
+================================================================================
+FILE: Festivaly 2022.xlsx  (161492 B)
+================================================================================
+
+--- sheet: 'Březen'  rows=999 cols=26 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'cena najmu', 'poznamky', 'Kdo pujde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Čoko Fest 2022', '2022-03-04 00:00:00', 'Kroměřiž', '', 'https://festivaly.eu/coko-fest-2021-vystavist', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Kolem světa', '18.-20.3.', 'Praha', '', 'https://kolemsveta.cz/festival2022/', 'karel.wolf@gmail.com', '', '', '6000,- kč', 'Eva +Nasťa', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Slavnosti mandloní a vína 2022 v Hustopečích', '25.-27.3.', 'Hustopeče', '', '', 'tic@hustopece.cz', '519 412 909', '', '', 'Dan P', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Slavnosti Jara', '2022-03-26 00:00:00', 'Blansko', '', '', '', '', '', 'nájem', 'Tomáš', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['čokofestival ', '25-27.04', 'české budějovice', '', 'https://www.vcb.cz/navstevnici/akce/cokoladov', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Duben'  rows=1006 cols=25 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'cena najmu', 'poznamky', 'kdo pujde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Chris Cokofest', '1-3.4.', 'Ostrava', '', '', '', '', '', '', 'Matěj Kačka', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Farmarsko -Potravinarske trhy ', '2022-04-02 00:00:00', 'Hradec Kralové', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['April wine', '1.-2.4.', 'Hradec Kralové', '', 'https://www.vinarskecentrum.cz/o-vine/vinarsk', '', '', 'zdarma', 'p. Kopelentová (potravinař roku, chce nas tam', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Járni Street Food Festival Tábor', '2022-04-02 00:00:00', 'Tábor', '', 'https://www.visittabor.eu/akce/jarni-street-f', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['svatky jara častolovice', '8-10.4', 'Častolovice', '', 'https://www.kudyznudy.cz/akce/velikonoce-svat', '', 'Helmich 721311719', '1.500,- kč ', 'dle známých velmi navštěvovaná akce', 'Známi Libora', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Květen'  rows=1013 cols=25 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'cena najmu', 'poznamky', 'Kdo jde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Golf', '2022-05-05 00:00:00', 'Karštejn', 'Lena Ondráčková - GPA Event s.r.o.', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Tři hrady', '2022-05-07 00:00:00', 'Potštejn', '', 'http://kct-sopotnice.com/index.php/pres-tri-h', '', '', '', 'dojednat se starostou potštejna', 'Verča?', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Hradecké nábřeží gurmánů - Chuť jara', '2022-05-07 00:00:00', 'Hradec Králové', 'RAKKHK', 'https://z-p3-upload.facebook.com/events/29756', '', '', 'Zdarma', 'Lenka Kopelentová, odeslaná přihláška', 'Nasťa + Tom', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Festival pro čolka', '2022-05-07 00:00:00', '', '', 'https://www.informuji.cz/akce/z/251695-festiv', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['burger Street Festival', '6.-7.5.', 'Brno', '', 'https://burgerstreetfestival.cz/', '', '', '', 'vice měst', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Červen'  rows=1026 cols=25 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'cena najmu', 'poznamky', 'Kdo jde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Den děti', '2022-06-01 00:00:00', 'Mikulov', 'Mikulovská rozvojová, s.r.o.', '', 'konesova@mikulovskarozvojova.cz', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Golf', '2022-06-02 00:00:00', 'Casa Serena (Kutná Hora)', 'Lena Ondráčková - GPA Event s.r.o.', '', 'lena.ondrackova@gmail.com', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Po Valašsku na skútru', '2-5.6', 'Rožnov pod Radhoštěm (Zlínský)', 'Radek R.', 'http://wsrider.cz', '', '736663396', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Svátky města Olomouce', '3.6. - 4.6.', 'Olomouc', '', '', 'Lebrová ', '739036161', '2000 Kč komplet + pytlík do soutěže', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Amosův Brandýs ', '3-5.6', 'Brandýs nad Orlicí', '', '', '', '', '', '18km od Vamberka', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Červenec'  rows=1028 cols=26 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'Kdo pujde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Pouť Vysočany', '2022-07-03 00:00:00', 'Vysočany', '', '', '', '', '', '120Kč na místě(nebo se dohodnem na pytlík)', '', 'Janča', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['VELKOPAVLOVICKÉ MERUŇKOBRANÍ', '2022-07-02 00:00:00', 'Velké Pavlovice', '', '', '', '', '', '500', '', 'Lucka Ptáčková', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Léto v centru Brna', '28.6.-2.7.', 'Brno', 'Bpoint', '', 'sterbova@bpoint.cz', '733 737 917', '1900 Kč/den bez DPH', '', 'Jana', 'Brno', 'Bpoint', '', 'sterbova@bpoint.cz', '733 737 917', '1900 Kč/den bez DPH', '', 'Jana', '', '', '', '', '', '', '', '']
+  r7: ['Street Food & Beer Festival', '2.-3.7', 'Sněžný', 'restaurace u Kosků', '', '', '777095576', '', '', '', 'Lucka Ptáčková', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Pekelný poloostrov 2022', '1.-2.7.', 'Holyšov', '', 'https://pekelnyostrov.cz/', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Srpen'  rows=1018 cols=26 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'cena najmu', 'poznamky', 'kdo pujde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Dej si food Slavnosti okurek ', '5.-6.8.', 'Znojmo', '', '', '', '', '', '', 'Matěj a Silva', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Dej si food', '2022-08-06 00:00:00', 'Luka nad Jihlavou', '', 'Salátová', '', '', '', '', 'Lucie Ptáčková', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Šikland', '2022-08-07 00:00:00', '', '', '', '', '', '', '', 'Lucie Ptáčková', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Brno ZOO', '6.-7.8.', 'Brno', 'Peková 724963680', '', '', '', '', '', 'Veronika Adamová 18let', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Sabor Latino Praha - gastrofest v centru Prah', '4-7.8.', '', '', '', '', '', '', 'Nájemné - 14 000 Kč za čtyři dni nebo jednotl', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Záři'  rows=1027 cols=26 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'cena najmu', 'poznamky', 'trzba cca', 'Kdo pujde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['HK Svátek Víno', '2022-09-02 00:00:00', 'Hradec Králové', '', '', '', '', '', '', '', 'Matěj', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Jídlo na ulici', '2022-09-03 00:00:00', 'Zábřeh', '', 'https://www.facebook.com/jidlonaulici/', '', '', '', '', '', 'Matěj', 'přihláška podaná, potvrzeno', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Slavnosti chleba ve Slupi 2022', '2022-09-03 00:00:00', 'Slup', '', '', '', '541 421 480', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Kinder Fest výstaviště', '2022-09-03 00:00:00', 'Brno ', '', 'Nikolas Pieszka@eventsczsk.cz', '', '', '', 'Nfc tron 18%', 'šílená komunikace!!!! do poslední chvíle nesc', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Food Litovel', '2022-09-03 00:00:00', 'Litovel', '', 'ALice Hemerková Bittnerová', '', '777647581', '', 'bez nájmu, moc nás chtějí, akce 12-22h, potvr', '', 'Dáša', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Říjen'  rows=1013 cols=25 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'web/', 'cena najmu', 'poznámky', 'kdo pujde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Svatohubertské slavnosti v Kuksu', '2022-10-01 00:00:00', '', 'Dominik Haž', '', '', '', 'potvrzena přihláška viz mail', '', 'Lucie Ptáčková ', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Caravaning', '2022-09-07 00:00:00', 'Brno', '', '', '', '', '3000', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Slavnosti dobrého jídla', '4 - 8.10', 'Brno', '', 'sterbova@bpoint.cz', '733 737 917', '54000', '11495', 'přihlášeno,info v mailu', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Beer park', '7-8.10', 'Bjorn sad', '', 'Ivo Krejčiřík', '776 633 351', '13000', '2000', '', 'Daniel Tesařík,Roman Nguyen', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Burger festival', '30.9-2.10', 'OC Vaňkovka', '', '', '', '', '', '', 'odeslaná přihláška', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Listopad'  rows=1012 cols=25 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'web', 'cena najmu', 'poznámky', 'kdo pujde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Festival LIFE', '4.-6.11.', 'Brno výstaviště', '', '', '', '', '', 'odeslaná přihláška', 'Kristína 5+6, Verča Adamová 4.11', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Hubertské slavnosti zámek Plumlov', '2022-11-05 00:00:00', 'Plumlov', 'kastelán 775999815', '', '', '', '200', '', 'Lucie Ptáčková', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Entomologická burza', '2022-11-05 00:00:00', 'Kroměříž', '', '', '604 670 861', '', '600', '', '', 'Lucie ', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Extreme food plno-zamítnuto', '2022-11-05 00:00:00', 'Ostrava', '', '', '', '', '1500 bez dph ', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Kurimský svátek vína', '2022-11-12 00:00:00', 'Kuřim', 'Šmahelová 602955050', '', '', '', '200', 'začíná v 10, můžem dojet tak at stihnem nachy', 'Verča Adamová', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Prosinec'  rows=1011 cols=26 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'web', 'cena najmu', 'poznámky', 'kdo pujde', 'zatím s ?', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['u Tesca až do Vánoc', '', 'Kutná Hora', '', 'sonazacek@seznam..cz', '731580363', '', 'zdarma, jen elektřina, vlastní stánek', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Výstaviště Flora Olomouc tržnice', '26.11.-23.12', 'Olomouc ', '', '', '', '', '10000 bez dph', '', 'Iveta Fischerová v týdnu, ', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Vánoční jarmark', '2022-12-02 00:00:00', 'Boskovice', '', '', '', '', '600', '', 'Radek Burian', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Vánoční jarmark', '2-3.12', 'Luhačovice', '', '', '', '', '', '', 'Matěj', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Vánoce na výstavišti', '1-4.12', 'České Budějovice', '', 'rotbauer@vcb.cz', '778 454 064 zavolat!', 'poslaná přihláška', '1200m2', '', 'Jarda', 'Daniela Krulická, Iveta Fábryová', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+================================================================================
+FILE: Festivaly 2023.xlsx  (238025 B)
+================================================================================
+
+--- sheet: 'Leden'  rows=1000 cols=25 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'kdo půjde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Entomologický den', '28.1. 8-13h', 'Kroměříž výstavičtě', 'Čagánek', 'hobbyvystaviste@tiscali.cz', '604670861', 'www.hobbyvystaviste.cz', '', 'přihláška odeslána 5.1. - zamítnuto, je tam V', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Únor'  rows=1000 cols=26 ---
+  r1: ['  ', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'trzba cca', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Masopustní jarmark v Kroměříži', '2022-02-18 00:00:00', 'Kroměříž', 'Rajmišová', '<rajli@email.cz>', '603 806 965', '', '600', 'poslaná přihláška 5.12.2022', '', 'Zdenka Hrozková', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Lanškrounský Masopust s Flerjarmarkem', '2023-02-11 00:00:00', 'Lanškroun', 'Helena Görnerová', 'info@helenag.cz', '604678578', 'https://trhylanskroun.cz', '500,- na místě', 'přihlášeno na webtržiště - přijatí', '', 'Zdenka Hrozková', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Čokofestival', '10-12.2', 'Olomouc Šantovka', '', '', '', '', '3000bezdph', 'Poslaná přihlška na Chrise', '', 'Dáša, Roman Nguyen', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['SALIMATECH 2023', '7-9.2', 'BVV', '', '', '', '', '21235,-', 'Neprodejní akce, pro nás prodejně skvělá!!!', '', 'Dáša, Libor', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['24.-26. 2. 2023 Brno (Nová Zbrojovka) - BSF W', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Březen'  rows=1000 cols=26 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'web', 'cena najmu', 'poznámky', 'kdo pujde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Čokofestival', '10-12.3.', 'Hradec Králové OC Futurum', '', '', '', '', '3000bez dph', 'poslaná přihláška na Chrise', 'Tom Burian', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Tvořivá Olomouc', '18-19.3.', 'Olomouc', 'Marta Nevrlá', 'info @tvoriva-olomouc.cz', '605 543 051', '', '', 'vypsaná přihláška na webu', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Mandlové slavnosti', '24-26.3 - prodej jen 25.3.', 'Hustopeče', '', '', '', '', '1600,-', 'odeslaná přihláška', 'Tom Burian', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['17.-19. 3. 2023 Ostrava (Trojhalí) - BSF Wint', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Čokofestival', '24-26.3', 'České Budějovice', '', '', '', '', '', '', 'Matěj', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Duben'  rows=1000 cols=26 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'web', 'cena najmu', 'poznámky', 'kdo pujde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Velikonoční výstava ', '31.3-2.4.', 'Častolovice', '721 311 719 p. Helmich', '', '', 'https://www.zahradkari.com/news/velikonocni-v', '2000,- složenkou', 'pošle přihlášku poštou', 'Dáša+Adela Korábová', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Slavnost', '1.4. 8-14h', 'Zlín', 'Míša Topič', 'michaelatopic@zlin.eu', '734 111 694', '', '150,-+3 balíčky', 'netahat stánek', 'Dáša', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['veliká pouť', '7.-10.4.', 'Kutná Hora', 'Josef Tříska', '', '724050491', '', '3000', 'místo č 188 - nájezd okolo 7h', 'Zbyněk Vlašic', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Pivní festival Brno jaro', '18.-22.4.  11-22h', 'Svoboďák', 'Markéta Štěrbová Break Point', '', '', '', '11495,-', 'přihlášeno', '19,20 -Roman, 22 - Jan Uhrin', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Flora', '20.-23.4.', 'Olomouc', '', '', '', '', '5960,-bez dph', 'venkovní prostor', 'Jan Uhrin, Pavel Horák', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Květen'  rows=1000 cols=26 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'kdo půjde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Food Festival Holice', '1.5.10-18h', 'Holice', 'Vít Doubravský', 'foodfestival@nahlubaku.cz', '774 138 594', '', '1500,-', 'poslaná přihláška', 'Adéla Korábová', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Tři hrady', '2022-05-06 00:00:00', 'Potštejn', 'Starosta 602457468', 'http://kct-sopotnice.com/index.php/pres-tri-h', '', '', '0,-', '', 'Lenka Ciglerová', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Bohemia Apetit Fest', '6.5.  11-19h', 'Chrudim', 'Eduard Kropáček, mob.: 777 788 890, catering@', '', '', '', '500+balíčky', '', 'Radek Burian', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Slavnosti dobrého jídla', '9.-.13.5.', 'Svobodák', 'Markéta Štěrbová Break Point', '', '', '', '', 'v mailu potvrzeno, přihlášeno', '9,10,13 - Šárka Neprašová, 11 -Anička Kubelko', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Červen'  rows=1000 cols=26 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'web', 'cena najmu', 'poznamky', 'kdo půjde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Slavnosti města Olomouc', '2-3.6', 'Olomouc', '', '', '', '', 'NFC 20%', '', 'Lucie Bydžovská', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Dětský den ', '2023-06-03 00:00:00', 'Blansko', 'Blansko zamecký park', 'pani Sokolová', 'https://www.kulturablansko.cz/', 'ksmb@blansko.cz', '1350,-', '', 'Lukáš Souček', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Slavnosti břeclav', '9-10.6.', 'Břeclav', 'Dana Trchalíková', '725 540 162', '', '', 'NFC 20%', '', 'Jaroslav Záděra', 'Info má, pro věci ve čtvrtek', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Festival kávy a čaje', '10.-11.6.', 'Kroměříž výstaviště', 'Čagánek', 'hobbyvystaviste@tiscali.cz', '604670861', 'www.hobbyvystaviste.cz', '2000', 'přihláška odeslána 5.1. - potvrzeno, zaplacen', 'Silvie', 'info má, pro věci čt nebo pátek', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Červenec'  rows=1000 cols=26 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'kdo půjde', 'kdo půjde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Pivní fetsival 15tý ročník', '1.-2.7.', 'Padochov u Oslavan', 'Pazourek', 'pazinv@seznam.cz', '608720862', 'webtržiště-mail', '1452,-', '', 'Adéla Lekešová', 'přijede pro věci ve středu', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['157. výročí bitvy u Hradce Králové', '2023-07-01 00:00:00', 'Hradec Hrálové', 'obecní úřad Všestary', 'Monika Kutálková 495458028 urad@vsestary-obec', '', '723 627 226', '600,-', '', 'Lenka C ', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Šikland sraz moto', '2023-07-01 00:00:00', 'Šikland', 'Hemer', '', '', '', '2000Kč na místě!!!', 'domluveno, jiný pořadatel odsouhlasil jiný hm', 'Marek Krumpholc', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Sváteční jarmark v KUKSU', '5.-9.7.', 'Kuks', '', ';', '', '', '2500,-+2000Vratná kauce,uhrazeno 5.6.23', '', 'Lucie Bydžovská', '', 'poslat 70 perník+vzorky', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Den fotbalu Polička', '7.-9.7.', 'Polička, Pardubický kraj', '', '', '', '', '18% NFC', '', 'Lucie Fagulcová', '', 'uterý 4.7. dopo', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Srpen'  rows=1000 cols=26 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'web', 'mail', 'mobil', 'cena najmu', 'poznamky', 'kdo pujde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Tradiční jarmark v Kuksu', '5-6.8', 'Kuks', 'Dominik Haž', '', 'haz.dominik@ccrkhk.cz', '702 147 371', '1000', 'zrušen organizátorem skrz počasí', 'Adéla Korábová', 'do Vamberka posláno - stánek, box, peněženka,', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Porcinkule Opočno', 'možnost prodeje od 4.8..-6.8.', 'Opočno', 'Stojanová', 'https://www.opocno.cz/porcinkule-v-opocne/a-1', 'stojanova@mu.opocno.cz', '725475557', '980,- uhrazeno', 'přihlášeno', 'Lucie Bydžovská', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Svatovavřinecké slavnosti Hodonín', '2023-08-05 00:00:00', 'Hodonín', 'Pachlová', 'pachlova@dkhodonin.cz', '', '', '400,-', 'přihlášeno', 'Radka Flegrová', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Pouť Úsov', '', 'Úsov', '', '', '', '', '', '', 'Josef s tyčkama', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Porciunkule  Hostinné', '5-6.8 pátek4.8. asi od večera', 'Hostinné', 'Janeček 602376505,bratr 602327571', '', '', 'https://www.porciunkule.cz/program', '', 'voláno a sms 23.6.', 'daleko a bez brigádníka, včas zrušeno', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Září'  rows=1000 cols=25 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'cena najmu', 'poznamky', 'trzba cca', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Chillibraní Bzzzukot', '2023-09-02 00:00:00', 'Židenice', 'Zuzana Vávrová', '<zuzka@chillibrani.cz>', '', '1700,- + 6 pytlíků propagace', 'Letošní svátek chilli bude a v brněnských Žid', '', 'Lenka Ciglerová pos 1', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['IV. kvalifikace na 133. VP', '2023-09-02 00:00:00', 'Pardubice', 'EventB2B', '', '', '', '', '', 'Adéla nemuže', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Pouť ke svatému Jiljí', '2023-09-03 00:00:00', 'Svitavy', 'Haraštová', '', '734685285', '200,-', 'přihlásit 1.4.', '', 'Helena Neduchalová', 'https://www.ic.svitavy.cz/cs/m-836-stankovy-p', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Food piknik Event Park Ladronka, Praha 6', '3.9. 11-18h', 'Praha', 'Petr Farský', 'petr.farsky@cncenter.cz', '724014616', '5000,- + 950ks pytlíků do košů?', 'nájezd do 9.30', '', 'Burdíková Lucie z ČB- upřesníme, zaučení by b', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Food festival na zámku', '2022-09-02 00:00:00', 'Kostelec nad Orlicí', 'Ivona Jasníková 734709023, Tereza Jasníková 7', '', '', '1000,-', 'přihláška odeslána 13.12.', '', 'Helena Neduchalová', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Říjen'  rows=1000 cols=26 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'kdo půjde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Entomologický den', '2023-10-21 00:00:00', 'Kroměříž výstaviště', 'Čagánek', 'hobbyvystaviste@tiscali.cz', '604670861', 'www.hobbyvystaviste.cz', '', 'přihláška odeslána 5.1. - zamítnuto, je tam V', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['OLIMA  FLORA', '5. 10. – 8. 10. 2023', 'Olomouc', 'Číhalová', '', '', '', '7212', '', 'Helena Neduchalová', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Jablkobraní 13.30-19h  ', '2023-10-07 00:00:00', 'Drnovice u Kunštátu', '', '737260905 - pani volala, pošle mail', '', '', 'Zdarma', '', 'Radka Fléglová', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['133 Velká Pardubická', '7-8.10', 'Pardubice', 'EventB2B', 'Zemek', '', '33000', '12705,- včetně energií', '', 'Martin Stříž', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Slavnosti dobrého jídla', '3. - 7. 10.', 'Svoboďák', 'Markéta Štěrbová Break Point', '', '', '', 'Chceme slevu, dali přednost jiným', 'přihlášeno', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Listopad'  rows=1000 cols=26 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'kdo půjde', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Výlov rybníka Olšovec ', '4-5.11.', 'Jedovnice', '', 'kemp@olsovec.cz', '724783881', '', '3000,-', '', 'Tom', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Farmářské trhy', '2023-11-10 00:00:00', 'Lipník na Bečvou', '', '', '', '', '', '', 'Helena Neduchalová', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Svatomartinské oslavy', '11.11. 10-16h', 'Jaroměř', 'Košková', 'mks2.jaromer@seznam.cz', '777 088 619', '', '0', 'příjezd na nachystání do 10', 'Lucka Hanáková', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['svatomartinské hodování', '2023-11-11 00:00:00', 'Kroměříž', 'Rajmišová', '', '', '', '300,-', '', 'Helena Neduchalová', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Vin(n)osti svatého Martina', '12. - 15. 11.', 'Svoboďák', 'Markéta Štěrbová Break Point', '', '', '', '', 'v mailu potvrzeno, přihláška nezaslána', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Prosinec'  rows=1000 cols=10 ---
+  r1: ['Food festivaly', '', '', '', '', '', '', '', '', '']
+  r2: ['', '', '', '', '', '', '', '', '', '']
+  r3: ['nazev', 'termin', 'misto', 'organizator', 'mail', 'mobil', 'organizator', 'cena najmu', 'poznamky', 'kdo půjde']
+  r4: ['Vánoce na výstavišti pavilon T1', '30.11-3.12', 'České Budějovice', '', '', '', '', '4114,-', 'přiháška 9.10.', '']
+  r5: ['Andělské Vánoce', '1.-3.12', 'Kroměříž výstaviště', 'Čagánek', 'hobbyvystaviste@tiscali.cz', '604670861', 'www.hobbyvystaviste.cz', '2000,-', 'přihláška odeslána 5.1.', 'Helena Neduchalová']
+  r6: ['Jarmark', '3.-11.', 'Hodonín', '', '', '', '', '', '', 'Helena Neduchalová']
+  r7: ['Adventní punčování', '2023-12-02 00:00:00', 'Hustopeče', 'Karolína Hrnčiříková', 'hrncirikova@hustopece.cz', '775 095 526', '', '', '', 'Radka Fléglová']
+  r8: ['Vánoční Flerjarmark', '2023-12-10 00:00:00', 'Česká Třebová', 'info@trhyceskatrebova.cz', 'Görnerová', '604678578', '', '', '', 'Lucie Hanáková']
+
+--- sheet: 'Vánoční akce'  rows=1000 cols=2 ---
+  r1: ['Vánoční trhy', '']
+  r2: ['', '']
+  r3: ['Dlouhodobé trhy:', '']
+  r4: ['Hradec Králové', '']
+  r5: ['Olomouc', 'horní, dolní náměstí, tržnice']
+  r6: ['Praha', 'vánoční trhy na Praze 11 Háje se konají 25 ro']
+  r7: ['Karlovy Vary', 'před OC Varyáda v Karlových Varech se nám uvo']
+  r8: ['Úštěk - slet andělů (daleko) Litoměřice', 'https://www.facebook.com/photo/?fbid=63461245']
+================================================================================
+FILE: Festivaly 2024 (1.část).xlsx  (14877 B)
+================================================================================
+
+--- sheet: 'List1'  rows=45 cols=9 ---
+  r1: ['název', 'datum', 'místo', 'kontakt', 'mail', 'mobil', 'kdo by jel', 'poznámka', '']
+  r2: ['Čokofestival', '19-21.1.2024', 'České Budějovice', 'Chris', '', '', 'Lucie Budíková', '', '']
+  r3: ['Masopust Josefov', '2023-02-10 00:00:00', 'Jaroměř', 'Krejčová', '<krejcova@pevnostjosefov.cz>', '725 759 614', '', '', '']
+  r4: ['Novo Expo', '2024-03-01 00:00:00', 'Nové Mesto nad Metují', '', '', '', '', 'zdarma, velká akce a zámku, organizátoři jako', '']
+  r5: ['Trhy Česká Třebová', '24.3.', 'Česká Třebová', 'Görnerová', 'info@trhyceskatrebova.cz', '604678578', '', '', '']
+  r6: ['Mandlové slavnosti', '22-24.3.2024', 'Hustopeče', '', 'https://www.slavnosti-mandloni.cz/', '', '', '', '']
+  r7: ['Novo expo days', '25.4. - 28.4. 2024', 'Nové město nad metují', '', '', '', '', 'nabízejí zdarma . 3 000 - 5 000 OSOB', '']
+  r8: ['Velikonoční jarmark', '2024-03-27 00:00:00', 'Hradec Králové - Pouchov', 'Josef Matouš', 'JosefMatousUOP@seznam.cz', '', '', '', '']
+
+--- sheet: 'List4'  rows=1 cols=1 ---
+
+--- sheet: 'List2'  rows=1 cols=1 ---
+
+--- sheet: 'List3'  rows=1 cols=1 ---
+================================================================================
+FILE: Festivaly 2024 (2.část) - Trhy Aleš.xlsx  (20154 B)
+================================================================================
+
+--- sheet: 'České festivaly vína 2024'  rows=38 cols=6 ---
+  r1: ['Datum', 'Název akce', 'Ročník', 'Místo konání', 'Čas konání', 'Očekávaná návštěvnost']
+  r2: ['20.4.', 'Festival vína Červený Hrádek', '3.', 'zámek Červený Hrádek v Jirkově', '13:00 - 22:00', '3000']
+  r3: ['26. - 27.4.', 'Plzeňský festival vína - jaro', '8.', 'Smetanovy a Kopeckého sady, Plzeň', '13:00 - 22:00', '11000']
+  r4: ['4.5.', 'Chotěšovský festival vína', '7.', 'klášter Chotěšov', '13:00 - 22:00', '2000']
+  r5: ['11.5.', 'Chebský festival vína', '4.', 'nám. Krále Jiřího z Poděbrad, Cheb', '13:00 - 22:00', '4000']
+  r6: ['18.5.', 'Strakonický festival vína', '3.', 'Panská zahrada, Strakonice', '13:00 - 22:00', '2000']
+  r7: ['25.5.', 'Domažlický festival vína', '2.', 'náměstí Míru, Domažlice', '13:00 - 22:00', '4000']
+  r8: ['1.6.', 'Ostrovský festival vína', '2.', 'Zámecký park, Ostrov', '13:00 - 22:00', '3000']
+
+--- sheet: 'Food festivaly 2024'  rows=6 cols=6 ---
+  r1: ['Datum', 'Název akce', 'Ročník', 'Místo konání', 'Čas konání', 'Očekávaná návštěvnost']
+  r2: ['1.5.', 'Street food piknik Přeštice', '3.', 'Masarykovo náměstí, Přeštice', '10:00 - 18:00', '3000']
+  r3: ['8.6.', 'Víno a jídlo na zámku Kozel', '6.', 'Státní zámek Kozel', '11:00 - 20:00', '3000']
+  r4: ['21.7.', 'Street food piknik Poděbrady', '5.', 'Lázeňská kolonáda, Poděbrady', '10:00 - 18:00', '6000']
+  r5: ['4.8.', 'Street food piknik Trutnov', '5.', 'Městský park, Trutnov', '10:00 - 18:00', '4500']
+  r6: ['27.10.', 'Street food piknik Jaroměř', '4.', 'Masarykovy sady, Jaroměř', '10:00 - 17:00', '3000']
+
+--- sheet: 'Craft beer festy 2024'  rows=33 cols=6 ---
+  r1: ['Datum', 'Název akce', 'Ročník', 'Místo konání', 'Čas konání', 'Očekávaná návštěvnost']
+  r2: ['13.4.', 'Craft beer fest Mariánské Lázně', '2.', 'Hlavní kolonáda, Mariánské Lázně', '12:00 - 22:00', '3500']
+  r3: ['22.6.', 'Craft beer fest Kolín', '3.', 'Karlovo náměstí, Kolín', '12:00 - 22:00', '3500']
+  r4: ['29.6.', 'Craft beer fest Poděbrady', '4.', 'Lázeňská kolonáda, Poděbrady', '12:00 - 22:00', '5000']
+  r5: ['', '', '', '', '', '']
+  r6: ['', '', '', '', '', '']
+  r7: ['', '', '', '', '', '']
+  r8: ['', '', '', '', '', '']
+
+--- sheet: 'Řemeslné trhy a jarmarky 2024'  rows=15 cols=4 ---
+  r1: ['Datum', 'Název akce', 'Místo konání', 'Čas konání']
+  r2: ['17.3.', 'Litický velikonoční jarmark', 'Budilovo náměstí, Plzeň-Litice', '9:00 - 17:00']
+  r3: ['23.3.', 'Velikonoční jarmark Průhonice', 'Květnové náměstí, Průhonice', '9:00 - 16:00']
+  r4: ['24.3.', 'Velikonoční jarmark Rokycany', 'Masarykovo náměstí, Rokycany', '10:00 - 17:00']
+  r5: ['25. - 28.3.', 'Velikonoční trhy Trutnov', 'Krakonošovo náměstí, Trutnov', '9:00 - 17:00']
+  r6: ['29. - 31.3.', 'Velikonoční trhy Poděbrady', 'Lázeňská kolonáda, Poděbrady', '10:00 - 18:00']
+  r7: ['31.3. - 1.4.', 'Velikonoční jarmark na zámku Kozel', 'Státní zámek Kozel', '10:00 - 18:00']
+  r8: ['8.6.', 'Zámecké slavnosti na zámku Kynžvart ', 'Státní zámek Kynžvart', '10:00 - 17:00']
+================================================================================
+FILE: Měsíční přehled.xlsx  (41607 B)
+================================================================================
+
+--- sheet: 'Říjen 2024'  rows=20 cols=7 ---
+  r1: ['', '', '', '', '', '', '']
+  r2: ['', 'Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', '']
+  r3: ['', '3.-6.10. ', 'Veletrh Flora Olomouc (OLIMA)', '50000', '7260', 'Franšíza', '']
+  r4: ['', '05.10.', 'Písecký festival Medu a jablek', '1500', '1000', '1275', '']
+  r5: ['', '2024-10-05 00:00:00', 'Svatohubertské slavnosti', '10000', '500', '1650', '']
+  r6: ['', '12.10;', 'Bramborobraní ', '8000', '300', 'Franšíza', '']
+  r7: ['', '2024-10-12 00:00:00', 'Farmářské trhy Pardubice', '2000', '200', 'Franšíza', '']
+  r8: ['', '12.10.', '133 Velká Pardubická', '5000', '7260', 'Franšíza', '']
+
+--- sheet: 'Listopad 2024'  rows=29 cols=7 ---
+  r1: ['', '', '', '', '', '', '']
+  r2: ['', 'Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  r3: ['', '2024-11-03 00:00:00', 'Hobby burza sběratelů', '5000', '1000', 'Franšíza', 'Slezáková']
+  r4: ['', '2024-11-02 00:00:00', 'Trhy Jiřák', '5000', '500', 'Franšíza', 'Přibyl']
+  r5: ['', '2-3.11.2024', 'Výlov rybníka Olšovec', '29000', '3000', 'Franšíza', 'Sobotka']
+  r6: ['', '2-3.11.2024', 'Comic Con Junior', '26000', '8228', 'Franšíza', 'Sobotka']
+  r7: ['', '2024-11-10 00:00:00', 'Krumlovská 11', '5300', '0', '1050', 'Šachlová']
+  r8: ['', '7.-10.11.2024', '                                             ', '41250', '8228', 'Franšíza', 'Sobotka']
+
+--- sheet: 'Prosinec 2024'  rows=33 cols=7 ---
+  r1: ['', '', '', '', '', '', '']
+  r2: ['', 'Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  r3: ['', '2024-12-01 00:00:00', '                                             ', '13500', '500', '                  Franšíza', '                                             ']
+  r4: ['', '2024-12-01 00:00:00', '                                             ', '10000', '1600', 'Franšíza', '                                        Sobot']
+  r5: ['', '1.12.-8.12.2024', 'Vánoční trhy Ostrava', '48375', '3750', '12425', 'brig.']
+  r6: ['', '      1.12.2024', '                                             ', '11250', '1600', 'Franšíza', '                                        Sobot']
+  r7: ['', '1.12.-8.12.2024', 'Vánoční trhy Olomouc', '84520', '9500', '13800', 'brig.']
+  r8: ['', '7.12.-8.12.2024', 'Svařákobraní Pardubice', '19500', '2000', '3900', 'Sloupenský']
+
+--- sheet: 'Leden 2025'  rows=3 cols=6 ---
+  r1: ['', '', '', '', '', '']
+  r2: ['Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  r3: ['17.-26.1.2025', 'IGW Berlín', '255000', '39325', 'Franšíza', 'Chytrý']
+
+--- sheet: 'Únor 2025'  rows=6 cols=6 ---
+  r1: ['', '', '', '', '', '']
+  r2: ['Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  r3: ['2025-02-08 00:00:00', 'Farmářské trhy HK', '10000', '1000', 'Franšíza', 'Přibyl']
+  r4: ['2025-02-22 00:00:00', 'Farmářské trhy Pardubice', '8500', '500', 'Franšíza', 'Přibyl']
+  r5: ['2025-02-28 00:00:00', 'Farmářské trhy Přerov', '11000', '1000', 'Franšíza', 'Přibyl']
+  r6: ['', '', '', '', '', '']
+
+--- sheet: 'Březen 2025'  rows=16 cols=6 ---
+  r1: ['', '', '', '', '', '']
+  r2: ['Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  r3: ['2025-03-01 00:00:00', 'Street food Ždár nad Sázavou', '12500', '4500', '', 'Přibyl']
+  r4: ['2025-03-02 00:00:00', 'Farmářské trhy Hradec Králové', '6000', '1500', '', 'Přibyl']
+  r5: ['2025-03-08 00:00:00', 'Čokoládový den Přerov', '7500', '500', '', 'Přibyl']
+  r6: ['14.-16.3.2025', 'Sport Expo Praha', '48000', '18000', '', 'Přibyl']
+  r7: ['2025-03-15 00:00:00', 'Depo Street food Klatovy', '22000', '1600', '', 'Budil']
+  r8: ['2025-03-21 00:00:00', 'Trhy HK', '5000', '1500', '', 'Přibyl']
+
+--- sheet: 'Duben 2025'  rows=47 cols=6 ---
+  r1: ['', '', '', '', '', '']
+  r2: ['Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  r3: ['2025-04-05 00:00:00', '                                             ', '7500', '1000', '', 'Přibyl']
+  r4: ['2025-04-05 00:00:00', '                                    Bučovický', '11500', '250', '', 'Sobotka']
+  r5: ['2025-04-06 00:00:00', 'Trhy,Písek', '6900', '500', '', 'Budil']
+  r6: ['2025-04-06 00:00:00', 'Velikonoční farmářské trhy, Smiřice', '5000', '450', '', 'Přibyl']
+  r7: ['2025-04-06 00:00:00', 'Street food festival, Plzeň', '11800', '1000', '', 'Budil']
+  r8: ['10.-12.4.2025', 'Jarní trhy, České Budějovice', '9000', '1000', '', 'Kačenová']
+
+--- sheet: 'Květen 2025'  rows=37 cols=6 ---
+  r1: ['', '', '', '', '', '']
+  r2: ['Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  r3: ['1.-3.5.2025', '               Burger festival, Uherské Hradi', '25625', '6000', '6750', 'Pakhofferová']
+  r4: ['2025-05-01 00:00:00', '                                       Food p', '5500', '3000', '', 'Kačenová']
+  r5: ['2.-4.5.2025', '                                             ', '3900', '600', '', 'Kačenová']
+  r6: ['2025-05-03 00:00:00', 'Miletínská pouť,Miletín', '3500', '800', '', 'Přibyl']
+  r7: ['2025-05-04 00:00:00', 'Pivní pohoda, Jaroměř', '8500', '2420', '', 'Přibyl']
+  r8: ['9.-10.5.2025', 'Burger street festival, Plzeň', '21000', '4500', '', 'Kačenová']
+
+--- sheet: 'Červen 2025'  rows=29 cols=12 ---
+  r1: ['', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', 'Jméno', '', '', '', '', '', '']
+  r3: ['2025-06-01 00:00:00', 'Dětský den, Česká Skalice', '5000', '200', '', 'Přibyl', '', '', '', '', '', '']
+  r4: ['2025-06-01 00:00:00', 'Pivní fest, Kostelec', '6000', '500', '', 'Urválek', '', '', '', '', '', '']
+  r5: ['2025-06-07 00:00:00', 'Dětský den Vamberk', '3000', '0', '', 'Urválek', '', '', '', '', '', '']
+  r6: ['7.-8.6.2025', 'Aviatická pouť Pardubice', '31000', '7260', '', 'Přibyl', '', '', '', '', '', '']
+  r7: ['2025-06-07 00:00:00', 'Bezva fest, Plzeň', '12000', '7260', '', 'Kačenová', '', '', '', '', '', '']
+  r8: ['2025-06-06 00:00:00', 'Festival Královehradeckého kraje', '10000', '0', '', 'Přibyl', '', '', '', '', '', '']
+
+--- sheet: 'Červenec 2025'  rows=18 cols=7 ---
+  r1: ['', '', '', '', '', '', '']
+  r2: ['Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', 'Jméno', '']
+  r3: ['2025-07-01 00:00:00', 'Farmářské trhy, Praha', '3000', '1500', '', 'Kačenová', 'řeší si franšízant.']
+  r4: ['2.-3.7.2025', 'Koupaliště Bělkovice', '5500', '200', '', 'Kupský', 'řeší si franšízant.']
+  r5: ['3.-6.7,2025', 'Festival LA kultury, Praha', '8500', '4500', '', 'Kačenová', 'řeší si franšízant.']
+  r6: ['4.-5.7.2025', 'Vesuf, Suchý', '12500', '6050', '', 'Sobotka', 'vyfakturováno.']
+  r7: ['5.-6.7.2025', 'Helfštýnská pouť, Olomouc', '7000', '800', '', 'Kupský', 'řeší si franšízant.']
+  r8: ['2025-07-12 00:00:00', 'Hudební akce, Strakonice', '5500', '1000', '', 'Kačenová', 'řeší si franšízant.']
+
+--- sheet: 'Srpen 2025'  rows=10 cols=7 ---
+  r1: ['', '', '', '', '', '', '']
+  r2: ['Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', 'Jméno', '']
+  r3: ['2025-08-09 00:00:00', '                                      Lidový ', '', '1000', '', 'Tomášková', 'uhrazeno']
+  r4: ['21.-26.8.2025', 'Země živitelka, ČB', '', '21780', '', 'Satrapa, Kačenová, Burdíková', 'vyfakturováno.']
+  r5: ['23.-24.08.2025', 'Food day festival, Pardubice', '', '7260', '', 'Přibyl', 'vyfakturováno.']
+  r6: ['23.-24.08.2025', 'Peřeje Srbsko, Beroun', '', '', '', 'Kačenová', 'řeší si franšízant.']
+  r7: ['2025-08-23 00:00:00', 'Street food festiválek, Sedlčany', '', '', '', 'Přibyl', 'není zatím vyfakturováno.']
+  r8: ['                                          24.', '                             Farmářské trhy, ', '', '500', '', 'Přibyl', 'řeší si franšízant.']
+
+--- sheet: 'Září 2025'  rows=8 cols=7 ---
+  r1: ['', '', '', '', '', '', '']
+  r2: ['Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', 'Jméno', '']
+  r3: ['6.-7.9.2025', 'Dětský sen, Olomouc', '', '2500', '', 'Přibyl', 'řeší si franšízant.']
+  r4: ['2025-09-06 00:00:00', 'Posvícení, Nymburk', '', '6292', '', 'Přibyl', 'není zatím vyfakturováno.']
+  r5: ['2025-09-06 00:00:00', 'Charitativní sraz Amerik', '', '', '', 'Kačenová', 'řeší si franšízant.']
+  r6: ['14.-17.9.2025', 'Národní výstava hosp.zvířat, Brno', '', '6200', '', 'Satrapa', 'bude platit hotově']
+  r7: ['2025-09-21 00:00:00', 'Farmářské trhy, Rokytnice', '', '500', '', 'Přibyl', 'řeší si franšízant.']
+  r8: ['                      26.-27.9.2025', 'Svatováclavské slavnosti, Dobruška', '', '', '', 'Přibyl', 'řeší si franšízant.']
+
+--- sheet: 'Říjen 2025'  rows=3 cols=7 ---
+  r1: ['', '', '', '', '', '', '']
+  r2: ['Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', 'Jméno', '']
+  r3: ['2.-5.10.2025', '   Horti-Komplex Flora, Olomouc', '', '4000', '', 'Přibyl', 'není zatím vyfakturováno.']
+
+--- sheet: 'Listopad 2025'  rows=5 cols=6 ---
+  r1: ['', '', '', '', '', '']
+  r2: ['Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', 'Jméno']
+  r3: ['', '', '', '', '', '']
+  r4: ['', '', '', '', '', '']
+  r5: ['', '', '', '', '', '']
+
+--- sheet: 'Prosinec 2025'  rows=4 cols=7 ---
+  r1: ['', '', '', '', '', '', '']
+  r2: ['Datum', 'Akce ', 'Tržba', 'Nájem', 'Mzda', 'Jméno', '']
+  r3: ['11.-14.12.2025', '        Vánoční trhy výstaviště Brno', '', '7865', '', 'Satrapa', 'není zatím vyfakturováno.']
+  r4: ['4.-.7.12.2025', '        Vánoční stříbrné dny, Praha', '', '5800', '', 'Přibyl', 'není zatím vyfakturováno.']
+================================================================================
+FILE: Poutě 2025.xlsx  (41208 B)
+================================================================================
+
+--- sheet: 'Únor'  rows=2 cols=6 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Poznámky / nájem']
+  r2: ['Matějská pouť', 'Praha', 'Středočeský', '22.2.-13.4.2025', 'tisíce návštěvníků', 'nájem cca 10 000 - 30 000,-.']
+
+--- sheet: 'Březen'  rows=1 cols=1 ---
+  r1: ['nekonají se žádné poutě.']
+
+--- sheet: 'Duben'  rows=11 cols=6 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  r2: ['Sedlecká pouť', 'Kutná Hora', 'Středočeský', '17.-21.4.2025', 'atraktivní', 'až 150 stánků, 6500,- za místo,přihlášeni,Při']
+  r3: ['Velikonoční pouť s jarmarkem ', 'Dobrá Voda u ČB', 'Jihočeský', '18.-21.4.2025', 'atraktivní/ spíše ne', 'cca 30-40 stánků,  602 409 204, poptáno, přih']
+  r4: ['Kňovice – pouť', 'Kňovice', 'Středočeský', '2025-04-20 00:00:00', 'spíše ne', '']
+  r5: ['Řípská pouť', 'Říp', 'Ústecký', '25.-27.4.2025', 'atraktivní', '250 stánků, 416 845 093,nájem 5 100,- za 3 dn']
+  r6: ['Pouť sv. Jiří v Černošíně', 'Černošín', 'Plzeňský', '2025-04-26 00:00:00', 'atraktivní dle franšízanta', 'nevybírá se nájem, do 50 stánkařů, 374 692 10']
+  r7: ['Pouť – Brušperk', 'Brušperk', 'Moravskoslezský', '26.-27.4.2025', 'atraktivní', 'do 50 stánků, 602 428 823, 591 144 460, 60,- ']
+  r8: ['Svatovojtěšská pouť ', 'Libice nad Cidlinou', 'Středočeský', '26.-27.4.2025', 'atraktivní', 'do 80 stánků, 200,-/1m, 724 050 491, vyjádřen']
+
+--- sheet: 'Květen'  rows=31 cols=7 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky', '']
+  r2: ['Májová pouť / Odemykání vody ', 'Otrokovice', 'Zlínský', '2025-05-01 00:00:00', 'spíše ne', '', '']
+  r3: ['Miletínská pouť', 'Miletín', 'Královehradecký', '3.-4.5.2025', 'atraktivní dle fotek', 'cca 100 stánkařů, 100,-/m2/den,  Josef Nyp, 6', '']
+  r4: ['Pouť Katovice', 'Katovice', 'Plzeňský', '2.-4.5.2025', 'atraktivní dle fotek', 'doporučeno franšízantem', '']
+  r5: ['Tradiční pouť ', 'Hutisko – Solanec', 'Zlínský', '2025-05-04 00:00:00', 'spíše ne', '', '']
+  r6: ['Vojtěšská pouť ', 'Losiná ', 'Plzeňský', '2025-05-04 00:00:00', 'spíše ne', '', '']
+  r7: ['Pouť v Příčovech', 'Příčovi', 'Středočeský', '2025-05-04 00:00:00', 'spíše ne', '', '']
+  r8: ['130 let založení SDH', 'Vídeň', 'Rakousko', '2025-05-10 00:00:00', 'spíše ne', '', '']
+
+--- sheet: 'Červen'  rows=28 cols=6 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  r2: ['Štramberská pouť 2025', 'Štramberk', 'Moravskoslezský', '2025-06-01 00:00:00', 'atraktivní dle fotek', 'cca přes 200 stánkařů, 50,-/m2, 558 840 617, ']
+  r3: ['Křiny pouť', 'Křtiny', 'Jihomoravský', '2025-06-01 00:00:00', 'atraktivní dle fotek', '50-100 stánakřů, 100,-/m2, rezervace přímo v ']
+  r4: ['Písečenská pouť', 'Písečné nad Dyjí', 'Jihočeský ', '5.-6.6.2025', 'spíše ne', '20-50 stánkařů, nevybírá se, 721 066 545 Závo']
+  r5: ['Rudoltická pouť', 'Rudoltice', 'Pardubický', '2025-06-07 00:00:00', 'spíše ne', '']
+  r6: ['Křiny pouť - velká', 'Křtiny', 'Jihomoravský', '7.-9.6.2025', 'atraktivní dle fotek', '50-100 stánakřů, 100,-/m2, rezervace přímo v ']
+  r7: ['Aviatická pouť ', 'Pardubice', 'Pardubický', '7.-.8.6.2025', 'atraktivní dle fotek, 27 000 ', 'cca přes 200 stánkařů, cena dle stánku a nace']
+  r8: ['Pouť v Jincích', 'Jince ', 'Středočeský', '7.-.8.6.2025', 'spíše ne', '30-50 stánkařů']
+
+--- sheet: 'Červenec'  rows=21 cols=7 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky', '']
+  r2: ['HELFŠTÝNSKÁ POUŤ', 'Helfštýn', 'Olomoucký', '5.-6.7.2025', 'spíše ne', '1000,-/m2, 581 797 093', '']
+  r3: ['Pouťové slavnosti a kácení máje ', 'Jarošově nad Nežárkou', 'Jihočeský', '2025-07-05 00:00:00', 'spíše ne', '', '']
+  r4: ['Lomnická pouť 2025', 'Lomnice u Tišnova', 'Jihomoravský', '2025-07-06 00:00:00', 'spíše ne', '', '']
+  r5: ['Radíč – pouť ', 'Radič', 'Středočeský', '2025-07-06 00:00:00', 'spíše ne', '', '']
+  r6: ['Markétská pouť ', 'Horní Planá', 'Jihočeský', '11.-13.7.2025', 'atraktivní ', 'cca 40 stánků, 900,-/den, 380 738 008', '']
+  r7: ['Luhačovická pout', 'Luhačovice', 'Zlínský', '2025-07-14 00:00:00', 'spíše ne', 'cca 50 stánků, zaslána poptávka gabinagergelo', '']
+  r8: ['Jindřichovská pouť ', 'Lučany nad Nisou 2025 – Jindřichov', 'Liberecký', '2025-07-19 00:00:00', 'spíše ne', '', '']
+
+--- sheet: 'Srpen'  rows=34 cols=6 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  r2: ['Tradiční pouť Porcinkule', 'Jindřichův Hradec', 'Jihočeský', '1.-3.8.2025', 'atraktivní', 'cca 160 stánků, 602 526 832, poptáno, 728 989']
+  r3: ['Porcinkule Opočno', 'Opočno', 'Královehradecký', '1.-3.8.2025', 'atraktivní', '200 stánků, 494 669 621, 980,- za všechny dny']
+  r4: ['11. Vysocká řemeslná pouť ', 'Vysoké nad Jizerou', 'Liberecký', '2.-3.8.2025', 'atraktivní', '50 - 70 stánků, 604 823 215, 500,- za místo, ']
+  r5: ['Karlovská pouť', 'Velké Karlovice', 'Zlínský', '2025-08-03 00:00:00', 'spíše ne', '']
+  r6: ['Pouť Oslavice', 'Oslavice', 'Vysočina', '2025-08-03 00:00:00', 'spíše ne', '']
+  r7: ['Chodské slavnosti a Vavřinecká pouť ', 'Domažlice ', 'Plzeňský', '8.-10.8.2025', 'atraktivní', '130 stánků, 100,-/m2/den, žádost na stránkách']
+  r8: ['Chrudimská pouť ', 'Chrudim', 'Pardubický', '8.-10.8.2025', 'atraktivní', 'cca 200 stánků, 469 657 111, přihlášeni, 1500']
+
+--- sheet: 'Září'  rows=20 cols=6 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  r2: ['Trhy – Sušická pouť', 'Sušice ', 'Plzeńský', '6.-7.9.2025', 'atraktivní ', 'cca 150 stánků, 376 540 201, stánek 1200,- za']
+  r3: ['Sychrovská pouť', 'Sychrov', 'Liberecký', '6.-7.9.2025', 'atraktivní', 'cca 70 stánků,   485 146 081, 150,-/m/den, zd']
+  r4: ['Příborská pouť ', 'Příbor', 'Moravskoslezský', '2025-09-07 00:00:00', 'spíše ne', '']
+  r5: ['Mrkvancová pouť', 'Polná', 'Vysočina', '12.-14.9.2025', 'atraktivní', 'cca 220 stánkařů, 567 559 200, 130,-/m2/den ,']
+  r6: ['Kamýk nad Vltavou pouť', 'Kamýk nad Vltavou', 'Středočeský', '2025-09-14 00:00:00', 'spíše ne', '']
+  r7: ['Krásná Hora nad Vltavou – pouť', 'Krásná Hora nad Vltavou', 'Středočeský', '2025-09-14 00:00:00', 'spíše ne', '']
+  r8: ['Den Tradic města Petřvald - pouť', 'Petřvald', 'Moravskoslezský', '19.-20.9.2025', 'spíše ne', 'do 50 stánků']
+
+--- sheet: 'Říjen'  rows=7 cols=6 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  r2: ['Štěpánovická pouť', 'Štěpánovice', 'Plzeňský', '2025-10-04 00:00:00', '500-1000', 'spíše ne']
+  r3: ['', '', '', '', '', '']
+  r4: ['', '', '', '', '', '']
+  r5: ['', '', '', '', '', '']
+  r6: ['', '', '', '', '', '']
+  r7: ['', '', '', '', '', '']
+
+--- sheet: 'Listopad'  rows=2 cols=6 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky']
+  r2: ['Svatomartinská pouť', 'Mikulov', 'Jihomoravský', '7.-11.11.2025', '', '25 stánkařů, 1500-3500,- víkend, 721 054 559,']
+
+--- sheet: 'Pochody'  rows=10 cols=7 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'Návštěvnost', 'Nájem / Poznámky', '']
+  r2: ['Pochod Praha – Prčice', 'Praha', 'Středočeský', '2025-05-17 00:00:00', '22000', 'náměstí obsazeno, poptáno po trase, ozvou se.', '']
+  r3: ['Horažďovická padesátka', 'Horážďovice', 'Středočeský', '2025-05-24 00:00:00', '1327', 'nemají zájem.', '']
+  r4: ['Přerovská padesátka – memoriál Jiřího Caletky', 'Přerov', 'Olomouc', '2025-03-08 00:00:00', 'akce již proběhla', '', '']
+  r5: ['Středočeská šedesátka', 'Unhošť', 'Středočeský', '2025-04-12 00:00:00', '1628', 'nechtějí stánky', '']
+  r6: ['Štramberský Jasoň', 'Ostrava', 'Moravskoslezský', '2025-05-24 00:00:00', '1693', 'poptáno, zatím bez odezvy.', '']
+  r7: ['Pochod přes tři hrady', 'Sopotnice', 'Královehradecký', '2025-05-10 00:00:00', '18000', 'přihlášeni - areál Domova pod hradem Žampach,', 'dva stánky?? Přibyl.']
+  r8: ['Krajem bitvy u Lipan', 'Český Brod', 'Středočeský', '2025-05-31 00:00:00', '', 'poptáno.', '']
+================================================================================
+FILE: Příprava 2024 výkaz 2023.xlsx  (178335 B)
+================================================================================
+
+--- sheet: 'Únor'  rows=1000 cols=9 ---
+  r1: ['Akce', 'datum', 'brigádník', 'POS', 'PRODÁNO', 'prodej', 'výplata', 'nájem na akci', '']
+  r2: ['SALIMATECH 2023 BVV', '7.- 9.2.', 'Dáša + Libor', '5', 'cca 700ks', '64600,-', '', '21235,-', '']
+  r3: ['Čokofestival', '10.-12.2.', 'Dáša', '5', '276', '31285,-', '1422 benzín', '3000 bezdph,-', '']
+  r4: ['', '', 'Roman Nguyen', '5', '73', '8744,-', '1887,-', '', '']
+  r5: ['Masopustní jarmark v Kroměříži', '18.2.', 'Zdenka Hrozková', '2', '102', '11375,-', '2264,-', '600,-', 'vyplaceno hotově, růžové prohlásení má']
+  r6: ['Lanškrounský Masopust s Flerjarmarkem', '11.2.', 'Zdenka Hrozková', '2', '70', '8712,-', '1781,-', '500,- na místě,-', '']
+  r7: ['', '', '', '', '', '', '', '', '']
+  r8: ['', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Březen'  rows=1000 cols=25 ---
+  r1: ['Akce', 'datum', 'brigádník', 'POS', 'PRODÁNO', 'prodej', 'výplata', 'nájem na akci', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['Čokofestival - Hradec Králové OC Futurum', '10-12.3.', 'Tomáš Burian', '5', '247', '28988', '5275,-', '3000bez dph', 'započítán benzín a nákup košíčků a káblíku na', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['Mandlové slavnosti - Hustopeče', '24-26.3 - prodej jen 25.3.', 'Tomáš Burian', '2', '197', '23178', '2970,-', '1600,-', 'nevyplaceno', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Velikonoční výstava Častolovice', '31.3', 'Dagmar Bártová', '2', '', '', '', '2000,-', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Duben'  rows=998 cols=26 ---
+  r1: ['Akce', 'datum', 'čas na stánku', 'brigádník', 'POS', 'PRODÁNO', 'obrat', 'výplata', 'nájem na akci', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['Velikonoční výstava Častolovice', '2023-03-31 00:00:00', 'vykázáno v březnu', 'Dagmar Bártová', '2', '74', '8655,-', '', '2000,-', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['', '1.-2.4.', '17,5h', 'Adéla Korábová', '5', '143', '13013', '2487,-', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Slavnost - Zlín', '1.4. 8-14h', '6h', 'Dagmar Bártová', '', '132', '14883', '-', '200,- +3 pytlíky', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['veliká pouť - Kutná Hora', '7.-10.4.', '38h', 'Zbyněk Vlašic', '3', '499', '59378', '10850,-', '3000,-', 'nemá růžové prohlášení 10000 vyplaceno, dát n', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Pivní festival Brno jaro - Svoboďák', '18.-22.4.  11-22h', '18.4 - ', 'Anna Kubelková ', '3', '113', '13114', '1695,-', '11495,-', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['', '', '19-20.4 - ', 'Roman Nguyen', '3', '140', '16361', '2100,-', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['', '', '21.4. - 7,5h', 'Jan Soukup', '3', '82', '8695,-', '1230,-', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Květen'  rows=1001 cols=25 ---
+  r1: ['Akce', 'datum', 'brigádník', 'POS', 'PRODÁNO', 'obrat 2024', 'výplata', 'nájem na akci', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['Food Festival Holice', '01.05.2023 -> našel jsem až v červenci', 'Adéla Korábová', '1', '95', '11110', '1965,-', '', '2024 asi není', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['Tři hrady potštejn', '06.05.2023 -> 11.5.24', 'Lenka Ciglerová', '4', '173', '18958', '4296,-', 'zdarma', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Bohemia Apetit Fest Chrudim', '6.5.  11-19h -> 11.5 24', 'Radek Burian', '2', '183', '20687', '2745,-', '500,-+4 balíčky', '2024 bohužel již obsazeno.', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Svoboďák', '9.-13.5.', 'Šárka Neprašová', '2', '68', '7939', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['', '', 'Šárka Neprašová', '', '103', '12200', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['', '', 'Šárka Neprašová', '', '190', '21731', '5415,-', 'záloha 2600,-', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['', '', 'Anna Kubelková', '', '64', '7574', '1250,-', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Červen'  rows=978 cols=7 ---
+  r1: ['Název akce', 'Kde se koná', 'Kraj', 'datum', 'Poznámky z minulých let', 'Poznámky 2024', 'Odkaz na akci']
+  r2: ['Dětský den Blansko', 'Blansko', 'Jihomoravský', '2024-06-01 00:00:00', '2023: Prodej 6480 Kč, Nájem 1350 Kč', '2025 zaměřit se na dětké dny v krajských měst', '']
+  r3: ['Farmářské a řemeslné trhy', 'Blansko', 'Jihomoravský', '2024-06-06 00:00:00', '––––––––––––––––', 'přihlášeno,nájem 200 Kč, prodej: 2625 Kč', '']
+  r4: ['Slavnosti Břeclav ', 'Břeclav', 'Jihomoravský', '7.-8.6. 2024', '2023: Prodej 55509 Kč, Nájem 20%', 'obsazeno', '']
+  r5: ['Grizlyfest', 'Olomouc', 'Olomoucký', '2024-06-08 00:00:00', '––––––––––––––––', 'přihlášeno, prodej: 13375 Kč', '']
+  r6: ['Vyznání růžím', 'Olomouc', 'Olomoucký', '8.-9.6. 2024', '2023: Prodej 705 Kč', 'nevyplatí se', '']
+  r7: ['Svátky řemesel', 'Kunštát', 'Jihomoravský', '8.-9.6. 2024', '––––––––––––––––', 'pojede pan Sobotka, prodej cca 25000 Kč', '']
+  r8: ['Festival kávy a čaje', 'Kroměříž', 'Zlínský', '8.-9.6. 2024', '2023: Prodej 14817 Kč, Nájem 2000 Kč', 'přihlášeno, prodej: 10500 Kč', '']
+
+--- sheet: 'Červenec'  rows=1004 cols=22 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'Poznámky z minulých let', 'Poznámky 2024', 'Odkaz na akci', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['Pivní fetsival 15tý ročník Padochov u Oslavan', '', '', '1.-2.7.', '9890', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['Velehradská pouť a Dny lidí dobré vůle', 'Velehrad', 'Zlínský', '4.-5.7. 2024', '–––––––––––––––––––', 'plné, přihlášku příště poslat do 15.4.', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Dřevorock fest', 'Dřevohostice', 'Olomoucký', '2024-07-05 00:00:00', '', '', 'https://drevorockfest.cz/#kontakt', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Levandulový festival', 'Bezděkov', 'Olomoucký', '5.-6.7. 2024', '', 'mají konkurenci, možná příští rok', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Den fotbalu Polička', 'Polička', 'Pardubický', '5.-6.7. 2024', '2023: Prodej 20130 Kč, Nájem 18 %', 'registrace přes NFCtron, plné', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Sváteční jarmark v KUKSU', '', '', '5-9.7.', '7629', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Vesuf festival', 'Suchý', 'Jihomoravský', '5.-6.7. 2024', '2023: Prodej 21057 Kč, Nájem 0 Kč', 'nájem 5000 Kč', 'https://www.vesuf.cz/pro-stankare/', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Srpen'  rows=998 cols=22 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'nájem/prodej', 'Poznámky', 'Odkaz na akci', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['Summer night food festival', 'Hradec Králové', 'Královéhradecký', '2024-08-03 00:00:00', '', 'přihláška na webu', 'https://agenturajuicy.cz/rezervace-summer-nig', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['Porcinkule Opočno ', 'Opočno', 'Královéhradecký', '3.-4.8. 2024', '2023: Prodej 10519 Kč, Nájem 980 Kč', 'přihláška odeslána, Ságnerová', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Street food piknik ', 'Trutnov', 'Královéhradecký', '2024-08-04 00:00:00', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Chodské slavnosti', 'Domažlice', '', '9.-11.8. 2024', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Hrady festival', 'Veveří', 'Jihomoravský', '9.-10.8. 2024', '2023: Prodej 26675 Kč, Nájem 6000 Kč', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Svatovavřinecké slavnosti', 'Hodonín', 'Jihomoravský', '2024-08-10 00:00:00', '2023: Prodej 21541 Kč, Nájem 400 Kč', 'Sobotka, 9.8. o půl 4 přijede pro věci', 'https://www.dkhodonin.eu/program/904-svatovav', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Pojez fest', 'Karlova Studánka', 'Moravskoslezský', '2024-08-10 00:00:00', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Září'  rows=1005 cols=22 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Poznámky', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['Pouť ke svatému Jiljí', '', '', '2024-09-01 00:00:00', '2023: Prodej 15380 Kč, Nájem 200 Kč ', 'volné, nikdo nejel.', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['Bítešské hody', 'Velká Bíteš', 'Vysočina', '      4.9.-11.9.2024', '', 'mají plno', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Chillibraní Bzzzukot Židenice', 'Brno', 'Jihomoravský', '2024-09-07 00:00:00', '2023: Prodej 30169 Kč, Nájem 1700 Kč +6 balíč', 'nájem zaplacen, Lukáš Souček brigádník.', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Food piknik Event Park Ladronka, Praha 6', 'Praha', '', '3.9. 11-18h', '2023: Prodej 31212 Kč, Nájem 5000 Kč ', 'neměl kdo jet.', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Burger street festival', 'Hodonín', 'Jihomoravský ', '         6.9.-8.9.2024', '', 'sortiment s Grigem, zasmluvněno na celý rok, ', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Královopolské vinobraní', 'Brno', 'Jihomoravský ', '         6.9.-7.9.2024', '', 'nechtějí nás', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Prima Burgerfest', 'Praha', 'Praha', '7.-8.9. 2024', 'nájem 5000,-', 'neměl kdo .', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Říjen'  rows=1041 cols=22 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Poznámky', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['Veletrh Flora Olomouc (OLIMA)', '                  Olomouc', 'Olomoucký', '3.-6.10. 2024', '50 000,-,  nájem 7 260,-', 'přihlášeno, Sobotka', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['vinobraní na zámku Valtice', '                    Valtice', 'Jihomoravský', '4.10.-5.10.2024', '2023: Prodej 6708 Kč', 'obsazeno, konkurence', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Burčákové slavnosti ', '              Hustopeče', 'Jihomoravský', '4.10.-5.10.2024', '', 'zatím náhradníci, pokud někdo vypadne.', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['Stavba teplo,energie ', '                  Ostrava', 'Moravskoslezský', '4.10.-5.10.2024', '3000 lidí', 'nepojedeme.', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Drnovické jablkobraní', 'Drnovice u Kunštátu', '', '2024-10-05 00:00:00', 'prrodej 2023 :7810', 'malý prodej', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['Burčákový pochod', '       Prušánky', 'Jihomoravský', '2024-10-05 00:00:00', 'účast nevíme', 'Čajokrásno, festival zarezervován, kdo pojede', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Olomoucké vinné slavnosti', 'Olomouc', 'Olomoucký', '4.-5.10.2024', '', 'obsazeno - Šubová,subovaj@seznam.cz.', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+--- sheet: 'Listopad'  rows=968 cols=11 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'Prodej', 'Poznámka', '', '', '', '', '']
+  r2: ['Farmářské trhy', 'Strakonice ', 'Jihočeský ', '2024-11-01 00:00:00', '', 'přihláška, není pro nás výdělečné.', '', '', '', '', '']
+  r3: ['Svatomartinské-klobásové trhy', 'Olomouc tržnice', 'Olomoucký', '2024-11-02 00:00:00', '', 'přihláška zaslána, info@wine-club.cz,776 747 ', '', '', '', '', '']
+  r4: ['Krampuslauf', 'Zámek Dětenice', 'Královehradecký', '2024-11-02 00:00:00', '', 'přihláška zaslána, + 420 602 728 422, nechtěj', '', '', '', '', '']
+  r5: ['Maker Faire ', 'Olomouc', 'Olomoucký', '2024-11-02 00:00:00', 'nájem 2420,-.', 'účastnili bychom se, ale veletrh je v duchu p', '', '', '', '', '']
+  r6: ['Hobby burza sběratelů', 'Kroměříž', 'Zlínský', '2024-11-03 00:00:00', 'nájem 1000,-, tržba 5000,-', '', '', '', '', '', '']
+  r7: ['Trhy Jiřák', 'Praha', '', '2024-11-02 00:00:00', 'tržba 5000,-', '', '', '', '', '', '']
+  r8: ['Festival kostek ', 'Mladá Boleslav', 'Středočeský ', '2.-3.11.2024', '', 'zaslána přihláška, 734 801 848 Roudná, nemají', '', '', '', '', '']
+
+--- sheet: 'Prosinec'  rows=1029 cols=7 ---
+  r1: ['Akce', 'datum', 'Město', 'Účast', '', 'nájem na akci', 'Poznámka']
+  r2: ['Vánoce Jihlava', '1.12.-31.12.2024', 'Vysočina', '', '', '', 'nepojedeme.']
+  r3: ['Advent', '1.12.-24.12.2024', 'Pardubice', '', '', '', 'přihláška zaslána']
+  r4: ['Vánoční trhy Zlín', '7.12-23.12.2024', 'Zlín', '', '', 'nájem 10 200,-, tržba 116 770,-', '']
+  r5: ['Stříbrné vánoční dny', '5-8.12.2024', 'Praha Letňany', '15823 účast', '', 'tržba : 42 500,-, nájem 11 495,- vč.DPH', 'přihlášeni, pojedeme velká účast, Ságnerová.']
+  r6: ['Advent', '2024-12-08 00:00:00', '         Český Krumlov', '', '', '', 'neschválený stánek - není dobový, Šachlová,Iv']
+  r7: ['Advent', '13.12.-15.12.2024', '         Český Krumlov', '', '', '', 'Šachlová- nemůže.']
+  r8: ['Advent', '20.12.-22.12.2024', '         Český Krumlov', '', '', '', 'Šachlová- chtějí dobový stánek.']
+
+--- sheet: 'Rezervované akce'  rows=57 cols=19 ---
+  r1: ['Název akce', 'Kde se koná', 'Datum', 'Stav', 'Franšízant/Brigádník', 'Prodej', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r2: ['Květen', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r3: ['CZECH FOOD EXPO ', 'České Budějovice', '9-12. 5. 2024', 'zúčastněno', 'Karel Satrapa', '63135', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r4: ['Potštejnská pouť', 'Potštejn', '17. -19. 5. 2024', 'zúčastněno', 'Karel Satrapa', '54011', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r5: ['FOODART Festival', 'Nové město nad Metují', '2024-05-25 00:00:00', 'zúčastněno', 'Libor Sloupenský', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r6: ['Burger fest', 'Kyjov', '2024-05-25 00:00:00', 'přihlášeno', 'Matěj Chytrý', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r7: ['EURO BIKE FEST', 'Pasohlávky', '25.-26.5. 2024', 'zúčastněno', 'Jarda Sobotka', 'cca 26 000 Kč', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  r8: ['Červen', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+================================================================================
+FILE: Příprava 2025 výkaz 2024 v1..xlsx  (53133 B)
+================================================================================
+
+--- sheet: 'Leden'  rows=3 cols=6 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Poznámky']
+  r2: ['Trhy Šantovka', 'Olomouc ', 'Olomoucký ', '                                 24.-26.1.202', '', 'Jarda - nakonec nejel.']
+  r3: ['IGW Berlín', 'Berlín', '', '17.-19.1.2025', 'velmi dobrá akce , tržba 2025 - cca 150 000,-', 'Matěj Chytrý']
+
+--- sheet: 'Únor'  rows=12 cols=7 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  r2: ['Salima ', 'Brno', 'Jihomoravský', '25.2.-27.2.2025', 'tržba 2024-64600,přesunuta na rok 2026', 'desetitisíce', '']
+  r3: ['Čoko festival', 'Brno', 'Jihomoravský', '10.-12.2.2025', 'tržba 2024 - cca 40 000,-', '21000', 'spolupráce s konkurencí.']
+  r4: ['Masopust', 'Český Brod', 'Středočeský', '2025-02-22 00:00:00', 'poprvé', 'nabídnuto franšízantem', 'Přibyl nepojede.']
+  r5: ['Čokoládový festival ', 'Olomouc', 'Olomoucký', '14.-16.2.2025', 'tržba 2024- cca 40 000,-', 'desetitisíce, dobrá akce', 'spolupráce s konkurencí']
+  r6: ['Čokoládový festival', 'Ostrava', 'Moravskoslezský', '14.-16.2.2025', 'akce nám byla doporučena.', 'tisíce, dobrá akce', 'spolupráce s konkurencí']
+  r7: ['Matějská pouť', 'Praha', 'Středočeský', '22.-13.4.2025', 'nájem 10-30 000,- ', 'tisíce lidí', 'obsazeno.']
+  r8: ['Trhy v Galerce', 'Pardubice', '                       Pardubický', '2025-02-22 00:00:00', 'nájem 500,-,2024 jsme nebyly, tržba 2025- 850', '500', ' Přibyl.']
+
+--- sheet: 'Březen'  rows=17 cols=7 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  r2: ['Zimní futrování ', 'Ždár nad Sázavou', 'Vysočina', '2025-03-01 00:00:00', 'nájem 500,-, 2023 -nebyly, 2024- nebyli jsme', 'doporučená akce, návštěvnost 1000', 'přihlášeni Přibyl.']
+  r3: ['Masoupust', 'Brušperk', 'Moravskoslezský', '2025-03-01 00:00:00', 'nebyly jsme žádný rok, nájem cca 1000,-', 'doporučená akce, návštěvnost 600', 'malá akce, nepojedeme.']
+  r4: ['Masoupust', 'Kroměříž', 'Zlínský', '2025-03-08 00:00:00', 'tržba 2024-6 000,-, nájem 600,-.', 'malá účast do 500', 'přihlášeni, nepojedeme.']
+  r5: ['Čokoládový den v Galerce', 'Přerov', 'Olomoucký', '2025-03-08 00:00:00', '2025 - tržba 7 500,-,nájem 500,-, tržba 2024 ', '6000-7000', 'Přibyl.']
+  r6: ['Jarní street food ', 'Kolín', 'Středočeský', '2025-04-13 00:00:00', 'nájem 6 292,-, doporučená akce.', '3000', 'Přibyl nepojede - moc drahé.']
+  r7: ['Depo street food ', 'Klatovy', 'Plzeňský', '2025-03-15 00:00:00', 'nájem 1800,-, tržba 2025- 22 000,-,2024- jsme', '4000', 'přihlášeni, Budil.']
+  r8: ['Forbikes, veletrh cyklistiky', 'Praha', 'Středočeský', '14.-16.3.2025', 'tržba 2025 = 48 000,-, nájem 18 000,-, tržba ', '19020', 'přihlášeni, Přibyl.']
+
+--- sheet: 'Duben'  rows=49 cols=8 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky', '']
+  r2: ['Jarní street food', 'Tábor', 'Jihočeský', '2025-04-05 00:00:00', '6292 s DPH,-, jeli bychom poprvé', 'dobrá akce, 4000', 'Přibyl nakonec rezervace zrušena.', '']
+  r3: ['Bučovický jarmark', 'Bučovice ', 'Jihomoravský', '2025-04-05 00:00:00', 'tržba 2024- 12 000,-, tržba 2025    , nájem', 'franšízant zajišťuje si sám', 'Sobotka.', '']
+  r4: ['Street food festival', 'Plzeň', 'Plzeňský', '2025-04-06 00:00:00', 'jedeme poprvé, nájem    , tržba 2025', 'franšízant zajišťuje si sám', 'přihlášeni, Budil.', '']
+  r5: ['Vsetínský krpec', 'Vsetín', 'Zlínský', '2025-04-06 00:00:00', 'jeli bychom poprvé', 'doporučeno franšízantem', 'nový franšízant - upozornil na akci pozdě, pr', '']
+  r6: ['Velikonoční trhy', 'Písek', 'Jihočeský', '2025-04-06 00:00:00', 'jeli bychom poprvé', 'franšízant zajišťuje si sám', 'Budil.', '']
+  r7: ['Velikonoční farmářské trhy', 'Smiřice ', 'Královehradecký', '2025-04-06 00:00:00', '450,- za místo, tržba 2024- 5000,-, v roce 20', 'dobrá akce tisíce návštěvníků,', 'přihlášeni.Přibyl.', '']
+  r8: ['Street food festival', 'Chotěšov', 'Plzeňský', '2025-04-12 00:00:00', 'jedeme poprvé, nájem    , tržba 2025', 'franšízant zajišťuje si sám', 'přihlášeni. Budil', '']
+
+--- sheet: 'Květen'  rows=58 cols=7 ---
+  r1: ['Akce', 'Město', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  r2: ['Street food festival', 'Liberec', 'Liberecký', '2025-05-01 00:00:00', 'nájem 6 897,-, jedeme poprvé, tržba 2025', '4500', 'nepřihlášeni, Budil nechtěl jet.']
+  r3: ['Zlínský Majáles', 'Zlín', 'Zlínský', '2025-05-01 00:00:00', 'jeli bychom poprvé', 'tisíce,doporučeno franšízantem', 'nemají místo.']
+  r4: ['Pivní pohoda', 'Jaroměř', 'Královehradecký', '2025-05-03 00:00:00', 'nájem 2 420,-, jedeme poprvé, tržba 2025 7 50', '1500,doporučeno franšízantem', 'přihlášeni, Přibyl.']
+  r5: ['Oslavy města', 'Nymburk', 'Středočeský', '2025-05-03 00:00:00', 'nájem 6 897,-, jedeme poprvé, tržba 2025', '3000,dobrá akce', 'přihlášeni, Urválek- nemá zájem, Budil se nev']
+  r6: ['Ostravský majáles', 'Ostrava', 'Moravskoslezský', '2025-05-03 00:00:00', 'jeli bychom poprvé', 'tisíce', 'plně obsazeno.']
+  r7: ['Oslavu Plzeň', 'Plzeň', 'Plzeňský', '2025-05-08 00:00:00', 'jedeme poprvé,zajišťuje si franšízant', '', 'přihlášeni, Budil.']
+  r8: ['Burger street ', 'Plzeň', 'Plzeňský', '8.-10.5.2025', 'jedeme poprvé, zajišťuje si franšízant', '', 'přihlášeni, Kačenová.']
+
+--- sheet: 'Červen'  rows=48 cols=7 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  r2: ['Dětský den', 'Vamberk', 'Královehradecký', '2025-06-07 00:00:00', 'zajišťuje si franšízant', '100-150', 'přihlášeni, Urválek.']
+  r3: ['Pivní fest', 'Kostelec', 'Královehradecký', '2025-06-01 00:00:00', 'zajišťuje si franšízant', '2500', 'přihlášeni, řeší si franšízant, Urválek.']
+  r4: ['Food day festival', 'Holovousy', 'Královehradecký', '2025-06-01 00:00:00', 'jedeme poprvé, nájem 7260,-, tržba 2025', '3500-4000', 'přihlášeni, tento rok se nekonají.']
+  r5: ['Pivní slavnosti', 'Znojmo', 'Jihomoravský', '2025-06-07 00:00:00', 'jedeme poprvé, nájem upřesní', '25000', 'přihlášeni?']
+  r6: ['Fesťáček 2025', 'Plzeň', 'Plzeňský', '2025-06-14 00:00:00', 'jedeme poprvé, nájem upřesní, řeší si franšíz', '6500', 'přihlášeni, Kačenová.']
+  r7: ['Festival Královehradeckého kraje', 'Hradec Králové', 'Královehradecký', '2025-06-06 00:00:00', 'nájem 0,-, řeší si frenšízant, jedeme poprvé', '2500', 'přihlášeni, Přibyl.']
+  r8: ['Bezva fest tour', 'Plzeň', 'Plzeňský', '2025-06-07 00:00:00', 'nájem 7 260,-, jedeme poprvé, tržba 12 500,-', 'řeší si franšízant,2500', 'přihlášeni, Kačenová.']
+
+--- sheet: 'Červenec'  rows=28 cols=7 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  r2: ['Znojemské slavnosti piva', 'Znojmo', 'Jihomoravský', '2025-07-07 00:00:00', 'nájem  upřesní, jedeme poprvé', '25000', 'přihlášeni?']
+  r3: ['Fesťáček', 'Hradec Králové ', 'Královehradecký', '2025-07-05 00:00:00', 'nájem cca 2500? 2024 - zrušeno kvůli počasí', '8000', 'přihlášeni? Přibyl?']
+  r4: ['Rock of Masters', 'Vizovice', 'Zlínský', '10.-13.07.2025', 'faktura zatím nedorazila, jedeme poprvé', 'doporučeno franšízantem, 10 000', 'přihlášeni? Pakhofferová nepojede, Tkadlec ta']
+  r5: ['Otrokovické letní slavnosti', 'Otrokovice', 'Zlínský', '11.-12.7.2025', 'nájem 5808,-.jedeme poprvé', 'doporučeno franšízantem, 5000', 'přihlášeni.']
+  r6: ['Moře u Mělníka', 'Mělník', 'Středočeský', '2025-07-12 00:00:00', 'nájem 4 235,-¨, jedeme poprvé', '2000', 'přihlášeni, Matěj.']
+  r7: ['Trhy v Galerce', 'Přerov', 'Olomoucký', '2025-07-18 00:00:00', '', '', 'slabá akce, nepojedeme.']
+  r8: ['Craft beer fest', 'Poděbrady', 'Středočeský', '2025-07-19 00:00:00', 'nájem 3025,-, jedeme poprvé', 'doporučeno franšízantem, 5000', 'přihlášeni. Přibyl.']
+
+--- sheet: 'Srpen'  rows=32 cols=7 ---
+  r1: ['Akce', 'Město', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  r2: ['Slavnosti okurek', 'Znojmo', 'Jihomoravský', '2024-08-02 00:00:00', 'poprvé', '1500-2000', 'asi se nekoná.']
+  r3: ['Svatovavřinecké slavnosti', 'Hodonín', 'Jihomoravský', '2025-08-09 00:00:00', 'tržba 2024- cca 23 000,-, nájem upřesní', '5000', 'zaslána přihláška přes web.']
+  r4: ['Fesťáček', 'Zlín', 'Zlínský', '2025-08-09 00:00:00', 'poprvé, nájem 2 500,-?', '4500-5000', 'přihlášeni?']
+  r5: ['Jičínský food festival', 'Jičín', 'Královehradecký', '2025-08-09 00:00:00', 'poprvé', '5500', 'přihlášeni jako náhradníci.']
+  r6: ['Festival plný chutí ', 'Hrušovany', 'Jihomoravský', '2025-08-10 00:00:00', 'minulý rok konkurence, nájem?', '3000', 'přihlášeni?ozvou se co nejdříve.']
+  r7: ['Kyjovské letní slavnosti', 'Kyjov', 'Jihomoravský', '15.-17.8.2025', 'tento rok poprvé, nájem 600', '2000', 'přihlášeni.']
+  r8: ['Fesťáček', 'Olomouc', 'Olomoucký', '2025-08-16 00:00:00', 'poprvé, nájem?', '4500', 'přihlášeni?']
+
+--- sheet: 'Září'  rows=38 cols=9 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky', '', '']
+  r2: ['Valašské záření', 'Vsetín', 'Zlínský', '05.-07.09.2025', 'poprvé, nájem se upřesní', 'doporučeno franšízant, 3 000', 'přihlášeni?', '', '']
+  r3: ['Dětský sen', 'Olomouc ', 'Olomoucký', '6.7.9.2025', 'nájem 2500,-řeší si Přibyl, jedeme poprvé, tr', 'řeší si franšízant,2000', 'přihlášeni, Přibyl.', '', '']
+  r4: ['Posvícení', 'Nymburk', 'Středočeský', '2025-09-06 00:00:00', 'poprvé, nájem se upřesní, doporučeno', '5000-6000', 'přihlášeni, Přibyl.', '', '']
+  r5: ['Chillibraní', 'Brno-Velodron', 'Jihomoravský', '2025-09-06 00:00:00', 'nájem 2500,-, prodej 2023: 31 000,-, prodej 2', '2000', 'přihlášeni.', '', '']
+  r6: ['Lednické vinobraní a gulášfest', 'Lednice', 'Jihomoravský', '2025-09-06 00:00:00', 'nájem cca 4 000,-, 2024 měli plno', '3000-4000', 'rezervace?', '', '']
+  r7: ['Charitativní sraz Amerik', 'Tábor', 'Jihočeský', '2025-09-06 00:00:00', 'řeší si franšízant', '3500', 'přihlášeni, Kačenová.', '', '']
+  r8: ['Zažít Blansko jinak', 'Blansko', 'Jihomoravský', '2025-09-07 00:00:00', 'prodej 2024:28 000,-, nájem 1000?', '1000', 'přihlášeni.', '', '']
+
+--- sheet: 'Říjen'  rows=14 cols=7 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  r2: ['Horti komplex - Flora Olomouc', 'Olomouc', '                                             ', '                                     2.-5.10.', ' nájem 4000,-, 2024 cca 50 000,-', '25000', 'přihlášeni, Přibyl.']
+  r3: ['Farmářské trhy', 'Doudleby', 'Královehradecký', '2025-10-19 00:00:00', 'tržba 16 125,-, nájem 500,-', '6000', 'přihlášeni.']
+  r4: ['Street food Sázava', 'Sázava', 'Středočeský', '2025-10-19 00:00:00', 'tržba 2024 cca 31 000,-, nájem upřesní', '18000', 'přihlášeni?']
+  r5: ['Street food Jaroměř', 'HK', 'Královehradecký', '2025-10-27 00:00:00', 'tržba 2024: 15 000,-, nájem 3 630,-', '13000', 'přihlášeni?']
+  r6: ['Cibulový jarmark', 'Hořovice', 'Středočeský', '04.-05.10.2025', 'poprvé, nájem zašlou.', '1500', 'přihlášeni.']
+  r7: ['Břevnovské posvícení ', 'Praha', 'Středočeský', '04.-06.10.2025', 'nájem 2 420,-, 2024 nás nechtěli.', '8000', 'přihlášeni.']
+  r8: ['Velká Pardubická', 'Pardubice', 'Pardubický', '2025-10-12 00:00:00', 'slabé prodeje 2024: 10 000,-, lepší místo, hl', '5000-6000', 'přihlášeni.']
+
+--- sheet: 'Listopad'  rows=15 cols=7 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  r2: ['Velká Pardubická', 'Pardubice', 'Královehradecký', '2025-11-01 00:00:00', '2024 nebyli jsme, nájem 4000,-?', '5500', 'přihlášeni?']
+  r3: ['Svatomartinské trhy ', 'Poděbrady', 'Středočeský', '2025-11-08 00:00:00', '2024 - obsazeno, nájem upřesní', '2000', 'přihlášeni.']
+  r4: ['Farmářské trhy', 'Doudleby', 'Královehradecký', '2025-11-16 00:00:00', 'tržba 2024:21 000,-, nájem 500,-', '1500', 'přihlášeni, Přibyl?']
+  r5: ['Adventní punčování', 'Hustopeče', 'Jihomoravský', '2025-11-29 00:00:00', 'jedeme poprvé, nájem?', 'doporučeno, 2500-3000', 'přihlášeni.']
+  r6: ['Chocolate Festival', 'Liberec', 'Liberecký', '01.-02.11.2025', '', '', 'spolupráce s konkurencí']
+  r7: ['Comic Con Junior', 'Brno', 'Jihomoravský', '02.-03.11.2025', ' tržba 2024 cca 26 000,-, nájem cca 8 228,-', '7000', 'přihlášeni?']
+  r8: ['Výlov rybníka Olšovec', 'Jedovnice', 'Jihomoravský', '02.-03.11.2025', 'tržba 2024 :cca 29 000,-', '22000', 'přihlášeni - spustí se začátek v září.']
+
+--- sheet: 'Prosinec'  rows=14 cols=7 ---
+  r1: ['Akce', 'Místo', 'Kraj', 'datum', 'prodej', 'Návštěvnost', 'Poznámky']
+  r2: ['Jarmark ', 'Rokytnice v Orlických horách', 'Liberecký', '2025-12-07 00:00:00', 'tržba 2024- 22 000,-, nájem 500,-', '1000', 'přihlášeni,Přibyl?']
+  r3: ['Farmářské trhy ', 'Doudleby', 'Královehradecký', '2025-12-07 00:00:00', 'tržba 2024- 21 000,-, nájem 500,-', '1000', 'přihlášeni,Přibyl?']
+  r4: ['Flerjarmark', 'Česká Třebová', 'Jihomoravský', '2025-12-08 00:00:00', 'tržba 2024- 26 000,-, nájem zašlou', '2500', 'přihlášeni?']
+  r5: ['Svařákobraní ', 'Pardubice', 'Pardubický', '2025-12-08 00:00:00', 'tržba 2024- 20 000,-, nájem upřesní', '5000', 'přihlášeni?']
+  r6: ['Vánoční trhy', 'Dobruška', 'Královehradecký', '2025-12-12 00:00:00', 'tržba 2024-nezaznamenána, tržba 2025', '3000', 'přihlášeni?']
+  r7: ['Vánoční trhy v uličce', 'Hradec Králové ', '                                             ', '                                             ', 'tržba 2024- 45 000,-, fakturu upřesní', '15000', 'přihlášeni?']
+  r8: ['Znojemské vánoční trhy', 'Znojmo', 'Jihomoravský', '01.-23.12.2025', 'tržba 2024-nezaznamenána, nájem upřesní', '5500', 'přihlášeni?']

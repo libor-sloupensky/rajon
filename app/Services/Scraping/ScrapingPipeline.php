@@ -145,12 +145,72 @@ class ScrapingPipeline
         $statistiky['podle_typu'][$data['typ'] ?? 'jiny'] = ($statistiky['podle_typu'][$data['typ'] ?? 'jiny'] ?? 0) + 1;
 
         // 6. Deduplikace + uložení (fuzzy match + merge)
+        $puvodniPocetKonfliktu = 0;
+        if ($existujici = $this->matcher->najdiExistujici($data)) {
+            $puvodniPocetKonfliktu = count($existujici->konflikty ?? []);
+        }
+
         $akce = $this->ulozAkci($data, $url, $skore, $stav, $zdroj);
         $novy = $akce->wasRecentlyCreated;
 
         $this->ulozAkceZdroj($akce, $zdroj, $url, $data);
 
+        // 7. Fallback na web pořadatele — pokud po merge přibyly konflikty a akce má web_url
+        $nyniPocetKonfliktu = count($akce->konflikty ?? []);
+        if (!$novy && $nyniPocetKonfliktu > $puvodniPocetKonfliktu && !empty($akce->web_url)) {
+            $vyresenoZPoradatele = $this->zkusitVyresitZPoradatele($akce);
+            if ($vyresenoZPoradatele) {
+                return ['stav' => 'aktualizovany', 'akce_id' => $akce->id, 'poznamka' => 'konflikty_vyreseny_poradatelem'];
+            }
+        }
+
         return ['stav' => $novy ? 'novy' : 'aktualizovany', 'akce_id' => $akce->id];
+    }
+
+    /**
+     * Pokus se vyřešit konflikty stažením webu pořadatele.
+     * Web pořadatele má trust 95+ (jen manual je 100), takže jeho data přepíšou konflikty.
+     */
+    protected function zkusitVyresitZPoradatele(Akce $akce): bool
+    {
+        $webPoradatele = $akce->web_url;
+        if (empty($webPoradatele)) return false;
+
+        // Už jsme scrapovali tento web? Pokud ano, nedělat to znovu
+        $existingScrape = $akce->akceZdroje()->where('url', $webPoradatele)->exists();
+        if ($existingScrape) return false;
+
+        // Fetch + AI extrakce
+        $html = $this->fetchHtml($webPoradatele);
+        if (!$html) return false;
+
+        $data = $this->extractor->extrahuj($html, $webPoradatele);
+        if (!$data) return false;
+
+        // Vytvořit dočasný "virtuální" zdroj s flagem je_web_poradatele=true
+        // Nebo použít existující zdroj ale flagovat URL jako od pořadatele
+        $virtualZdroj = new \App\Models\Zdroj([
+            'nazev' => 'Web pořadatele (' . parse_url($webPoradatele, PHP_URL_HOST) . ')',
+            'url' => $webPoradatele,
+            'cms_typ' => 'web_poradatele',
+            'je_web_poradatele' => true,
+        ]);
+
+        // Merge — AkceMerger detekuje web_poradatele (buď flag, nebo doména)
+        $this->merger->merge($akce, $data, $virtualZdroj, $webPoradatele);
+
+        // Uložit do akce_zdroje s flagem
+        \App\Models\AkceZdroj::updateOrCreate(
+            ['zdroj_id' => $akce->zdroj_id, 'url' => $webPoradatele],
+            [
+                'akce_id' => $akce->id,
+                'je_od_poradatele' => true,
+                'surova_data' => $data,
+                'posledni_ziskani' => now(),
+            ]
+        );
+
+        return true;
     }
 
     protected function fetchHtml(string $url): ?string
@@ -224,10 +284,19 @@ class ScrapingPipeline
         // Inicializace pole_zdroje pro všechna vyplněná pole
         $this->merger->inicializujZdroje($akce, $zdroj);
 
-        // Ročníkové propojení — AI návrh pro admin potvrzení
+        // Ročníkové propojení — auto při similarity ≥ threshold, jinak návrh adminovi
         $navrhy = $this->matcher->navrhniPropojeniRocniku($data);
         if (!empty($navrhy)) {
-            $akce->navrh_propojeni = $navrhy;
+            $autoThreshold = (int) config('scraping.auto_propojeni_similarity', 90);
+            $nejlepsi = $navrhy[0];
+
+            if (!empty($nejlepsi['similarity']) && $nejlepsi['similarity'] >= $autoThreshold) {
+                // Automatické propojení na nejpodobnější starší ročník
+                $akce->propojena_s_akci_id = $nejlepsi['akce_id'];
+                $akce->navrh_propojeni = array_slice($navrhy, 1);  // ponechat další návrhy
+            } else {
+                $akce->navrh_propojeni = $navrhy;
+            }
             $akce->save();
         }
 
