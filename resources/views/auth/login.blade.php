@@ -8,6 +8,12 @@
             </div>
         @endif
 
+        @if (session('error'))
+            <div class="mb-4 rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-700">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <form method="POST" action="{{ route('login') }}" class="space-y-4">
             @csrf
 
@@ -51,8 +57,8 @@
             Přihlásit se přes Google
         </a>
 
-        <p class="mt-6 text-center text-sm text-gray-500">
-            Nemáte účet? <a href="{{ route('register') }}" class="font-medium text-primary hover:text-primary-dark">Zaregistrujte se</a>
+        <p class="mt-6 text-center text-xs text-gray-400">
+            Přístup je možný pouze na pozvánku administrátora.
         </p>
     </div>
 </x-layouts.app>

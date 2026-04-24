@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AkceController as AdminAkceController;
 use App\Http\Controllers\Admin\ScrapingController;
 use App\Http\Controllers\Admin\UzivateleController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\Auth\RegistraceController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,10 @@ Route::get('/api/akce-mapa', [AkceController::class, 'mapaJson'])->name('api.akc
 // Google OAuth
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.redirect');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
+
+// Registrace pouze na pozvánku
+Route::get('/registrace', [RegistraceController::class, 'zobrazit'])->name('registrace');
+Route::post('/registrace', [RegistraceController::class, 'registrovat'])->name('registrace.store');
 
 // Přihlášený uživatel
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -38,6 +43,13 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\JeAdmin::class])->pr
     Route::delete('/akce/{akce}', [AdminAkceController::class, 'destroy'])->name('akce.destroy');
     Route::get('/zdroje', [AdminAkceController::class, 'zdroje'])->name('zdroje');
     Route::get('/uzivatele', [UzivateleController::class, 'index'])->name('uzivatele');
+
+    // Pozvánky
+    Route::get('/pozvanky', [\App\Http\Controllers\Admin\PozvankyController::class, 'index'])->name('pozvanky.index');
+    Route::get('/pozvanky/new', [\App\Http\Controllers\Admin\PozvankyController::class, 'create'])->name('pozvanky.create');
+    Route::post('/pozvanky', [\App\Http\Controllers\Admin\PozvankyController::class, 'store'])->name('pozvanky.store');
+    Route::post('/pozvanky/{pozvanka}/resend', [\App\Http\Controllers\Admin\PozvankyController::class, 'resend'])->name('pozvanky.resend');
+    Route::delete('/pozvanky/{pozvanka}', [\App\Http\Controllers\Admin\PozvankyController::class, 'destroy'])->name('pozvanky.destroy');
 
     // Scraping — zdroje a běhy
     Route::get('/scraping', [ScrapingController::class, 'index'])->name('scraping.index');

@@ -22,7 +22,8 @@ return [
     'views' => true,
 
     'features' => [
-        Features::registration(),
+        // Registrace NE — jen na pozvánku (vlastní controller/route)
+        // Features::registration(),
         Features::resetPasswords(),
         Features::emailVerification(),
     ],

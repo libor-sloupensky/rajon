@@ -136,6 +136,11 @@ class Akce extends Model
         return $this->hasMany(AkceZdroj::class, 'akce_id');
     }
 
+    public function vykazy(): HasMany
+    {
+        return $this->hasMany(AkceVykaz::class, 'akce_id');
+    }
+
     /** Je kraj akce ve sledovaném regionu (východní ČR)? */
     public function jeVRegionu(): bool
     {

@@ -37,8 +37,7 @@
 
             <div class="flex items-center gap-3">
                 @guest
-                    <a href="{{ route('login') }}" class="text-sm text-gray-600 hover:text-primary transition">Přihlásit</a>
-                    <a href="{{ route('register') }}" class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark transition">Registrace</a>
+                    <a href="{{ route('login') }}" class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark transition">Přihlásit</a>
                 @endguest
             </div>
         </nav>

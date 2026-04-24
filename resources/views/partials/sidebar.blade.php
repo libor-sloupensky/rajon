@@ -37,6 +37,7 @@
                         <a href="{{ route('admin.scraping.index') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.scraping.*') ? 'active' : '' }}">Scraping zdrojů</a>
                         <a href="{{ route('admin.zdroje') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.zdroje') ? 'active' : '' }}">Zdroje dat</a>
                         <a href="{{ route('admin.uzivatele') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.uzivatele') ? 'active' : '' }}">Uživatelé</a>
+                        <a href="{{ route('admin.pozvanky.index') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.pozvanky.*') ? 'active' : '' }}">Pozvánky</a>
                     </div>
                 </div>
             @endif
