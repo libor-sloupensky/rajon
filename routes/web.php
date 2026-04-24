@@ -34,6 +34,7 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\JeAdmin::class])->pr
     Route::post('/akce', [AdminAkceController::class, 'store'])->name('akce.store');
     Route::get('/akce/{akce}/edit', [AdminAkceController::class, 'edit'])->name('akce.edit');
     Route::put('/akce/{akce}', [AdminAkceController::class, 'update'])->name('akce.update');
+    Route::post('/akce/{akce}/odemknout-pole', [AdminAkceController::class, 'odemknoutPole'])->name('akce.odemknout-pole');
     Route::delete('/akce/{akce}', [AdminAkceController::class, 'destroy'])->name('akce.destroy');
     Route::get('/zdroje', [AdminAkceController::class, 'zdroje'])->name('zdroje');
     Route::get('/uzivatele', [UzivateleController::class, 'index'])->name('uzivatele');

@@ -59,6 +59,11 @@ class Akce extends Model
         'velikost_stav',
         'velikost_info',
         'velikost_signaly',
+        'pole_manualni',
+        'pole_zdroje',
+        'konflikty',
+        'merge_log',
+        'navrh_propojeni',
     ];
 
     protected function casts(): array
@@ -72,7 +77,32 @@ class Akce extends Model
             'obrat' => 'integer',
             'velikost_skore' => 'integer',
             'velikost_signaly' => 'array',
+            'pole_manualni' => 'array',
+            'pole_zdroje' => 'array',
+            'konflikty' => 'array',
+            'merge_log' => 'array',
+            'navrh_propojeni' => 'array',
         ];
+    }
+
+    /** Označí pole jako manuálně upravené (scraping ho nepřepíše). */
+    public function uzamknoutPole(string $pole): void
+    {
+        $manualni = $this->pole_manualni ?? [];
+        $manualni[$pole] = now()->toIso8601String();
+        $this->pole_manualni = $manualni;
+    }
+
+    public function odemknoutPole(string $pole): void
+    {
+        $manualni = $this->pole_manualni ?? [];
+        unset($manualni[$pole]);
+        $this->pole_manualni = $manualni ?: null;
+    }
+
+    public function jePoleUzamceno(string $pole): bool
+    {
+        return isset(($this->pole_manualni ?? [])[$pole]);
     }
 
     public function uzivatel(): BelongsTo

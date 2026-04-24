@@ -24,6 +24,8 @@ class ScrapingPipeline
     public function __construct(
         protected ZdrojAnalyzer $analyzer,
         protected AkceExtractor $extractor,
+        protected AkceMatcher $matcher,
+        protected AkceMerger $merger,
     ) {}
 
     /**
@@ -142,7 +144,7 @@ class ScrapingPipeline
         $statistiky['podle_velikosti'][$stav] = ($statistiky['podle_velikosti'][$stav] ?? 0) + 1;
         $statistiky['podle_typu'][$data['typ'] ?? 'jiny'] = ($statistiky['podle_typu'][$data['typ'] ?? 'jiny'] ?? 0) + 1;
 
-        // 6. Deduplikace + uložení
+        // 6. Deduplikace + uložení (fuzzy match + merge)
         $akce = $this->ulozAkci($data, $url, $skore, $stav, $zdroj);
         $novy = $akce->wasRecentlyCreated;
 
@@ -165,27 +167,31 @@ class ScrapingPipeline
         }
     }
 
-    /** Ulož nebo aktualizuj akci (deduplikace podle nazev + datum_od + misto/mesto). */
+    /** Ulož nebo aktualizuj akci — fuzzy matching + field-level merge. */
     protected function ulozAkci(array $data, string $url, int $skore, string $stav, Zdroj $zdroj): Akce
     {
+        $data['typ'] = $this->normalizujTyp($data['typ'] ?? 'jiny');
+        $data['_skore'] = $skore;
+        $data['_stav'] = $stav;
+
+        // 1. Fuzzy match na existující akci
+        $existing = $this->matcher->najdiExistujici($data);
+
+        if ($existing) {
+            // Update přes AkceMerger (respektuje manuální pole + trust)
+            $this->merger->merge($existing, $data, $zdroj, $url);
+            return $existing;
+        }
+
+        // 2. Nová akce — vytvořit + inicializovat pole_zdroje
         $nazev = $data['nazev'] ?? 'Bez názvu';
         $datumOd = $data['datum_od'] ?? null;
-        $mesto = $data['mesto'] ?? $data['misto'] ?? null;
-
-        // Deduplikace
-        $existing = Akce::query()
-            ->where('nazev', $nazev)
-            ->when($datumOd, fn ($q) => $q->whereDate('datum_od', $datumOd))
-            ->when($mesto, fn ($q) => $q->where(fn ($q2) => $q2->where('misto', 'like', "%{$mesto}%")->orWhere('adresa', 'like', "%{$mesto}%")))
-            ->first();
-
-        $hash = hash('sha256', json_encode($data));
-        $slug = $this->vytvorUnikatniSlug($nazev, $datumOd, $existing?->id);
+        $slug = $this->vytvorUnikatniSlug($nazev, $datumOd, null);
 
         $payload = [
             'nazev' => $nazev,
-            'slug' => $existing?->slug ?? $slug,
-            'typ' => $this->normalizujTyp($data['typ'] ?? 'jiny'),
+            'slug' => $slug,
+            'typ' => $data['typ'],
             'popis' => $data['popis'] ?? null,
             'datum_od' => $datumOd,
             'datum_do' => $data['datum_do'] ?? null,
@@ -203,22 +209,29 @@ class ScrapingPipeline
             'zdroj_typ' => 'scraping',
             'zdroj_id' => $zdroj->id,
             'vstupne' => $data['vstupne'] ?? null,
-            'externi_hash' => $hash,
+            'externi_hash' => hash('sha256', json_encode($data)),
             'velikost_skore' => $skore,
             'velikost_stav' => $stav,
-            'velikost_info' => $data['velikost_info'] ?? null,
+            'velikost_info' => $data['velikost_info']
+                ? "[{$zdroj->nazev}] " . $data['velikost_info']
+                : null,
             'velikost_signaly' => $data['velikost_signaly'] ?? null,
             'stav' => 'navrh',
         ];
 
-        if ($existing) {
-            if ($existing->externi_hash !== $hash) {
-                $existing->update($payload);
-            }
-            return $existing;
+        $akce = Akce::create($payload);
+
+        // Inicializace pole_zdroje pro všechna vyplněná pole
+        $this->merger->inicializujZdroje($akce, $zdroj);
+
+        // Ročníkové propojení — AI návrh pro admin potvrzení
+        $navrhy = $this->matcher->navrhniPropojeniRocniku($data);
+        if (!empty($navrhy)) {
+            $akce->navrh_propojeni = $navrhy;
+            $akce->save();
         }
 
-        return Akce::create($payload);
+        return $akce;
     }
 
     /** Ulož záznam do akce_zdroje (many-to-many). */

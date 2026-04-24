@@ -97,9 +97,31 @@ class AkceController extends Controller
             'stav' => ['required', 'string'],
         ]);
 
+        // Auto-lock: pole, které admin změnil, označíme jako manuální — scraping ho nepřepíše
+        $manualni = $akce->pole_manualni ?? [];
+        $zdroje = $akce->pole_zdroje ?? [];
+        foreach ($data as $pole => $novaHodnota) {
+            if ($akce->$pole != $novaHodnota) {
+                $manualni[$pole] = now()->toIso8601String();
+                $zdroje[$pole] = 'manual';
+            }
+        }
+        $data['pole_manualni'] = $manualni;
+        $data['pole_zdroje'] = $zdroje;
+
         $akce->update($data);
 
-        return redirect()->route('admin.akce.index')->with('success', 'Akce aktualizována.');
+        return redirect()->route('admin.akce.index')->with('success', 'Akce aktualizována. Upravená pole jsou zamčena proti přepisu scrapingem.');
+    }
+
+    /** Odemknout pole — scraping ho zase bude moci aktualizovat. */
+    public function odemknoutPole(Request $request, Akce $akce)
+    {
+        $request->validate(['pole' => ['required', 'string']]);
+        $akce->odemknoutPole($request->pole);
+        $akce->save();
+
+        return back()->with('success', "Pole {$request->pole} odemknuto.");
     }
 
     public function destroy(Akce $akce)

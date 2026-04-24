@@ -419,3 +419,57 @@ AI prompt navíc vyzývá:
 6. Implementovat `VelikostKlasifikator` (AI scoring)
 7. Admin UI pro přidání zdroje + test extrakce
 8. Přidat první 3 zdroje: kudyznudy.cz (filtrovat kraj), stankar.cz, webtrziste.cz
+
+## Merge strategie (aktualizace 2026-04-24)
+
+### Problém
+Stejná akce může existovat ve více zdrojích (kudyznudy + stankar + webtrziste) s různou kvalitou dat.
+Další komplikace: admin může pole upravit ručně — scraping to nesmí přepsat.
+
+### Řešení — 3 vrstvy
+
+**1. Fuzzy matching (`AkceMatcher`):**
+- Strategie A: slug exact (`pout-u-sv-jiri-2026`)
+- Strategie B: název + datum ± 3 dny + město LIKE
+- Strategie C: similar_text ≥ 80 % + datum ± 3 dny + GPS < 1 km
+
+**2. Field-level merge (`AkceMerger`):**
+Priorita pravidel (shora dolů):
+- `pole_manualni` → NIKDY nepřepsat
+- Prázdné pole → DOPLNIT
+- Popis: delší verze (1.2×) → PŘEPSAT
+- Klíčové pole (datum, GPS, místo) konflikt → ULOŽIT DO `konflikty`, admin rozhodne
+- Trust ranking: vyšší trust zdroje → PŘEPSAT
+- `velikost_info` → APPEND z více zdrojů (`[kudyznudy] ... [stankar] ...`)
+- `velikost_signaly` → MERGE JSON
+- `velikost_skore` → vyšší vyhrává
+
+**3. Trust ranking (`config/scraping.php`):**
+```
+kudyznudy: GPS=90, kontakt=85, popis=75
+wordpress_mec (stankar): čas=85, popis=65, kontakt=55
+webtrziste: velikost_signaly=95, vstupne=80, kontakt=20
+manual: * = 100  (admin vyhraje vždy)
+excel: najem=100, obrat=100
+```
+
+### Metadata sledovaná na akci
+
+- `pole_manualni` — JSON: `{kontakt_email: "2026-04-24T10:30"}` — pole zamčená adminem
+- `pole_zdroje` — JSON: `{gps_lat: "kudyznudy"}` — zdroj hodnoty
+- `konflikty` — JSON: seznam konfliktních rozhodnutí, admin rozhoduje
+- `merge_log` — JSON: posledních 20 merge operací (audit trail)
+- `navrh_propojeni` — JSON: AI navrhuje ročníkové propojení ("Řípská pouť 2025")
+
+### Auto-lock v admin UI
+
+- Když admin edituje pole → auto-přidá do `pole_manualni` s timestampem
+- Pole s visacím zámkem 🔒 v UI, tlačítko "Odemknout" vrátí kontrolu scrapingu
+- Zobrazení: "ze zdroje: kudyznudy" u každého pole
+
+### Ročníkové propojení
+
+- `AkceMatcher::navrhniPropojeniRocniku()` hledá podobné akce z jiných let
+- Uloží do `akce.navrh_propojeni` (JSON)
+- Admin v UI vidí banner: "🔗 AI navrhuje propojení s: Řípská pouť 2025 (podobnost 92%)"
+- Admin kliknutím propojí přes `propojena_s_akci_id`
