@@ -35,9 +35,7 @@
                     <div class="rj-sidebar-section-body" style="max-height: 20rem;">
                         <a href="{{ route('admin.akce.index') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.akce.*') ? 'active' : '' }}">Správa akcí</a>
                         <a href="{{ route('admin.scraping.index') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.scraping.*') ? 'active' : '' }}">Scraping zdrojů</a>
-                        <a href="{{ route('admin.zdroje') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.zdroje') ? 'active' : '' }}">Zdroje dat</a>
-                        <a href="{{ route('admin.uzivatele') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.uzivatele') ? 'active' : '' }}">Uživatelé</a>
-                        <a href="{{ route('admin.pozvanky.index') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.pozvanky.*') ? 'active' : '' }}">Pozvánky</a>
+                        <a href="{{ route('admin.uzivatele') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.uzivatele') ? 'active' : '' }}">Uživatelé a pozvánky</a>
                     </div>
                 </div>
             @endif

@@ -41,15 +41,11 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\JeAdmin::class])->pr
     Route::put('/akce/{akce}', [AdminAkceController::class, 'update'])->name('akce.update');
     Route::post('/akce/{akce}/odemknout-pole', [AdminAkceController::class, 'odemknoutPole'])->name('akce.odemknout-pole');
     Route::delete('/akce/{akce}', [AdminAkceController::class, 'destroy'])->name('akce.destroy');
-    Route::get('/zdroje', [AdminAkceController::class, 'zdroje'])->name('zdroje');
+    // Uživatelé — na jedné stránce i seznam pozvánek + rychlý formulář pro pozvání
     Route::get('/uzivatele', [UzivateleController::class, 'index'])->name('uzivatele');
-
-    // Pozvánky
-    Route::get('/pozvanky', [\App\Http\Controllers\Admin\PozvankyController::class, 'index'])->name('pozvanky.index');
-    Route::get('/pozvanky/new', [\App\Http\Controllers\Admin\PozvankyController::class, 'create'])->name('pozvanky.create');
-    Route::post('/pozvanky', [\App\Http\Controllers\Admin\PozvankyController::class, 'store'])->name('pozvanky.store');
-    Route::post('/pozvanky/{pozvanka}/resend', [\App\Http\Controllers\Admin\PozvankyController::class, 'resend'])->name('pozvanky.resend');
-    Route::delete('/pozvanky/{pozvanka}', [\App\Http\Controllers\Admin\PozvankyController::class, 'destroy'])->name('pozvanky.destroy');
+    Route::post('/uzivatele/pozvat', [UzivateleController::class, 'pozvat'])->name('uzivatele.pozvat');
+    Route::post('/uzivatele/pozvanky/{pozvanka}/resend', [UzivateleController::class, 'resendPozvanku'])->name('uzivatele.pozvanka.resend');
+    Route::delete('/uzivatele/pozvanky/{pozvanka}', [UzivateleController::class, 'zrusitPozvanku'])->name('uzivatele.pozvanka.zrusit');
 
     // Scraping — zdroje a běhy
     Route::get('/scraping', [ScrapingController::class, 'index'])->name('scraping.index');

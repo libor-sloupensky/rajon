@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Akce;
-use App\Models\Zdroj;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -132,10 +131,4 @@ class AkceController extends Controller
         return redirect()->route('admin.akce.index')->with('success', 'Akce smazána.');
     }
 
-    public function zdroje()
-    {
-        $zdroje = Zdroj::orderBy('vytvoreno', 'desc')->paginate(20);
-
-        return view('admin.zdroje.index', compact('zdroje'));
-    }
 }
