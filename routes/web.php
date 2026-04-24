@@ -7,18 +7,13 @@ use App\Http\Controllers\Admin\UzivateleController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\RegistraceController;
 use App\Http\Controllers\DashboardController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Veřejné routy
-Route::get('/', fn () => redirect('/akce'));
-Route::get('/akce', [AkceController::class, 'index'])->name('akce.index');
-Route::get('/akce/{akce:slug}', [AkceController::class, 'show'])->name('akce.show');
-Route::get('/mapa', [AkceController::class, 'mapa'])->name('akce.mapa');
+// Kořen — redirect podle stavu přihlášení
+Route::get('/', fn () => Auth::check() ? redirect('/dashboard') : redirect('/login'));
 
-// API pro mapu
-Route::get('/api/akce-mapa', [AkceController::class, 'mapaJson'])->name('api.akce.mapa');
-
-// Google OAuth
+// Google OAuth — jediné veřejné auth endpointy (kromě login/registrace)
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.redirect');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
 
@@ -26,10 +21,18 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name
 Route::get('/registrace', [RegistraceController::class, 'zobrazit'])->name('registrace');
 Route::post('/registrace', [RegistraceController::class, 'registrovat'])->name('registrace.store');
 
-// Přihlášený uživatel
+// Celý web pouze pro přihlášené s ověřeným e-mailem
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Katalog akcí
+    Route::get('/akce', [AkceController::class, 'index'])->name('akce.index');
+    Route::get('/akce/{akce:slug}', [AkceController::class, 'show'])->name('akce.show');
+    Route::get('/mapa', [AkceController::class, 'mapa'])->name('akce.mapa');
     Route::post('/akce/{akce}/rezervovat', [AkceController::class, 'rezervovat'])->name('akce.rezervovat');
+
+    // API pro mapu
+    Route::get('/api/akce-mapa', [AkceController::class, 'mapaJson'])->name('api.akce.mapa');
 });
 
 // Admin (je_admin middleware)
@@ -41,7 +44,8 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\JeAdmin::class])->pr
     Route::put('/akce/{akce}', [AdminAkceController::class, 'update'])->name('akce.update');
     Route::post('/akce/{akce}/odemknout-pole', [AdminAkceController::class, 'odemknoutPole'])->name('akce.odemknout-pole');
     Route::delete('/akce/{akce}', [AdminAkceController::class, 'destroy'])->name('akce.destroy');
-    // Uživatelé — na jedné stránce i seznam pozvánek + rychlý formulář pro pozvání
+
+    // Uživatelé + pozvánky
     Route::get('/uzivatele', [UzivateleController::class, 'index'])->name('uzivatele');
     Route::post('/uzivatele/pozvat', [UzivateleController::class, 'pozvat'])->name('uzivatele.pozvat');
     Route::post('/uzivatele/pozvanky/{pozvanka}/resend', [UzivateleController::class, 'resendPozvanku'])->name('uzivatele.pozvanka.resend');
