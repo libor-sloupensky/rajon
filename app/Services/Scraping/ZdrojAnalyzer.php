@@ -226,6 +226,7 @@ class ZdrojAnalyzer
     public function seznamUrlZSitemap(string $sitemapUrl, string $urlPatternDetail = '/akce/'): array
     {
         $urls = [];
+        $pattern = $this->normalizujPattern($urlPatternDetail);
 
         try {
             $response = Http::withHeaders(['User-Agent' => self::UA])
@@ -252,7 +253,7 @@ class ZdrojAnalyzer
             if (isset($xml->url)) {
                 foreach ($xml->url as $u) {
                     $loc = (string) $u->loc;
-                    if ($urlPatternDetail === '*' || str_contains($loc, $urlPatternDetail)) {
+                    if ($pattern === '*' || str_contains($loc, $pattern)) {
                         $urls[] = $loc;
                     }
                 }
@@ -262,5 +263,25 @@ class ZdrojAnalyzer
         }
 
         return $urls;
+    }
+
+    /**
+     * Normalizuj URL pattern — strip placeholder `{slug}`, `{id}` apod.
+     * "/akce/{slug}" → "/akce/", "/trhy/akce/program.php?id={id}" → "/trhy/akce/program.php"
+     */
+    protected function normalizujPattern(string $pattern): string
+    {
+        if ($pattern === '*' || $pattern === '') return '*';
+
+        // Odstranit vše od první `{` dál — včetně query stringu s placeholderem
+        if (($pos = strpos($pattern, '{')) !== false) {
+            $pattern = rtrim(substr($pattern, 0, $pos), '?&=/');
+            // Pokud zůstala jen cesta bez query, ponechat lomítko
+            if (!str_contains($pattern, '?')) {
+                $pattern = rtrim($pattern, '/') . '/';
+            }
+        }
+
+        return $pattern;
     }
 }

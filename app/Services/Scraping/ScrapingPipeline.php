@@ -98,19 +98,48 @@ class ScrapingPipeline
         return $log;
     }
 
-    /** Získej seznam URL ke scrapingu z sitemap. */
+    /** Získej seznam URL ke scrapingu z sitemap. Vždy vrací absolutní URL. */
     protected function ziskejUrls(Zdroj $zdroj): array
     {
         if ($zdroj->sitemap_url) {
-            return $this->analyzer->seznamUrlZSitemap(
+            $urls = $this->analyzer->seznamUrlZSitemap(
                 $zdroj->sitemap_url,
                 $zdroj->url_pattern_detail ?: '*'
             );
+        } else {
+            // Fallback: analyzovat listing URL a vytáhnout odkazy
+            $analyza = $this->analyzer->analyzuj($zdroj->url);
+            $urls = $analyza['struktura']['odkazy_akci'] ?? [];
         }
 
-        // Fallback: analyzovat listing URL a vytáhnout odkazy
-        $analyza = $this->analyzer->analyzuj($zdroj->url);
-        return $analyza['struktura']['odkazy_akci'] ?? [];
+        // Převést všechny relativní URL na absolutní (base URL zdroje)
+        $baseUrl = $this->extractBaseUrl($zdroj->url);
+        return array_map(fn ($u) => $this->absolutniUrl($u, $baseUrl), $urls);
+    }
+
+    /** Resolvuj URL proti base — vrátí absolutní URL. */
+    protected function absolutniUrl(string $url, string $baseUrl): string
+    {
+        // Už absolutní
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            return $url;
+        }
+        // Protocol-relative
+        if (str_starts_with($url, '//')) {
+            return 'https:' . $url;
+        }
+        // Absolutní path — přidat base
+        if (str_starts_with($url, '/')) {
+            return rtrim($baseUrl, '/') . $url;
+        }
+        // Relativní — přidat base + /
+        return rtrim($baseUrl, '/') . '/' . $url;
+    }
+
+    protected function extractBaseUrl(string $url): string
+    {
+        $parsed = parse_url($url);
+        return ($parsed['scheme'] ?? 'https') . '://' . ($parsed['host'] ?? '');
     }
 
     /** Zpracuj jednu akci — extrakce, filtry, uložení. */
