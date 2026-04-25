@@ -250,17 +250,25 @@ class ImportHistorickychDatSeeder extends Seeder
     /** @param array<string, mixed> $row */
     private function normalizujRadek(array $row, $now): array
     {
-        // Ořez podle limitů ve schématu — Excel parser někdy nasypal text mimo
-        // odpovídající sloupec (např. dlouhý popis do `kontakt_telefon`).
-        $telefon = $this->trunc($row['kontakt_telefon'] ?? null, 20);
-        $email = $this->trunc($row['kontakt_email'] ?? null, 255);
+        // Excel parser někdy nasypal text mimo odpovídající sloupec
+        // (např. popis akce do `kontakt_telefon`). Validuj formát:
+        $telefon = $row['kontakt_telefon'] ?? null;
+        $email = $row['kontakt_email'] ?? null;
 
-        // Pokud telefon vypadá jako email a email vypadá jako telefon, prohoď
-        if ($email && !str_contains($email, '@') && preg_match('/^[\d\s\+\-\(\)]+$/', $email)) {
-            // email je telefon
-            if (!$telefon) $telefon = $this->trunc($email, 20);
+        // Email — pokud nemá @, není to email; pokud vypadá jako telefon, přesuň
+        if ($email && !str_contains($email, '@')) {
+            if (!$telefon && preg_match('/^[\d\s\+\-\(\)\.\/]+$/', $email)) {
+                $telefon = $email;
+            }
             $email = null;
         }
+        // Telefon — pokud má znaky které nepatří do telefonu, není to telefon
+        if ($telefon && !preg_match('/^[\d\s\+\-\(\)\.\/]+$/', $telefon)) {
+            $telefon = null;
+        }
+        // Bezpečnostní ořez na limity sloupců
+        $telefon = $this->trunc($telefon, 20);
+        $email = $this->trunc($email, 255);
 
         return [
             'nazev' => $this->trunc($row['nazev'] ?? null, 255),
