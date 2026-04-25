@@ -721,18 +721,27 @@ class ScrapingPipeline
             // Velké veřejné akce (WormUP target)
             'pout' => 'pout',
             'food_festival' => 'food_festival',
-            'vinobrani' => 'vinobrani',
-            'dynobrani' => 'dynobrani',
+
+            // Sjednocené *braní (vinobraní, dýňobraní, jablkobraní, bramborobraní…)
+            'obrani' => 'obrani',
+            'vinobrani' => 'obrani',
+            'dynobrani' => 'obrani',
+            'jablkobrani' => 'obrani',
+            'bramborobrani' => 'obrani',
+
             'farmarske_trhy' => 'farmarske_trhy',
             'vanocni_trhy' => 'vanocni_trhy',
             'velikonocni_trhy' => 'velikonocni_trhy',
             'jarmark' => 'jarmark',
             'festival' => 'festival',
             'hudebni_festival' => 'festival',
+
+            // Slavnosti — městské vs. obecní/historické
+            'mestske_slavnosti' => 'mestske_slavnosti',
+            'dny_mesta' => 'mestske_slavnosti',
             'historicke_slavnosti' => 'slavnosti',
             'folklor' => 'slavnosti',
             'hody' => 'slavnosti',
-            'dny_mesta' => 'slavnosti',
             'obecni_slavnosti' => 'slavnosti',
             'slavnosti' => 'slavnosti',
 

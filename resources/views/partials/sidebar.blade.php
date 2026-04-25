@@ -22,7 +22,7 @@
                 <div class="px-2 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Akce</div>
                 <div class="rj-sidebar-section-body" style="max-height: 20rem;">
                     <a href="{{ url('/dashboard') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('dashboard') ? 'active' : '' }}">Dashboard</a>
-                    <a href="{{ url('/akce') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('akce') && !request()->is('akce/*') ? 'active' : '' }}">Katalog akcí</a>
+                    <a href="{{ url('/akce') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('akce.*') ? 'active' : '' }}">Katalog akcí</a>
                     <a href="{{ url('/mapa') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('mapa') ? 'active' : '' }}">Mapa</a>
                     <a href="{{ url('/moje-rezervace') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('moje-rezervace') ? 'active' : '' }}">Moje rezervace</a>
                 </div>
@@ -33,7 +33,6 @@
                 <div class="rj-sidebar-section rounded-lg border border-primary bg-primary/5 ring-1 ring-primary p-1">
                     <div class="px-2 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Administrace</div>
                     <div class="rj-sidebar-section-body" style="max-height: 20rem;">
-                        <a href="{{ route('admin.akce.index') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.akce.*') ? 'active' : '' }}">Správa akcí</a>
                         <a href="{{ route('admin.scraping.index') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.scraping.*') ? 'active' : '' }}">Scraping zdrojů</a>
                         <a href="{{ route('admin.uzivatele') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.uzivatele') ? 'active' : '' }}">Uživatelé a pozvánky</a>
                         <a href="{{ route('admin.error-logy.index') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.error-logy.*') ? 'active' : '' }}">Error logy</a>

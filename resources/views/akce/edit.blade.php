@@ -1,6 +1,6 @@
 <x-layouts.app title="Upravit akci — Rajón">
     <div class="max-w-3xl">
-        <a href="{{ route('admin.akce.index') }}" class="text-sm text-primary hover:text-primary-dark mb-4 inline-block">&larr; Zpět</a>
+        <a href="{{ route('akce.index') }}" class="text-sm text-primary hover:text-primary-dark mb-4 inline-block">&larr; Zpět na katalog</a>
         <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ $akce->nazev }}</h1>
         <p class="text-sm text-gray-500 mb-6">
             Velikost: <strong>{{ $akce->velikost_stav }}</strong> (skóre {{ $akce->velikost_skore }})
@@ -9,6 +9,12 @@
             @endif
         </p>
 
+        @if(session('success'))
+            <div class="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-2 text-sm text-green-800">
+                {{ session('success') }}
+            </div>
+        @endif
+
         {{-- Návrh ročníkového propojení --}}
         @if(!empty($akce->navrh_propojeni))
             <div class="mb-4 rounded-lg bg-blue-50 border border-blue-200 p-4">
@@ -16,7 +22,7 @@
                 <ul class="text-sm text-blue-800 space-y-1">
                     @foreach($akce->navrh_propojeni as $navrh)
                         <li>
-                            <a href="{{ route('admin.akce.edit', $navrh['akce_id']) }}" class="underline">{{ $navrh['nazev'] }}</a>
+                            <a href="{{ route('akce.edit', $navrh['akce_id']) }}" class="underline">{{ $navrh['nazev'] }}</a>
                             — {{ $navrh['datum_od'] }} · {{ $navrh['misto'] }}
                             <span class="text-xs text-blue-600">(podobnost {{ $navrh['similarity'] }}%)</span>
                         </li>
@@ -42,7 +48,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('admin.akce.update', $akce) }}" class="rounded-lg border border-gray-200 bg-white p-4 space-y-4">
+        <form method="POST" action="{{ route('akce.update', $akce) }}" class="rounded-lg border border-gray-200 bg-white p-4 space-y-4">
             @csrf
             @method('PUT')
 
@@ -68,7 +74,24 @@
                     'stav' => 'Stav',
                     'poznamka' => 'Poznámka',
                 ];
-                $typy = ['pout' => 'Pouť', 'food_festival' => 'Food festival', 'slavnosti' => 'Slavnosti', 'vinobrani' => 'Vinobraní', 'dynobrani' => 'Dýňobraní', 'farmarske_trhy' => 'Farmářské trhy', 'vanocni_trhy' => 'Vánoční trhy', 'velikonocni_trhy' => 'Velikonoční trhy', 'jarmark' => 'Jarmark', 'festival' => 'Festival', 'sportovni_akce' => 'Sportovní akce', 'koncert' => 'Koncert', 'divadlo' => 'Divadlo', 'vystava' => 'Výstava', 'workshop' => 'Workshop', 'jiny' => 'Jiný'];
+                $typy = [
+                    'pout' => 'Pouť',
+                    'food_festival' => 'Food festival',
+                    'slavnosti' => 'Slavnosti',
+                    'mestske_slavnosti' => 'Městské slavnosti',
+                    'obrani' => 'Obraní (vinobraní/dýňobraní/...)',
+                    'farmarske_trhy' => 'Farmářské trhy',
+                    'vanocni_trhy' => 'Vánoční trhy',
+                    'velikonocni_trhy' => 'Velikonoční trhy',
+                    'jarmark' => 'Jarmark',
+                    'festival' => 'Festival',
+                    'sportovni_akce' => 'Sportovní akce',
+                    'koncert' => 'Koncert',
+                    'divadlo' => 'Divadlo',
+                    'vystava' => 'Výstava',
+                    'workshop' => 'Workshop',
+                    'jiny' => 'Jiný',
+                ];
                 $stavy = ['navrh' => 'Návrh', 'overena' => 'Ověřená', 'zrusena' => 'Zrušená'];
             @endphp
 
@@ -119,16 +142,12 @@
                         @error($pole) <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
                     @if($uzamceno)
-                        <form method="POST" action="{{ route('admin.akce.odemknout-pole', $akce) }}" onclick="event.stopPropagation()">
-                            @csrf
-                            <input type="hidden" name="pole" value="{{ $pole }}">
-                            <button type="submit" class="rounded-lg border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-50" title="Odemknout pole — scraping ho zase bude aktualizovat">Odemknout</button>
-                        </form>
+                        <button type="submit" form="odemknout-{{ $pole }}" class="rounded-lg border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-50 self-end mb-1" title="Odemknout pole — scraping ho zase bude aktualizovat">Odemknout</button>
                     @endif
                 </div>
             @endforeach
 
-            {{-- Admin komentář — AI sem NIKDY nezasahuje --}}
+            {{-- Admin komentář --}}
             <div class="rounded-lg border border-purple-200 bg-purple-50 p-3">
                 <label class="block text-sm font-medium text-purple-900 mb-1">
                     📝 Admin komentář <span class="text-xs text-purple-600">(AI nezasahuje, jen ruční úpravy / XLS import)</span>
@@ -162,8 +181,30 @@
                 <button type="submit" class="flex-1 rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white hover:bg-primary-dark">
                     Uložit změny (auto-lock upravených polí)
                 </button>
+                @if(Auth::user()?->jeAdmin())
+                    <button type="submit" form="form-smazat" class="rounded-lg border border-red-300 bg-white px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50">
+                        Smazat
+                    </button>
+                @endif
             </div>
         </form>
+
+        @if(Auth::user()?->jeAdmin())
+            <form id="form-smazat" method="POST" action="{{ route('akce.destroy', $akce) }}" onsubmit="return confirm('Opravdu smazat akci {{ $akce->nazev }}?')" class="hidden">
+                @csrf
+                @method('DELETE')
+            </form>
+        @endif
+
+        {{-- Pomocné formuláře pro odemknutí polí (musí být mimo hlavní form) --}}
+        @foreach($polePopisky as $pole => $popisek)
+            @if($akce->jePoleUzamceno($pole))
+                <form id="odemknout-{{ $pole }}" method="POST" action="{{ route('akce.odemknout-pole', $akce) }}" class="hidden">
+                    @csrf
+                    <input type="hidden" name="pole" value="{{ $pole }}">
+                </form>
+            @endif
+        @endforeach
 
         {{-- Zdroje (akce_zdroje) --}}
         @if($akce->akceZdroje->isNotEmpty())

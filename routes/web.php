@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AkceController;
-use App\Http\Controllers\Admin\AkceController as AdminAkceController;
 use App\Http\Controllers\Admin\ErrorLogController;
 use App\Http\Controllers\Admin\ScrapingController;
 use App\Http\Controllers\Admin\UzivateleController;
@@ -26,11 +25,18 @@ Route::post('/registrace', [RegistraceController::class, 'registrovat'])->name('
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Katalog akcí
+    // Katalog + správa akcí (sjednoceno — každý přihlášený může editovat)
     Route::get('/akce', [AkceController::class, 'index'])->name('akce.index');
+    Route::get('/akce/nova', [AkceController::class, 'create'])->name('akce.create');
+    Route::post('/akce', [AkceController::class, 'store'])->name('akce.store');
     Route::get('/akce/{akce:slug}', [AkceController::class, 'show'])->name('akce.show');
-    Route::get('/mapa', [AkceController::class, 'mapa'])->name('akce.mapa');
+    Route::get('/akce/{akce}/upravit', [AkceController::class, 'edit'])->name('akce.edit');
+    Route::put('/akce/{akce}', [AkceController::class, 'update'])->name('akce.update');
+    Route::post('/akce/{akce}/odemknout-pole', [AkceController::class, 'odemknoutPole'])->name('akce.odemknout-pole');
+    Route::delete('/akce/{akce}', [AkceController::class, 'destroy'])->name('akce.destroy');
     Route::post('/akce/{akce}/rezervovat', [AkceController::class, 'rezervovat'])->name('akce.rezervovat');
+
+    Route::get('/mapa', [AkceController::class, 'mapa'])->name('akce.mapa');
 
     // API pro mapu
     Route::get('/api/akce-mapa', [AkceController::class, 'mapaJson'])->name('api.akce.mapa');
@@ -38,14 +44,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Admin (je_admin middleware)
 Route::middleware(['auth', 'verified', \App\Http\Middleware\JeAdmin::class])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/akce', [AdminAkceController::class, 'index'])->name('akce.index');
-    Route::get('/akce/create', [AdminAkceController::class, 'create'])->name('akce.create');
-    Route::post('/akce', [AdminAkceController::class, 'store'])->name('akce.store');
-    Route::get('/akce/{akce}/edit', [AdminAkceController::class, 'edit'])->name('akce.edit');
-    Route::put('/akce/{akce}', [AdminAkceController::class, 'update'])->name('akce.update');
-    Route::post('/akce/{akce}/odemknout-pole', [AdminAkceController::class, 'odemknoutPole'])->name('akce.odemknout-pole');
-    Route::delete('/akce/{akce}', [AdminAkceController::class, 'destroy'])->name('akce.destroy');
-
     // Uživatelé + pozvánky
     Route::get('/uzivatele', [UzivateleController::class, 'index'])->name('uzivatele');
     Route::post('/uzivatele/pozvat', [UzivateleController::class, 'pozvat'])->name('uzivatele.pozvat');
