@@ -250,23 +250,41 @@ class ImportHistorickychDatSeeder extends Seeder
     /** @param array<string, mixed> $row */
     private function normalizujRadek(array $row, $now): array
     {
+        // Ořez podle limitů ve schématu — Excel parser někdy nasypal text mimo
+        // odpovídající sloupec (např. dlouhý popis do `kontakt_telefon`).
+        $telefon = $this->trunc($row['kontakt_telefon'] ?? null, 20);
+        $email = $this->trunc($row['kontakt_email'] ?? null, 255);
+
+        // Pokud telefon vypadá jako email a email vypadá jako telefon, prohoď
+        if ($email && !str_contains($email, '@') && preg_match('/^[\d\s\+\-\(\)]+$/', $email)) {
+            // email je telefon
+            if (!$telefon) $telefon = $this->trunc($email, 20);
+            $email = null;
+        }
+
         return [
-            'nazev' => $row['nazev'] ?? null,
-            'slug' => $row['slug'] ?? null,
+            'nazev' => $this->trunc($row['nazev'] ?? null, 255),
+            'slug' => $this->trunc($row['slug'] ?? null, 255),
             'typ' => $row['typ'] ?? 'jiny',
-            'misto' => $row['misto'] ?? null,
-            'kraj' => $row['kraj'] ?? null,
-            'organizator' => $row['organizator'] ?? null,
-            'kontakt_email' => $row['kontakt_email'] ?? null,
-            'kontakt_telefon' => $row['kontakt_telefon'] ?? null,
-            'web_url' => $row['web_url'] ?? null,
+            'misto' => $this->trunc($row['misto'] ?? null, 255),
+            'kraj' => $this->trunc($row['kraj'] ?? null, 255),
+            'organizator' => $this->trunc($row['organizator'] ?? null, 255),
+            'kontakt_email' => $email,
+            'kontakt_telefon' => $telefon,
+            'web_url' => $this->trunc($row['web_url'] ?? null, 500),
             'zdroj_typ' => 'excel',
-            'zdroj_url' => $row['zdroj_url'] ?? null,
+            'zdroj_url' => $this->trunc($row['zdroj_url'] ?? null, 500),
             'stav' => $row['stav'] ?? 'navrh',
             'datum_od' => !empty($row['datum_od']) ? Carbon::parse($row['datum_od'])->toDateString() : null,
             'datum_do' => !empty($row['datum_do']) ? Carbon::parse($row['datum_do'])->toDateString() : null,
             'vytvoreno' => $now,
             'upraveno' => $now,
         ];
+    }
+
+    private function trunc(?string $s, int $max): ?string
+    {
+        if ($s === null || $s === '') return null;
+        return mb_substr($s, 0, $max);
     }
 }
