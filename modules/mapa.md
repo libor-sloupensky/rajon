@@ -1,15 +1,23 @@
 # Mapa modul
 
-## Stav: Připraveno (placeholder — čeká na MAPYCZ_API_KEY)
+## Stav: Implementováno (verze 1)
 
 ## Implementace
-- Fullscreen mapové zobrazení akcí
-- API endpoint `/api/akce-mapa` — JSON s GPS souřadnicemi
-- Mapy.cz REST API integrace
+- Leaflet 1.9.4 + Mapy.cz tile server (`api.mapy.cz/v1/maptiles/basic/256/...`)
+- API klíč z `config('services.mapycz.api_key')` (env `MAPYCZ_API_KEY`)
+- Markery jako kroužky barevné podle `typ` akce (pout, food_festival, …)
+- Popup: název, místo, datum
+- Auto-fit bounds na rozsah dat (s padding + maxZoom)
+- Fallback hláška pokud API klíč chybí
+- Atribuce Mapy.cz (povinná)
 
-## TODO
-- [ ] Integrace Mapy.cz REST API (po získání API klíče)
-- [ ] Marker clustery pro velký počet akcí
-- [ ] Filtrování na mapě (typ, termín)
-- [ ] Detail popup při kliku na marker
-- [ ] Geokódování adres (adresa → GPS) pro akce bez souřadnic
+## Datový vstup
+`AkceController::mapa()` posílá akce s `gps_lat/gps_lng`, `stav='overena'`,
+`datum_od >= now()`. Akce z XLSX importu mají `stav='navrh'` a žádné GPS,
+zobrazí se až po geokódování + ručním schválení adminem.
+
+## TODO (verze 2+)
+- [ ] Marker clustery pro velký počet akcí (po geokódování)
+- [ ] Filtrování na mapě (typ, termín, kraj)
+- [ ] Geokódování adres (adresa/místo → GPS) přes Mapy.cz Geocoding API
+- [ ] Možnost zobrazit i `stav='navrh'` (admin režim)
