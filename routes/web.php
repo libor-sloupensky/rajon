@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AkceController;
 use App\Http\Controllers\Admin\AkceController as AdminAkceController;
+use App\Http\Controllers\Admin\ErrorLogController;
 use App\Http\Controllers\Admin\ScrapingController;
 use App\Http\Controllers\Admin\UzivateleController;
 use App\Http\Controllers\Auth\GoogleController;
@@ -52,6 +53,13 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\JeAdmin::class])->pr
     Route::delete('/uzivatele/{uzivatel}', [UzivateleController::class, 'destroy'])->name('uzivatele.destroy');
     Route::post('/uzivatele/pozvanky/{pozvanka}/resend', [UzivateleController::class, 'resendPozvanku'])->name('uzivatele.pozvanka.resend');
     Route::delete('/uzivatele/pozvanky/{pozvanka}', [UzivateleController::class, 'zrusitPozvanku'])->name('uzivatele.pozvanka.zrusit');
+
+    // Error logy
+    Route::get('/error-logy', [ErrorLogController::class, 'index'])->name('error-logy.index');
+    Route::get('/error-logy/{soubor}', [ErrorLogController::class, 'show'])->name('error-logy.show');
+    Route::get('/error-logy/{soubor}/raw', [ErrorLogController::class, 'raw'])->name('error-logy.raw');
+    Route::get('/error-logy/{soubor}/download', [ErrorLogController::class, 'download'])->name('error-logy.download');
+    Route::delete('/error-logy/{soubor}', [ErrorLogController::class, 'destroy'])->name('error-logy.destroy');
 
     // Scraping — zdroje a běhy
     Route::get('/scraping', [ScrapingController::class, 'index'])->name('scraping.index');
