@@ -1,6 +1,9 @@
 # Historická data (XLS import)
 
-## Stav: Implementováno — XLSX parser lokálně, data-seeder na produkci
+## Stav: Implementováno (s mezerami) — odložené dočištění, viz § Mezery v importu
+
+**Otevřená otázka:** uživatel zvažuje, zda historická data vůbec využijeme.
+Před rozhodnutím o dočištění (viz dole) **nepokračovat**.
 
 **Rozhodnutí:** strategie **B** (kanonická akce + ročníkový výkaz).
 XLSX se parsují **lokálně**, výsledek je JSON v repu, produkce běží přes
@@ -273,6 +276,70 @@ vanocni_trhy, jarmark, festival, sportovni_akce, jiny`
 
 - `_explore.py` — dump prvních 8 řádků každého sheetu všech souborů.
 - `_count.py` — spočítá reálné neprázdné datové řádky per sheet.
+- `_analyza_pokryti.py`, `_analyza_pokryti.txt` — porovnání pokrytí JSON vs XLSX (2026-04-25).
 - `_structure.txt`, `_counts.txt` — výstupy (UTF-8).
 
-Po úspěšném importu mohou být smazány.
+---
+
+## Mezery v importu — odložený TODO
+
+Analýza 2026-04-25 (`temporary/_analyza_pokryti.txt`) ukázala, že **import
+ztratil tři typy informací**, které ve zdrojových XLSX existují:
+
+### A) `akce.poznamka` — nikdy se neexportovala (0 / 1 021)
+Ve zdrojích je `Poznámky` v ~600 řádcích (Festivaly 22/23, Příprava 2024
+výkaz 2023). `HeaderMapper` sloupec mapuje na klíč `poznamka`, ale
+`FileImporter::najdiNeboVytvor` ho do `ExportCollector` **nezapisuje**
+(chybí v poli atributů jak v create, tak v matched větvi).
+
+### B) `akce.velikost_signaly` — nikdy se neexportovaly (0 / 1 021)
+- Poutě 2025: `Návštěvnost` u 141 / 144 akcí ("atraktivní" / "spíše ne" / "22000")
+- Aleš 2024: `Ročník` (1.–8.) + `Návštěvnost` u 45 akcí
+- Total ~190 hodnot, všechny chybí.
+
+`FileImporter::rozsirVelikostSignaly()` updatuje PHP objekt `Akce`, ale
+v `--export` režimu se ten objekt nikam nepersistuje, collector ho nevidí.
+
+### C) `akce.typ` — 85 % je `jiny`
+Festivaly 2022/2023 mají v `r1` každého sheetu nadpis **„Food festivaly"**.
+Parser ho ignoruje, ~520 záznamů dostane `typ='jiny'` místo `food_festival`.
+Ostatní soubory (Příprava, Měsíční přehled) reálně typ neuvádějí, takže
+pro ně `jiny` zůstane.
+
+### D) Doplňková: `kraj` 56 %, kontakty 12–16 %
+Plně se neztratí, jen se po deduplikaci nezdědí z dalších výskytů. Merge
+politika v `najdiNeboVytvor` doplní jen prázdná pole — pokud v 1. řadě
+matchu nebyla, do 2. už se akce neaktualizuje (cache stav). Lze opravit.
+
+### Plán dočištění (až bude potvrzeno, že data využijeme)
+
+1. **`ExportCollector::ulozAkci`** — přidat do schématu klíče `poznamka` (text),
+   `velikost_signaly` (array). `ulozAkci()` musí mergovat `velikost_signaly` jako
+   asociativní pole (klíč → klíč), ne přepisovat.
+2. **`FileImporter`**:
+   - V `najdiNeboVytvor` (create i matched větev) zapisovat `poznamka` z `$raw['poznamka']` (případně z `Poznámky 2024` apod.).
+   - `rozsirVelikostSignaly()` přepsat — místo `$akce->velikost_signaly` ukládat do collectoru.
+   - Detekovat **typ z `r1` sheetu**: mapa { „Food festivaly"→`food_festival`,
+     „Vinobraní"→`vinobrani`, „Dýňobraní"→`dynobrani`, „Vánoční"→`vanocni_trhy`,
+     „Jarmark"→`jarmark` }. Předat strategii jako default; per-řádek typ z Aleše/Poutí má přednost.
+   - Merge kontaktů — pokud akce v collectoru existuje a nemá `mail`/`mobil`/`web`/`organizator`, doplnit z aktuálního Excel řádku (ne jen z prvního).
+3. **`database/data/historicka_data.json`** — přegenerovat:
+   `php artisan excel:import temporary --export=database/data/historicka_data.json`
+4. **`ImportHistorickychDatSeeder`** — rozšířit `normalizujRadek` o `poznamka` + `velikost_signaly` (cast na JSON). Plus pro **matched** akce v DB volat update prázdných polí (dnes přeskakuje rovnou).
+5. **Re-deploy** + chunked import přes `?phase=akce&offset=…` — akce existují, takže `matched++` + UPDATE prázdných polí.
+
+### Očekávaný posun po dočištění
+
+| Pole | dnes | po fixu |
+|---|---:|---:|
+| typ ≠ jiny | 15 % | ~70 % |
+| poznamka | 0 % | ~50 % |
+| velikost_signaly | 0 % | ~30 % |
+| kontakty | 12–16 % | ~25 % |
+| kraj | 56 % | ~75 % |
+
+### Není v plánu (vědomě vyhozeno)
+- `Mzda`, `Jméno` (brigádník) — z Měsíčního přehledu
+- `kdo půjde`, `Kdo jde` — z Festivaly 2022/2023
+- `POS`, `PRODÁNO ks`, `výplata`, `čas na stánku` — z Příprava 2024 výkaz 2023
+- `Vánoční akce` sheet (Festivaly 2023) — volný text, jen ručně
