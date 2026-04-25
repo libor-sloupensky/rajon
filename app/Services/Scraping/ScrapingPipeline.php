@@ -364,8 +364,24 @@ class ScrapingPipeline
             return ['stav' => 'preskoceny', 'duvod' => "Ignorovaný typ akce ({$normalizovanyTyp})"];
         }
 
-        // 2d. Indoor místo — pokud akce není trhy_jarmarky ani sportovní + místo
-        // má indoor signál (kino/sál/galerie/muzeum/...) → skip
+        // 2c2. Blacklist podle NÁZVU — "prohlídk" = guided tour, indoor aktivita
+        if ($this->nazevJeBlacklisted($data['nazev'] ?? '')) {
+            return ['stav' => 'preskoceny', 'duvod' => "Blacklist klíčové slovo v názvu"];
+        }
+
+        // 2c3. Strict indoor (muzeum / expozice / galerie) — bez výjimky pro typ
+        if ($this->jeStriktneIndoor($data['misto'] ?? '', $data['adresa'] ?? '')) {
+            return ['stav' => 'preskoceny', 'duvod' => "Strict indoor (muzeum/expozice/galerie)"];
+        }
+
+        // 2c4. Dlouhodobá akce (>14 dní) = blacklist (typicky výstava/expozice)
+        $maxDny = (int) config('scraping.max_trvani_dny', 14);
+        if ($this->trvaPrilisDlouho($data['datum_od'] ?? null, $data['datum_do'] ?? null, $maxDny)) {
+            return ['stav' => 'preskoceny', 'duvod' => "Trvání > {$maxDny} dní (dlouhodobá akce)"];
+        }
+
+        // 2d. Soft indoor — pokud akce není trhy_jarmarky ani sportovní + místo
+        // má indoor signál (kino/sál/...) → skip
         if (!in_array($normalizovanyTyp, ['trhy_jarmarky', 'sportovni_akce'], true)
             && $this->jeIndoorMisto($data['misto'] ?? '', $data['adresa'] ?? '')) {
             return ['stav' => 'preskoceny', 'duvod' => "Indoor místo ({$data['misto']})"];
@@ -779,6 +795,43 @@ class ScrapingPipeline
         }
 
         return $data;
+    }
+
+    /** Akce s "prohlídk" v názvu = guided tour = blacklist. */
+    protected function nazevJeBlacklisted(string $nazev): bool
+    {
+        $n = mb_strtolower($nazev);
+        if (str_contains($n, 'prohlídk') || str_contains($n, 'prohlidk')) return true;
+        return false;
+    }
+
+    /**
+     * Strict indoor — muzeum, expozice, galerie (bez ohledu na typ).
+     * Outdoor signál (areál muzea, zahrada galerie) výjimku neudělá — uživatel
+     * explicitně chce muzeum/expozice/galerie kompletně ven z katalogu.
+     */
+    protected function jeStriktneIndoor(string $misto, string $adresa = ''): bool
+    {
+        $kombi = mb_strtolower(trim($misto . ' ' . $adresa));
+        if (empty($kombi)) return false;
+        foreach (['muzeum', 'muzea', 'muzeu', 'muzejní', 'expozic',
+                  'galerie', 'galerii', 'galerii ', ' galerii,'] as $kw) {
+            if (str_contains($kombi, $kw)) return true;
+        }
+        return false;
+    }
+
+    /** Akce trvající déle než N dní = blacklist (dlouhodobá výstava/festival). */
+    protected function trvaPrilisDlouho(?string $datumOd, ?string $datumDo, int $maxDny = 14): bool
+    {
+        if (empty($datumOd) || empty($datumDo)) return false;
+        try {
+            $od = new \DateTime($datumOd);
+            $do = new \DateTime($datumDo);
+            return $od->diff($do)->days > $maxDny;
+        } catch (\Exception) {
+            return false;
+        }
     }
 
     /**

@@ -193,6 +193,9 @@ return [
         'prednaska',    // přednášky, besedy
     ],
 
+    /** Maximální trvání akce ve dnech — delší akce = dlouhodobá výstava/expozice → blacklist. */
+    'max_trvani_dny' => 14,
+
     /*
     |--------------------------------------------------------------------------
     | Adaptivní refresh interval podle blízkosti akce
