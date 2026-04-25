@@ -36,8 +36,13 @@ if (empty($token) || $token !== $expectedToken) {
 }
 
 header('Content-Type: text/plain; charset=utf-8');
+header('X-Accel-Buffering: no'); // nginx: vypnout buffering pro real-time stream
 @set_time_limit(300);
 @ini_set('memory_limit', '512M');
+@ini_set('zlib.output_compression', '0');
+@ini_set('output_buffering', '0');
+while (ob_get_level() > 0) { ob_end_flush(); }
+@ob_implicit_flush(true);
 
 // Lov fatal errorů (OOM, timeout, parse error) — bez tohoto Webglobe vrátí 500 HTML
 register_shutdown_function(function () {
@@ -54,15 +59,20 @@ register_shutdown_function(function () {
     }
 });
 
-$results = [];
-$results[] = '… start, memory_limit=' . ini_get('memory_limit')
-    . ', time_limit=' . ini_get('max_execution_time') . 's';
+// Streamovaný výstup — klient vidí progress okamžitě, nginx/proxy neaplikuje timeout
+$emit = function (string $line): void {
+    echo $line . "\n";
+    @flush();
+};
+
+$emit('… start, memory_limit=' . ini_get('memory_limit')
+    . ', time_limit=' . ini_get('max_execution_time') . 's');
 
 try {
     // OPcache reset
     if (function_exists('opcache_reset')) {
         opcache_reset();
-        $results[] = '✓ OPcache cleared';
+        $emit('✓ OPcache cleared');
     }
 
     // Laravel bootstrap přímo v PHP-FPM (žádný shell_exec — Webglobe nemá `php` v $PATH)
@@ -84,13 +94,13 @@ try {
         }
     };
 
-    $results[] = $runArtisan('cache:clear');
-    $results[] = $runArtisan('config:clear');
-    $results[] = $runArtisan('route:clear');
-    $results[] = $runArtisan('view:clear');
+    $emit($runArtisan('cache:clear'));
+    $emit($runArtisan('config:clear'));
+    $emit($runArtisan('route:clear'));
+    $emit($runArtisan('view:clear'));
 
     if (isset($_GET['migrate'])) {
-        $results[] = $runArtisan('migrate', ['--force' => true]);
+        $emit($runArtisan('migrate', ['--force' => true]));
     }
 
     if (isset($_GET['seed'])) {
@@ -98,13 +108,12 @@ try {
         foreach (explode(',', $seeders) as $seeder) {
             $seeder = trim($seeder);
             if ($seeder === '') continue;
-            $results[] = $runArtisan('db:seed', ['--class' => $seeder, '--force' => true]);
+            $emit($runArtisan('db:seed', ['--class' => $seeder, '--force' => true]));
         }
     }
+    $emit('… done in ' . round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 2) . 's');
 } catch (\Throwable $e) {
-    $results[] = '✗ FATAL: ' . get_class($e) . ': ' . $e->getMessage()
+    $emit('✗ FATAL: ' . get_class($e) . ': ' . $e->getMessage()
         . "\n  at " . $e->getFile() . ':' . $e->getLine()
-        . "\n\nTrace:\n" . $e->getTraceAsString();
+        . "\n\nTrace:\n" . $e->getTraceAsString());
 }
-
-echo implode("\n", $results);
