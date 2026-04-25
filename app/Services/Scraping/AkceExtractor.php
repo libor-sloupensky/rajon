@@ -46,6 +46,16 @@ DŮLEŽITÁ PRAVIDLA:
 - velikost_info: STRUČNĚ 1-2 věty max, jen konkrétní fakta (počty návštěvníků, stánkařů, ročník)
 - Nevymýšlej — pokud informaci nemáš, vrať null
 - Datumy vždy ve formátu YYYY-MM-DD
+- KRAJ je povinný pokud znáš obec/město. Pokud kraj v textu není, ODVOĎ ho ze
+  zeměpisné polohy obce/města (např. "Chvalovice u Znojma" → "Jihomoravský kraj",
+  "Brno" → "Jihomoravský kraj", "Ostrava" → "Moravskoslezský kraj"). Vrať vždy
+  oficiální český název kraje s velkým "K" tam, kde to je gramaticky správně:
+  "Jihomoravský kraj", "Moravskoslezský kraj", "Olomoucký kraj", "Pardubický kraj",
+  "Královéhradecký kraj", "Zlínský kraj", "Kraj Vysočina", "Středočeský kraj",
+  "Jihočeský kraj", "Plzeňský kraj", "Karlovarský kraj", "Ústecký kraj",
+  "Liberecký kraj", "Hlavní město Praha".
+- Pokud existují dvě obce stejného názvu, použij tu, která je v textu logická
+  (podle dalších indicií — typ akce, datum, organizátor); jinak nech null.
 
 Formát odpovědi: POUZE platný JSON objekt, bez úvodního/závěrečného textu, bez markdown bloku.
 PROMPT;

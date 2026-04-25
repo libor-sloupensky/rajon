@@ -216,6 +216,9 @@ class ScrapingPipeline
         $data = $this->extractor->extrahuj($html, $webPoradatele);
         if (!$data) return false;
 
+        // Stejné sanitace jako u běžného merge (typ enum, max délky)
+        $data = $this->oriznStringy($data);
+
         // Vytvořit dočasný "virtuální" zdroj s flagem je_web_poradatele=true
         // Nebo použít existující zdroj ale flagovat URL jako od pořadatele
         $virtualZdroj = new \App\Models\Zdroj([
