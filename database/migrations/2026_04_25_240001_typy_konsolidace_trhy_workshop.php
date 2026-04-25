@@ -14,6 +14,14 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Vypnout STRICT mode — DB může obsahovat řádky s neplatnými enum hodnotami,
+        // které musíme nejdřív přepsat na 'jiny' před zúžením enumu.
+        DB::statement("SET SESSION sql_mode=''");
+
+        // 0) Defenzivně: přepsat řádky s prázdným typem na 'jiny' (mohly vzniknout
+        //    z migrace 230001 která ALTER odhodila neznámé hodnoty na '').
+        DB::table('akce')->where('typ', '')->orWhereNull('typ')->update(['typ' => 'jiny']);
+
         // 1) Rozšířit enum o 'trhy_jarmarky' (legacy hodnoty zatím necháme, abychom mohli updatovat data)
         DB::statement("ALTER TABLE akce MODIFY COLUMN typ ENUM(
             'pout',

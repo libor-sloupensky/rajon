@@ -7,6 +7,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Vypnout STRICT mode — DB obsahuje řádky s neplatnými enum hodnotami
+        // (z dřívějších scrapingů, kdy AI vrátila něco mimo enum). Bez tohoto
+        // by ALTER TABLE selhal s "Data truncated for column typ".
+        DB::statement("SET SESSION sql_mode=''");
+
         // Přidat nové typy + ponechat ostatní (vinobrani/dynobrani zůstávají v enum
         // pro zpětnou kompatibilitu, ale UPDATE je migruje na 'obrani').
         DB::statement("ALTER TABLE akce MODIFY COLUMN typ ENUM(
