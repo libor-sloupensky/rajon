@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Zdroj;
+use App\Services\Scraping\AuthenticatedHttp;
 use Illuminate\Database\Seeder;
 
 class ZdrojeSeeder extends Seeder
@@ -49,8 +50,13 @@ class ZdrojeSeeder extends Seeder
                 'typ' => 'katalog',
                 'stav' => 'aktivni',
                 'frekvence_hodin' => 168,
-                'vyzaduje_login' => false,
-                'poznamka' => 'Custom PHP. 387 akcí. Filtruje podle kraje. Unikátní: počet registrovaných stánkařů (signál velikosti). E-mail/telefon jen po loginu.',
+                'vyzaduje_login' => true,
+                'login_url' => 'https://www.webtrziste.cz/trhy/prihlaseni/prihlaseni.php',
+                'login_credentials' => AuthenticatedHttp::zasifrujCredentials([
+                    'login' => 'wormup',
+                    'heslo' => '1416',
+                ]),
+                'poznamka' => 'Custom PHP. ~387 akcí. Filtruje podle kraje. Unikátní: počet registrovaných stánkařů. Login povolen — extrahuje i e-mail a telefon organizátora.',
             ],
         ];
 

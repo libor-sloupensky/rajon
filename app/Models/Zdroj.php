@@ -28,6 +28,10 @@ class Zdroj extends Model
         'frekvence_hodin',
         'posledni_chyby',
         'vyzaduje_login',
+        'login_url',
+        'login_credentials',
+        'login_session',
+        'login_session_until',
         'je_web_poradatele',
         'typ',
         'stav',
@@ -46,6 +50,7 @@ class Zdroj extends Model
             'struktura' => 'array',
             'vyzaduje_login' => 'boolean',
             'je_web_poradatele' => 'boolean',
+            'login_session_until' => 'datetime',
         ];
     }
 

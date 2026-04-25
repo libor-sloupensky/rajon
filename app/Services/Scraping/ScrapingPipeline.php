@@ -28,7 +28,11 @@ class ScrapingPipeline
         protected AkceMerger $merger,
         protected LokalizaceResolver $lokalizace,
         protected ListingPaginator $paginator,
+        protected AuthenticatedHttp $http,
     ) {}
+
+    /** Aktuálně zpracovávaný zdroj — pro fetchHtml login session. */
+    protected ?Zdroj $aktualniZdroj = null;
 
     /**
      * Spustí scraping pro daný zdroj.
@@ -36,6 +40,9 @@ class ScrapingPipeline
      */
     public function scrapujZdroj(Zdroj $zdroj, ?int $limit = null, bool $pouzeRegion = true): ScrapingLog
     {
+        // Předat zdroj do fetchHtml — pro login session
+        $this->aktualniZdroj = $zdroj;
+
         $log = ScrapingLog::create([
             'zdroj_id' => $zdroj->id,
             'zacatek' => now(),
@@ -256,7 +263,8 @@ class ScrapingPipeline
         $krajStat = $data['kraj'] ?? 'neznámý';
         $statistiky['podle_kraje'][$krajStat] = ($statistiky['podle_kraje'][$krajStat] ?? 0) + 1;
 
-        // 5. Region filter — přes kraj_id (DB), s fallbackem na text
+        // 5. Region filter — volitelný (default vypnuto, ukládáme všechny kraje ČR).
+        //    Ponecháno pro případnou budoucí filtraci per-franšízant (jeho region).
         if ($pouzeRegion) {
             $krajSlug = $loc['kraj_id'] ? (\App\Models\Kraj::find($loc['kraj_id'])?->slug) : null;
             $jeVRegionu = $krajSlug
@@ -347,18 +355,10 @@ class ScrapingPipeline
         return true;
     }
 
+    /** Fetch HTML — pokud zdroj vyžaduje login, projde přes AuthenticatedHttp. */
     protected function fetchHtml(string $url): ?string
     {
-        try {
-            $response = Http::withHeaders([
-                'User-Agent' => 'Mozilla/5.0 (compatible; RajonBot/1.0; +https://rajon.tuptudu.cz/)',
-                'Accept-Language' => 'cs,en;q=0.5',
-            ])->timeout(30)->get($url);
-
-            return $response->successful() ? $response->body() : null;
-        } catch (\Exception) {
-            return null;
-        }
+        return $this->http->fetchHtml($url, $this->aktualniZdroj);
     }
 
     /** Ulož nebo aktualizuj akci — fuzzy matching + field-level merge. */
