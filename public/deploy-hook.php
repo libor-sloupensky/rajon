@@ -36,47 +36,57 @@ if (empty($token) || $token !== $expectedToken) {
 }
 
 header('Content-Type: text/plain; charset=utf-8');
+@set_time_limit(300);
+@ini_set('memory_limit', '512M');
 $results = [];
 
-// OPcache reset
-if (function_exists('opcache_reset')) {
-    opcache_reset();
-    $results[] = '✓ OPcache cleared';
-}
-
-// Laravel bootstrap přímo v PHP-FPM (žádný shell_exec — Webglobe nemá `php` v $PATH)
-require_once $appDir . '/vendor/autoload.php';
-$app = require_once $appDir . '/bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-$kernel->bootstrap();
-
-$runArtisan = function (string $command, array $params = []) use ($app) {
-    $output = new Symfony\Component\Console\Output\BufferedOutput(
-        Symfony\Component\Console\Output\OutputInterface::VERBOSITY_NORMAL,
-        false, // no decoration (text/plain)
-    );
-    $exitCode = Illuminate\Support\Facades\Artisan::call($command, $params, $output);
-    $log = trim($output->fetch());
-    $marker = $exitCode === 0 ? '✓' : '✗';
-    return "{$marker} {$command} (exit={$exitCode})\n" . ($log !== '' ? $log . "\n" : '');
-};
-
-$results[] = $runArtisan('cache:clear');
-$results[] = $runArtisan('config:clear');
-$results[] = $runArtisan('route:clear');
-$results[] = $runArtisan('view:clear');
-
-if (isset($_GET['migrate'])) {
-    $results[] = $runArtisan('migrate', ['--force' => true]);
-}
-
-if (isset($_GET['seed'])) {
-    $seeders = (string) $_GET['seed'];
-    foreach (explode(',', $seeders) as $seeder) {
-        $seeder = trim($seeder);
-        if ($seeder === '') continue;
-        $results[] = $runArtisan('db:seed', ['--class' => $seeder, '--force' => true]);
+try {
+    // OPcache reset
+    if (function_exists('opcache_reset')) {
+        opcache_reset();
+        $results[] = '✓ OPcache cleared';
     }
+
+    // Laravel bootstrap přímo v PHP-FPM (žádný shell_exec — Webglobe nemá `php` v $PATH)
+    require_once $appDir . '/vendor/autoload.php';
+    $app = require_once $appDir . '/bootstrap/app.php';
+    $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+    $kernel->bootstrap();
+
+    $runArtisan = function (string $command, array $params = []) {
+        $output = new Symfony\Component\Console\Output\BufferedOutput();
+        try {
+            $exitCode = Illuminate\Support\Facades\Artisan::call($command, $params, $output);
+            $log = trim($output->fetch());
+            $marker = $exitCode === 0 ? '✓' : '✗';
+            return "{$marker} {$command} (exit={$exitCode})\n" . ($log !== '' ? $log . "\n" : '');
+        } catch (\Throwable $e) {
+            return "✗ {$command} EXCEPTION: " . get_class($e) . ': ' . $e->getMessage()
+                . "\n  at " . $e->getFile() . ':' . $e->getLine() . "\n";
+        }
+    };
+
+    $results[] = $runArtisan('cache:clear');
+    $results[] = $runArtisan('config:clear');
+    $results[] = $runArtisan('route:clear');
+    $results[] = $runArtisan('view:clear');
+
+    if (isset($_GET['migrate'])) {
+        $results[] = $runArtisan('migrate', ['--force' => true]);
+    }
+
+    if (isset($_GET['seed'])) {
+        $seeders = (string) $_GET['seed'];
+        foreach (explode(',', $seeders) as $seeder) {
+            $seeder = trim($seeder);
+            if ($seeder === '') continue;
+            $results[] = $runArtisan('db:seed', ['--class' => $seeder, '--force' => true]);
+        }
+    }
+} catch (\Throwable $e) {
+    $results[] = '✗ FATAL: ' . get_class($e) . ': ' . $e->getMessage()
+        . "\n  at " . $e->getFile() . ':' . $e->getLine()
+        . "\n\nTrace:\n" . $e->getTraceAsString();
 }
 
 echo implode("\n", $results);
