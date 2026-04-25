@@ -91,43 +91,60 @@ class ImportHistorickychDatSeeder extends Seeder
         $now = now();
         $bufInsert = [];
         $matched = 0;
+        $skipped = 0;
 
-        DB::transaction(function () use ($chunk, &$bufInsert, &$matched, $existSlug, $existByNazevMisto, $now) {
-            foreach ($chunk as $row) {
-                unset($row['externi_klic']);
+        foreach ($chunk as $row) {
+            unset($row['externi_klic']);
 
-                // Match nejdřív podle (nazev, misto)
-                $klicNM = $this->klicNazevMisto($row['nazev'] ?? '', $row['misto'] ?? null);
-                if (isset($existByNazevMisto[$klicNM])) {
-                    $matched++;
-                    continue;
-                }
-
-                // Vygenerovat unikátní slug
-                $slug = $row['slug'] ?? Str::slug($row['nazev'] ?? 'akce');
-                if ($slug === '') $slug = 'akce';
-                $finalSlug = $slug;
-                $i = 2;
-                while (isset($existSlug[$finalSlug])) {
-                    $finalSlug = $slug . '-' . $i++;
-                    if ($i > 9999) break;
-                }
-                $row['slug'] = $finalSlug;
-                $existSlug[$finalSlug] = -1;
-                $existByNazevMisto[$klicNM] = -1;
-
-                $bufInsert[] = $this->normalizujRadek($row, $now);
+            // Match nejdřív podle (nazev, misto)
+            $klicNM = $this->klicNazevMisto($row['nazev'] ?? '', $row['misto'] ?? null);
+            if (isset($existByNazevMisto[$klicNM])) {
+                $matched++;
+                continue;
             }
 
-            if ($bufInsert) {
+            // Vygenerovat unikátní slug
+            $slug = $row['slug'] ?? Str::slug($row['nazev'] ?? 'akce');
+            if ($slug === '') $slug = 'akce';
+            $finalSlug = $slug;
+            $i = 2;
+            while (isset($existSlug[$finalSlug])) {
+                $finalSlug = $slug . '-' . $i++;
+                if ($i > 9999) break;
+            }
+            $row['slug'] = $finalSlug;
+            $existSlug[$finalSlug] = -1;
+            $existByNazevMisto[$klicNM] = -1;
+
+            $bufInsert[] = $this->normalizujRadek($row, $now);
+        }
+
+        // Bulk insert — pokud selže, fallback na per-row + logování
+        if ($bufInsert) {
+            try {
                 Akce::insert($bufInsert);
+            } catch (\Throwable $e) {
+                $this->command->warn('Bulk insert failed: ' . $e->getMessage());
+                $this->command->warn('Fallback per-row…');
+                foreach ($bufInsert as $r) {
+                    try {
+                        Akce::insert([$r]);
+                    } catch (\Throwable $e2) {
+                        $skipped++;
+                        $this->command->warn(sprintf(
+                            "Skip '%s' (slug=%s): %s",
+                            $r['nazev'] ?? '?', $r['slug'] ?? '?',
+                            substr($e2->getMessage(), 0, 200),
+                        ));
+                    }
+                }
             }
-        });
+        }
 
         $this->command->line(sprintf(
-            "Akce [%d–%d / %d]: nových=%d, matched=%d, mem=%.1f MB",
+            "Akce [%d–%d / %d]: nových=%d, matched=%d, skipped=%d, mem=%.1f MB",
             $offset, $end, $celkem,
-            count($bufInsert), $matched,
+            count($bufInsert) - $skipped, $matched, $skipped,
             memory_get_peak_usage(true) / 1048576,
         ));
 
