@@ -76,7 +76,34 @@ return [
 
         // WordPress obecně
         'wordpress' => [
+            'datum_od' => 70,
+            'datum_do' => 70,
+            'web_url' => 70,
+            'popis' => 60,
+            'organizator' => 60,
             '*' => 55,
+        ],
+
+        // Drupal obecně
+        'drupal' => [
+            'datum_od' => 70,
+            'datum_do' => 70,
+            'popis' => 60,
+            '*' => 55,
+        ],
+
+        // JSON-LD schema.org/Event extrakce — strukturovaná data, vyšší trust
+        // (CMS to označí, ale data jsou předdefinovaná Googlem schema.org)
+        'json_ld' => [
+            'datum_od' => 90,
+            'datum_do' => 90,
+            'gps_lat' => 95,
+            'gps_lng' => 95,
+            'adresa' => 90,
+            'organizator' => 80,
+            'kontakt_email' => 80,
+            'web_url' => 90,
+            '*' => 75,
         ],
 
         // Custom PHP weby

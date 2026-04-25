@@ -27,6 +27,7 @@ class ScrapingPipeline
         protected AkceMatcher $matcher,
         protected AkceMerger $merger,
         protected LokalizaceResolver $lokalizace,
+        protected ListingPaginator $paginator,
     ) {}
 
     /**
@@ -107,22 +108,37 @@ class ScrapingPipeline
         return $log;
     }
 
-    /** Získej seznam URL ke scrapingu z sitemap. Vždy vrací absolutní URL. */
+    /**
+     * Získej seznam URL ke scrapingu — generická logika fungující pro libovolný katalog:
+     *   1. Pokud má zdroj sitemap_url → použít sitemap (nejrychlejší)
+     *   2. Jinak: ListingPaginator projde listing s paginací (pro zdroje bez sitemapu)
+     *   3. Poslední fallback: jen odkazy z hlavní stránky
+     *
+     * Vždy vrací absolutní URL.
+     */
     protected function ziskejUrls(Zdroj $zdroj): array
     {
+        $baseUrl = $this->extractBaseUrl($zdroj->url);
+        $detailPattern = $zdroj->url_pattern_detail ?: '*';
+
         if ($zdroj->sitemap_url) {
-            $urls = $this->analyzer->seznamUrlZSitemap(
-                $zdroj->sitemap_url,
-                $zdroj->url_pattern_detail ?: '*'
-            );
+            $urls = $this->analyzer->seznamUrlZSitemap($zdroj->sitemap_url, $detailPattern);
         } else {
-            // Fallback: analyzovat listing URL a vytáhnout odkazy
-            $analyza = $this->analyzer->analyzuj($zdroj->url);
-            $urls = $analyza['struktura']['odkazy_akci'] ?? [];
+            // Generický paginator — funguje pro libovolný katalog s listingem
+            $listingUrl = $zdroj->url_pattern_list
+                ? $this->absolutniUrl($zdroj->url_pattern_list, $baseUrl)
+                : $zdroj->url;
+
+            $urls = $this->paginator->sbirej($listingUrl, $detailPattern, $baseUrl);
+
+            // Poslední fallback — pokud paginator nenašel nic, jen analyzátor hlavní stránky
+            if (empty($urls)) {
+                $analyza = $this->analyzer->analyzuj($zdroj->url);
+                $urls = $analyza['struktura']['odkazy_akci'] ?? [];
+            }
         }
 
-        // Převést všechny relativní URL na absolutní (base URL zdroje)
-        $baseUrl = $this->extractBaseUrl($zdroj->url);
+        // Převést všechny relativní URL na absolutní
         return array_map(fn ($u) => $this->absolutniUrl($u, $baseUrl), $urls);
     }
 

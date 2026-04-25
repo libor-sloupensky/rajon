@@ -16,10 +16,12 @@ class AkceExtractor
 
     public function __construct(
         protected ?LokalizaceResolver $lokalizace = null,
+        protected ?JsonLdExtractor $jsonLd = null,
     ) {
         $this->apiKey = (string) config('services.anthropic.key');
         $this->model = (string) config('services.anthropic.model', 'claude-haiku-4-5-20251001');
         $this->lokalizace ??= app(LokalizaceResolver::class);
+        $this->jsonLd ??= app(JsonLdExtractor::class);
     }
 
     /**
@@ -30,9 +32,19 @@ class AkceExtractor
      */
     public function extrahuj(string $html, string $url): ?array
     {
+        // 1. Pokus zdarma — JSON-LD schema.org/Event přímo z HTML.
+        // Pokud máme dostatek dat (název + datum + místo), AI nepotřebujeme.
+        $jsonLdData = $this->jsonLd->extrahuj($html);
+        if ($jsonLdData && $this->jeKompletni($jsonLdData)) {
+            Log::info('Použit JSON-LD (bez AI volání)', ['url' => $url]);
+            return $jsonLdData;
+        }
+
+        // 2. Fallback na AI extrakci
         if (empty($this->apiKey)) {
-            Log::warning('ANTHROPIC_API_KEY not set — cannot extract');
-            return null;
+            Log::warning('ANTHROPIC_API_KEY not set — cannot extract via AI');
+            // Pokud máme aspoň částečné JSON-LD, vrátíme to
+            return $jsonLdData ?: null;
         }
 
         // Očisti HTML — odstraň <script>, <style>, nav a zkrať
@@ -134,6 +146,17 @@ PROMPT;
             Log::error("AI extraction exception: {$e->getMessage()}", ['url' => $url]);
             return null;
         }
+    }
+
+    /**
+     * Je JSON-LD data dostatečně kompletní? (klíčové pole vyplněné)
+     * Pokud ano, AI fallback není potřeba.
+     */
+    protected function jeKompletni(array $data): bool
+    {
+        return !empty($data['nazev'])
+            && !empty($data['datum_od'])
+            && (!empty($data['mesto']) || !empty($data['misto']) || !empty($data['adresa']));
     }
 
     /** Vypočítat velikostní skóre (0-100) z extrahovaných dat. */

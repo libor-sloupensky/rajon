@@ -26,6 +26,8 @@ class ZdrojAnalyzer
             'cms_typ' => null,
             'url_pattern_list' => null,
             'url_pattern_detail' => null,
+            'pocet_url_v_sitemap' => 0,
+            'ma_jsonld_event' => false,
             'html_ukazka' => null,
             'struktura' => [],
             'chyby' => [],
@@ -49,11 +51,64 @@ class ZdrojAnalyzer
             $result['html_ukazka'] = mb_substr($html, 0, 3000);
             $result['cms_typ'] = $this->detekujCms($html);
             $result['struktura'] = $this->extrahujStrukturu($html);
+            $result['ma_jsonld_event'] = !empty($result['struktura']['jsonld_events']);
         } else {
             $result['chyby'][] = 'Nelze stáhnout hlavní HTML.';
         }
 
+        // 4. Auto-detekce URL pattern detailu — ze sitemap (pokud ji máme)
+        if ($result['sitemap_url']) {
+            $sampleUrls = $this->seznamUrlZSitemap($result['sitemap_url'], '*');
+            $result['pocet_url_v_sitemap'] = count($sampleUrls);
+            if (!empty($sampleUrls)) {
+                $result['url_pattern_detail'] = $this->detekujUrlPattern($sampleUrls);
+            }
+        }
+        // Fallback: zkus detekovat z odkazů na hlavní stránce
+        if (empty($result['url_pattern_detail']) && !empty($result['struktura']['odkazy_akci'])) {
+            $result['url_pattern_detail'] = $this->detekujUrlPattern($result['struktura']['odkazy_akci']);
+        }
+
         return $result;
+    }
+
+    /**
+     * Auto-detekce URL pattern detailu — najde nejčastější path prefix mezi URL.
+     * Např. ["/akce/foo", "/akce/bar", "/contact"] → "/akce/"
+     */
+    protected function detekujUrlPattern(array $urls): ?string
+    {
+        if (empty($urls)) return null;
+
+        $prefixCount = [];
+        foreach ($urls as $url) {
+            $path = parse_url($url, PHP_URL_PATH) ?? '';
+            // Vezmi první 1-2 segmenty cesty
+            if (preg_match('#^(/[\w\-]+/)#', $path, $m)) {
+                $prefixCount[$m[1]] = ($prefixCount[$m[1]] ?? 0) + 1;
+            }
+            if (preg_match('#^(/[\w\-]+/[\w\-]+/)#', $path, $m)) {
+                $prefixCount[$m[1]] = ($prefixCount[$m[1]] ?? 0) + 1;
+            }
+        }
+
+        if (empty($prefixCount)) return null;
+
+        // Preferuj prefixy které vypadají jako "akce/events/event/akcie/..."
+        $klicovaSlova = ['akce', 'events', 'event', 'akcie', 'kalendar', 'calendar', 'pout', 'festival', 'program', 'trhy'];
+        $skore = [];
+        foreach ($prefixCount as $prefix => $cnt) {
+            $skore[$prefix] = $cnt;
+            foreach ($klicovaSlova as $kw) {
+                if (str_contains(mb_strtolower($prefix), $kw)) {
+                    $skore[$prefix] *= 5;  // boost
+                    break;
+                }
+            }
+        }
+
+        arsort($skore);
+        return array_key_first($skore);
     }
 
     /** robots.txt → najdi Sitemap: direktivy. */
