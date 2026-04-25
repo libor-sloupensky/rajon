@@ -38,7 +38,25 @@ if (empty($token) || $token !== $expectedToken) {
 header('Content-Type: text/plain; charset=utf-8');
 @set_time_limit(300);
 @ini_set('memory_limit', '512M');
+
+// Lov fatal errorů (OOM, timeout, parse error) — bez tohoto Webglobe vrátí 500 HTML
+register_shutdown_function(function () {
+    $err = error_get_last();
+    if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_COMPILE_ERROR, E_CORE_ERROR], true)) {
+        if (! headers_sent()) {
+            header('Content-Type: text/plain; charset=utf-8');
+        }
+        echo "\n\n✗ FATAL: [{$err['type']}] {$err['message']}\n  at {$err['file']}:{$err['line']}\n";
+        echo 'memory: ' . round(memory_get_peak_usage(true) / 1048576, 1) . " MB / limit "
+            . ini_get('memory_limit') . "\n";
+        echo 'time: ' . round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 2) . "s / limit "
+            . ini_get('max_execution_time') . "s\n";
+    }
+});
+
 $results = [];
+$results[] = '… start, memory_limit=' . ini_get('memory_limit')
+    . ', time_limit=' . ini_get('max_execution_time') . 's';
 
 try {
     // OPcache reset
