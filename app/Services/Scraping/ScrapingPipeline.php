@@ -364,6 +364,13 @@ class ScrapingPipeline
             return ['stav' => 'preskoceny', 'duvod' => "Ignorovaný typ akce ({$normalizovanyTyp})"];
         }
 
+        // 2d. Indoor místo — pokud akce není trhy_jarmarky ani sportovní + místo
+        // má indoor signál (kino/sál/galerie/muzeum/...) → skip
+        if (!in_array($normalizovanyTyp, ['trhy_jarmarky', 'sportovni_akce'], true)
+            && $this->jeIndoorMisto($data['misto'] ?? '', $data['adresa'] ?? '')) {
+            return ['stav' => 'preskoceny', 'duvod' => "Indoor místo ({$data['misto']})"];
+        }
+
         // Předat hash do data pro uložení
         $data['_html_hash'] = $hashNovy;
 
@@ -772,6 +779,40 @@ class ScrapingPipeline
         }
 
         return $data;
+    }
+
+    /**
+     * Detekuje, jestli je místo INDOOR (kino, sál, kostel, galerie, …).
+     * Pokud místo zároveň obsahuje outdoor signál (náměstí, park, areál),
+     * vrací false — venkovní areál u kulturního domu apod.
+     */
+    protected function jeIndoorMisto(string $misto, string $adresa = ''): bool
+    {
+        $kombi = mb_strtolower(trim($misto . ' ' . $adresa));
+        if (empty($kombi)) return false;
+
+        // Outdoor signály — výjimka i pokud místo obsahuje indoor klíčové slovo
+        $outdoor = ['náměstí', 'park ', ' parku', ' park,', 'areál', 'areálu',
+                    ' ulice', ' ulici', 'nábřeží', 'louka', 'pole', 'zahrad',
+                    'venkovní', 'open air', ' open-air'];
+        foreach ($outdoor as $o) {
+            if (str_contains($kombi, $o)) return false;
+        }
+
+        // Indoor klíčová slova
+        $indoor = [
+            'kino', 'sál', 'sále', 'sálu', 'kostel', 'kapl', 'klášter', 'synagog',
+            'galerie', 'galerii', 'muzeum', 'muzea', 'muzeu', 'expozic',
+            'knihovn', 'studio ', 'studi a ', 'restaurac', 'kavárn', 'vinárn',
+            'pivnic', 'kulturní dům', 'kulturního dom', 'lidový dům',
+            'kulturní centrum', 'dům dětí', 'dům umění',
+            'základní umělecká škola', 'základní škola', 'střední škola',
+            'gymnázium', 'gymnáziu', 'zuš',
+        ];
+        foreach ($indoor as $kw) {
+            if (str_contains($kombi, $kw)) return true;
+        }
+        return false;
     }
 
     /** Porovná hostname bez www. prefixu — stankar.cz === www.stankar.cz */
