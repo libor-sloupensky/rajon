@@ -81,16 +81,18 @@ try {
     $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
     $kernel->bootstrap();
 
-    $runArtisan = function (string $command, array $params = []) {
-        $output = new Symfony\Component\Console\Output\BufferedOutput();
+    $runArtisan = function (string $command, array $params = []) use ($emit) {
+        $emit("→ {$command} starting…");
+        // StreamOutput píše rovnou do stdout — uvidíme progress real-time
+        $stream = fopen('php://output', 'w');
+        $output = new Symfony\Component\Console\Output\StreamOutput($stream);
         try {
             $exitCode = Illuminate\Support\Facades\Artisan::call($command, $params, $output);
-            $log = trim($output->fetch());
-            $marker = $exitCode === 0 ? '✓' : '✗';
-            return "{$marker} {$command} (exit={$exitCode})\n" . ($log !== '' ? $log . "\n" : '');
+            @flush();
+            return "✓ {$command} (exit={$exitCode}) [" . round(memory_get_peak_usage(true) / 1048576, 1) . " MB]";
         } catch (\Throwable $e) {
             return "✗ {$command} EXCEPTION: " . get_class($e) . ': ' . $e->getMessage()
-                . "\n  at " . $e->getFile() . ':' . $e->getLine() . "\n";
+                . "\n  at " . $e->getFile() . ':' . $e->getLine();
         }
     };
 
