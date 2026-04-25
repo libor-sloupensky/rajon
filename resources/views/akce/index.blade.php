@@ -22,67 +22,81 @@
     @endif
 
     {{-- Filtry --}}
-    <form method="GET" class="mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 items-end">
-        <div class="col-span-2 lg:col-span-2">
-            <label class="block text-xs text-gray-500 mb-1">Hledat (název, místo, organizátor)</label>
-            <input type="text" name="hledat" value="{{ request('hledat') }}" placeholder="Hledat..."
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none">
-        </div>
-        <div>
-            <label class="block text-xs text-gray-500 mb-1">Typ</label>
-            <select name="typ" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-                <option value="">Všechny</option>
-                @foreach(['pout' => 'Pouť', 'food_festival' => 'Food festival', 'slavnosti' => 'Slavnosti a městské akce', 'obrani' => 'Obraní (vino/dýňo/bramboro/jablko/...)', 'trhy_jarmarky' => 'Trhy a jarmarky', 'festival' => 'Festival', 'sportovni_akce' => 'Sportovní akce', 'koncert' => 'Koncert', 'vystava' => 'Výstava', 'jiny' => 'Jiný'] as $val => $label)
+    @php
+        $kraje = [
+            'Praha', 'Středočeský kraj', 'Jihočeský kraj', 'Plzeňský kraj',
+            'Karlovarský kraj', 'Ústecký kraj', 'Liberecký kraj',
+            'Královéhradecký kraj', 'Pardubický kraj', 'Kraj Vysočina',
+            'Jihomoravský kraj', 'Olomoucký kraj', 'Zlínský kraj',
+            'Moravskoslezský kraj',
+        ];
+        $typy = [
+            'pout' => 'Pouť',
+            'food_festival' => 'Food festival',
+            'slavnosti' => 'Slavnosti a městské akce',
+            'obrani' => 'Obraní',
+            'trhy_jarmarky' => 'Trhy a jarmarky',
+            'festival' => 'Festival',
+            'sportovni_akce' => 'Sportovní akce',
+            'koncert' => 'Koncert',
+            'vystava' => 'Výstava',
+            'jiny' => 'Jiný',
+        ];
+    @endphp
+    <form method="GET" class="mb-6 space-y-2">
+        {{-- Řádek 1: hledat (přes celou šířku) --}}
+        <input type="text" name="hledat" value="{{ request('hledat') }}"
+            placeholder="Hledat (název, místo, organizátor)…"
+            class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:border-primary focus:outline-none">
+
+        {{-- Řádek 2: typ | kraj | datumy (od → do v jedné buňce) --}}
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <select name="typ" class="rounded-lg border border-gray-300 px-2 py-1.5 text-xs">
+                <option value="">Typ — všechny</option>
+                @foreach($typy as $val => $label)
                     <option value="{{ $val }}" {{ request('typ') === $val ? 'selected' : '' }}>{{ $label }}</option>
                 @endforeach
             </select>
-        </div>
-        <div>
-            <label class="block text-xs text-gray-500 mb-1">Kraj</label>
-            <input type="text" name="kraj" value="{{ request('kraj') }}" placeholder="Kraj..."
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none">
-        </div>
-        <div>
-            <label class="block text-xs text-gray-500 mb-1">Datum od</label>
-            <input type="date" name="datum_od" value="{{ request('datum_od') }}"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-        </div>
-        <div>
-            <label class="block text-xs text-gray-500 mb-1">Datum do</label>
-            <input type="date" name="datum_do" value="{{ request('datum_do') }}"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-        </div>
-        <div>
-            <label class="block text-xs text-gray-500 mb-1">Původ</label>
-            <select name="zdroj_typ" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-                <option value="">Vše</option>
-                <option value="web" {{ request('zdroj_typ') === 'web' ? 'selected' : '' }}>Z webu (scraping)</option>
-                <option value="excel" {{ request('zdroj_typ') === 'excel' ? 'selected' : '' }}>Z XLS importu</option>
+
+            <select name="kraj" class="rounded-lg border border-gray-300 px-2 py-1.5 text-xs">
+                <option value="">Kraj — všechny</option>
+                @foreach($kraje as $k)
+                    <option value="{{ $k }}" {{ request('kraj') === $k ? 'selected' : '' }}>{{ $k }}</option>
+                @endforeach
             </select>
+
+            <div class="flex items-center gap-1">
+                <input type="date" name="datum_od" value="{{ request('datum_od') }}"
+                    title="Datum od" aria-label="Datum od"
+                    class="w-full rounded-lg border border-gray-300 px-2 py-1.5 text-xs">
+                <span class="text-gray-400 text-xs">–</span>
+                <input type="date" name="datum_do" value="{{ request('datum_do') }}"
+                    title="Datum do" aria-label="Datum do"
+                    class="w-full rounded-lg border border-gray-300 px-2 py-1.5 text-xs">
+            </div>
         </div>
-        @if($jeAdmin)
-            <div>
-                <label class="block text-xs text-gray-500 mb-1">Stav</label>
-                <select name="stav" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-                    <option value="">Všechny (kromě zrušených)</option>
+
+        {{-- Řádek 3: stav (admin) | I minulé | tlačítka --}}
+        <div class="flex flex-wrap items-center gap-3">
+            @if($jeAdmin)
+                <select name="stav" class="rounded-lg border border-gray-300 px-2 py-1.5 text-xs">
+                    <option value="">Stav — všechny (kromě zrušených)</option>
                     @foreach(['navrh' => 'Návrh', 'overena' => 'Ověřená', 'zrusena' => 'Zrušená'] as $v => $l)
                         <option value="{{ $v }}" {{ request('stav') === $v ? 'selected' : '' }}>{{ $l }}</option>
                     @endforeach
                 </select>
-            </div>
-        @endif
-        <div class="flex items-center gap-2">
+            @endif
+
             <label class="text-xs text-gray-500 flex items-center gap-1">
                 <input type="checkbox" name="vse" value="1" {{ request('vse') ? 'checked' : '' }} class="rounded">
                 I minulé
             </label>
-        </div>
-        <div class="flex gap-2">
-            <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark transition">
+
+            <button type="submit" class="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-dark transition">
                 Filtrovat
             </button>
             @if(request()->hasAny(['hledat', 'typ', 'kraj', 'mesic', 'rok', 'datum_od', 'datum_do', 'stav', 'vse', 'zdroj_typ']))
-                <a href="{{ url('/akce') }}" class="text-sm text-gray-500 hover:text-primary self-center">Zrušit</a>
+                <a href="{{ url('/akce') }}" class="text-xs text-gray-500 hover:text-primary">Zrušit</a>
             @endif
         </div>
     </form>

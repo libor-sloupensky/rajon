@@ -52,21 +52,13 @@ class AkceController extends Controller
             $query->where('kraj', 'like', '%' . $request->kraj . '%');
         }
 
-        // Datum od / do — vyžadujeme, aby akce MĚLA datum
-        // (akce bez data se při filtraci na datum nezobrazí — jinak by zaplevelily výsledky)
+        // Datum od / do — strict: akce ZAČÍNÁ v zadaném rozsahu (datum_od je v intervalu).
+        // Akce bez datum_od se při filtraci nezobrazí (jinak by zaplevelily výsledky).
         if ($request->filled('datum_od')) {
-            $query->whereNotNull('datum_od')
-                  ->where(function ($q) use ($request) {
-                      $q->where('datum_do', '>=', $request->datum_od)
-                        ->orWhere(function ($qq) use ($request) {
-                            $qq->whereNull('datum_do')
-                               ->where('datum_od', '>=', $request->datum_od);
-                        });
-                  });
+            $query->whereNotNull('datum_od')->whereDate('datum_od', '>=', $request->datum_od);
         }
         if ($request->filled('datum_do')) {
-            $query->whereNotNull('datum_od')
-                  ->where('datum_od', '<=', $request->datum_do);
+            $query->whereNotNull('datum_od')->whereDate('datum_od', '<=', $request->datum_do);
         }
 
         // Měsíc/rok (zachováváme zpětnou kompatibilitu URL parametrů)
