@@ -11,20 +11,12 @@
         <form method="POST" action="{{ route('admin.uzivatele.pozvat') }}" class="p-4 space-y-3">
             @csrf
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">E-mail <span class="text-red-500">*</span></label>
-                    <input type="email" name="email" required value="{{ old('email') }}"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none">
-                    @error('email') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Role <span class="text-red-500">*</span></label>
-                    <select name="role" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-                        <option value="fransizan" {{ old('role') === 'fransizan' ? 'selected' : '' }}>Franšízant</option>
-                        <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Administrátor</option>
-                    </select>
-                </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">E-mail <span class="text-red-500">*</span></label>
+                <input type="email" name="email" required value="{{ old('email') }}"
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none">
+                @error('email') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                <p class="mt-1 text-xs text-gray-500">Nový uživatel bude automaticky franšízant. Roli administrátora můžeš nastavit po přijetí pozvánky.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -127,12 +119,17 @@
                             <th class="text-left px-4 py-2">Region</th>
                             <th class="text-left px-4 py-2">Registrace</th>
                             <th class="text-left px-4 py-2">Ověřen</th>
+                            <th class="text-right px-4 py-2">Akce</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @foreach($uzivatele as $u)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-2">{{ $u->celejmeno() }}</td>
+                            @php $jeJa = $u->id === auth()->id(); @endphp
+                            <tr class="hover:bg-gray-50 {{ $jeJa ? 'bg-blue-50/30' : '' }}">
+                                <td class="px-4 py-2">
+                                    {{ $u->celejmeno() }}
+                                    @if($jeJa)<span class="ml-1 text-xs text-blue-600">(já)</span>@endif
+                                </td>
                                 <td class="px-4 py-2 text-gray-600">{{ $u->email }}</td>
                                 <td class="px-4 py-2">
                                     <span class="rounded-full px-2 py-0.5 text-xs font-medium
@@ -147,6 +144,34 @@
                                         <span class="text-green-600 text-xs">✓</span>
                                     @else
                                         <span class="text-gray-400 text-xs">—</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2 text-right">
+                                    @if(!$jeJa)
+                                        <div class="flex gap-1 justify-end">
+                                            @php $novaRole = $u->role === 'admin' ? 'fransizan' : 'admin'; @endphp
+                                            <form method="POST" action="{{ route('admin.uzivatele.role', $u) }}"
+                                                onsubmit="return confirm('Změnit roli uživatele {{ $u->celejmeno() }} na {{ $novaRole }}?')">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="role" value="{{ $novaRole }}">
+                                                <button type="submit" class="rounded border border-gray-300 px-2 py-1 text-xs text-gray-700 hover:bg-gray-50"
+                                                    title="Změnit roli na {{ $novaRole }}">
+                                                    {{ $u->role === 'admin' ? '↓ fransizan' : '↑ admin' }}
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="{{ route('admin.uzivatele.destroy', $u) }}"
+                                                onsubmit="return confirm('Opravdu smazat uživatele {{ $u->celejmeno() }} ({{ $u->email }})? Tuto akci nelze vrátit.')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="rounded border border-red-300 px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                                                    title="Smazat uživatele">
+                                                    Smazat
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @else
+                                        <span class="text-xs text-gray-400">—</span>
                                     @endif
                                 </td>
                             </tr>

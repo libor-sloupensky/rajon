@@ -30,14 +30,14 @@ class UzivateleController extends Controller
         return view('admin.uzivatele.index', compact('uzivatele', 'pozvankyAktivni', 'pozvankyHistorie'));
     }
 
-    /** Rychlé vytvoření pozvánky z formuláře na stránce /admin/uzivatele. */
+    /** Rychlé vytvoření pozvánky z formuláře na stránce /admin/uzivatele.
+     *  Role je vždy 'fransizan' — admin se nastavuje až po registraci přes změnu role. */
     public function pozvat(Request $request)
     {
         $data = $request->validate([
             'email' => ['required', 'email', 'max:255'],
             'jmeno' => ['nullable', 'string', 'max:255'],
             'prijmeni' => ['nullable', 'string', 'max:255'],
-            'role' => ['required', 'in:admin,fransizan'],
             'region' => ['nullable', 'string', 'max:100'],
             'platnost_dni' => ['required', 'integer', 'min:1', 'max:365'],
         ]);
@@ -52,7 +52,7 @@ class UzivateleController extends Controller
             'email' => $data['email'],
             'jmeno' => $data['jmeno'] ?? null,
             'prijmeni' => $data['prijmeni'] ?? null,
-            'role' => $data['role'],
+            'role' => 'fransizan',
             'region' => $data['region'] ?? null,
             'stav' => 'cekajici',
             'plati_do' => now()->addDays((int) $data['platnost_dni']),
@@ -87,5 +87,34 @@ class UzivateleController extends Controller
     {
         $pozvanka->update(['stav' => 'zrusena']);
         return back()->with('success', 'Pozvánka zrušena.');
+    }
+
+    /** Změna role uživatele (admin ↔ fransizan). Sám sobě nelze. */
+    public function zmenitRoli(Request $request, Uzivatel $uzivatel)
+    {
+        if ($uzivatel->id === $request->user()->id) {
+            return back()->with('error', 'Nelze měnit roli sám sobě.');
+        }
+
+        $data = $request->validate([
+            'role' => ['required', 'in:admin,fransizan'],
+        ]);
+
+        $uzivatel->update(['role' => $data['role']]);
+
+        return back()->with('success', "Role uživatele {$uzivatel->celejmeno()} změněna na {$data['role']}.");
+    }
+
+    /** Smazání uživatele. Sám sebe nelze. */
+    public function destroy(Request $request, Uzivatel $uzivatel)
+    {
+        if ($uzivatel->id === $request->user()->id) {
+            return back()->with('error', 'Nelze smazat sám sebe.');
+        }
+
+        $jmeno = $uzivatel->celejmeno();
+        $uzivatel->delete();
+
+        return back()->with('success', "Uživatel {$jmeno} byl smazán.");
     }
 }

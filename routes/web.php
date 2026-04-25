@@ -48,6 +48,8 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\JeAdmin::class])->pr
     // Uživatelé + pozvánky
     Route::get('/uzivatele', [UzivateleController::class, 'index'])->name('uzivatele');
     Route::post('/uzivatele/pozvat', [UzivateleController::class, 'pozvat'])->name('uzivatele.pozvat');
+    Route::put('/uzivatele/{uzivatel}/role', [UzivateleController::class, 'zmenitRoli'])->name('uzivatele.role');
+    Route::delete('/uzivatele/{uzivatel}', [UzivateleController::class, 'destroy'])->name('uzivatele.destroy');
     Route::post('/uzivatele/pozvanky/{pozvanka}/resend', [UzivateleController::class, 'resendPozvanku'])->name('uzivatele.pozvanka.resend');
     Route::delete('/uzivatele/pozvanky/{pozvanka}', [UzivateleController::class, 'zrusitPozvanku'])->name('uzivatele.pozvanka.zrusit');
 
