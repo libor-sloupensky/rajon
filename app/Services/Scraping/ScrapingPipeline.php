@@ -621,7 +621,7 @@ class ScrapingPipeline
                 ? "[{$zdroj->nazev}] " . $data['velikost_info']
                 : null,
             'velikost_signaly' => $data['velikost_signaly'] ?? null,
-            'stav' => 'navrh',
+            'stav' => 'overena',
         ];
 
         $akce = Akce::create($payload);
