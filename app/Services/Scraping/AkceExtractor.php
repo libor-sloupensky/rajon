@@ -91,6 +91,11 @@ DŮLEŽITÁ PRAVIDLA:
   Pokud opravdu nemáš dost informací, vrať okres=null.
 - KRAJ není potřeba odvozovat — bude doplněn z okresu automaticky. Pokud je
   v textu explicitně, můžeš ho vrátit, jinak null.
+- EXTRAKCE Z NÁZVU: pokud v textu stránky není město, ZKUS HO NAJÍT v NÁZVU
+  akce. Typicky: "Festival X v Brně 2026" → mesto="Brno", "DEN - Sobotka 2026"
+  → mesto="Sobotka", "Slavnosti chřestu v Ivančicích" → mesto="Ivančice".
+  Pozor na české skloňování: "v Janských Lázních" → mesto="Janské Lázně",
+  "v Brně" → mesto="Brno", "v Praze" → mesto="Praha".
 - TYP: vyber CO NEJPŘESNĚJI z níže uvedeného seznamu. Pokud akce má v názvu
   "jarmark", "trh", "vánoční trh", musí být typ="trhy_jarmarky" — NIKDY ne "jine".
   Pokud má v názvu "pouť", "pout", musí být "pout". Při pochybnostech radši zvol

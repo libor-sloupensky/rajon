@@ -604,6 +604,21 @@ class ScrapingPipeline
             if ($odhad) $data['typ'] = $odhad;
         }
 
+        // Cleanup: pokud misto je jen kraj (typ. Stánkař), přesunout do kraj a vyčistit
+        if (!empty($data['misto']) && $this->jeJenKraj((string) $data['misto'])) {
+            if (empty($data['kraj'])) $data['kraj'] = $data['misto'];
+            $data['misto'] = null;
+        }
+
+        // Pokud nemáme město, zkusíme extrahovat z názvu (Stánkař často má "v Brně")
+        if (empty($data['mesto']) && empty($data['misto']) && !empty($data['nazev'])) {
+            $mesto = $this->extrahujMestoZNazvu((string) $data['nazev']);
+            if ($mesto) {
+                $data['mesto'] = $mesto;
+                if (empty($data['misto'])) $data['misto'] = $mesto;
+            }
+        }
+
         $data['_skore'] = $skore;
         $data['_stav'] = $stav;
 
@@ -735,6 +750,152 @@ class ScrapingPipeline
         }
 
         return $data;
+    }
+
+    /** Detekuje, jestli string je jen název kraje (např. "Středočeský kraj"). */
+    protected function jeJenKraj(string $text): bool
+    {
+        $t = mb_strtolower(trim($text));
+        if (str_ends_with($t, ' kraj') || str_starts_with($t, 'kraj ')) return true;
+        $kraje = ['praha', 'hlavní město praha'];
+        return in_array($t, $kraje, true);
+    }
+
+    /**
+     * Extrahuj název města z názvu akce.
+     * Pattern: " v <Mesto>", " - <Mesto>", "<Mesto> 2026"
+     * České skloňování: "v Janských Lázních" → "Janské Lázně", "v Brně" → "Brno"
+     */
+    protected function extrahujMestoZNazvu(string $nazev): ?string
+    {
+        // 1) " v X" / " ve X" — locative case (česky)
+        if (preg_match('/\b(?:v|ve)\s+([A-ZÁ-Ž][a-zá-žA-ZÁ-Ž\s\-]+?)(?:\s+\d{4}|\s*[-–]|\s*$|,)/u', $nazev, $m)) {
+            $mesto = trim($m[1]);
+            $mesto = $this->locativeToNominative($mesto);
+            return $this->validujMesto($mesto);
+        }
+
+        // 2) " - <Mesto> 2026" / " - <Mesto>" na konci
+        if (preg_match('/[-–]\s*([A-ZÁ-Ž][a-zá-žA-ZÁ-Ž\s\-]+?)(?:\s+\d{4})?\s*$/u', $nazev, $m)) {
+            $mesto = trim($m[1]);
+            if (mb_strlen($mesto) >= 2 && mb_strlen($mesto) <= 40) {
+                return $this->validujMesto($mesto);
+            }
+        }
+
+        // 3) "<Mesto> 2026" — město + rok (jen pokud je to 1-3 slova, jinak je to název akce)
+        if (preg_match('/^([A-ZÁ-Ž][a-zá-žA-ZÁ-Ž\s\-]+?)\s+\d{4}\s*$/u', $nazev, $m)) {
+            $mesto = trim($m[1]);
+            $pocetSlov = count(explode(' ', $mesto));
+            if (mb_strlen($mesto) >= 2 && $pocetSlov <= 3) {
+                return $this->validujMesto($mesto);
+            }
+        }
+
+        return null;
+    }
+
+    /** Validuje, jestli extrahované "mesto" je opravdu město (ne adjektivum kraje, ne event-keyword). */
+    protected function validujMesto(string $mesto): ?string
+    {
+        $low = mb_strtolower(trim($mesto));
+
+        // Adjektiva krajů — Liberecký/Středočeský/etc. nikdy nejsou město
+        $adjektiva = [
+            'liberecký', 'středočeský', 'jihočeský', 'jihomoravský', 'plzeňský',
+            'karlovarský', 'ústecký', 'pardubický', 'královéhradecký',
+            'zlínský', 'olomoucký', 'moravskoslezský', 'vysočina',
+        ];
+        foreach ($adjektiva as $adj) {
+            if ($low === $adj || str_starts_with($low, $adj . ' ')) return null;
+        }
+
+        // Event-keywords v názvu — "Burčákové slavnosti", "Festival X" → není město
+        $eventKeywords = ['slavnosti', 'festival', 'jarmark', 'trh', 'pouť',
+                          'koncert', 'výstava', 'workshop', 'sletu', 'soutěž',
+                          'den ', 'sezó', 'řemesla', 'oslavy'];
+        foreach ($eventKeywords as $kw) {
+            if (str_contains($low, $kw)) return null;
+        }
+
+        // Krajové názvy ("Kraj Vysočina")
+        if ($this->jeJenKraj($mesto)) return null;
+
+        // Příliš krátké
+        if (mb_strlen($mesto) < 2) return null;
+
+        return $mesto;
+    }
+
+    /** Velmi zjednodušená konverze locative → nominative pro česká města. */
+    protected function locativeToNominative(string $mesto): string
+    {
+        // Janských Lázních → Janské Lázně
+        // Ivančicích → Ivančice
+        // Brně → Brno
+        // Praze → Praha
+        // Sobotce → Sobotka
+        // Kroměříži → Kroměříž
+        // Specifické nepravidelnosti
+        $map = [
+            'praze' => 'Praha',
+            'brně' => 'Brno',
+            'ostravě' => 'Ostrava',
+            'plzni' => 'Plzeň',
+            'olomouci' => 'Olomouc',
+            'liberci' => 'Liberec',
+            'pardubicích' => 'Pardubice',
+            'jihlavě' => 'Jihlava',
+            'zlíně' => 'Zlín',
+            'ústí nad labem' => 'Ústí nad Labem',
+            'opavě' => 'Opava',
+            'kroměříži' => 'Kroměříž',
+            'táboře' => 'Tábor',
+            'sobotce' => 'Sobotka',
+            'havlíčkově brodě' => 'Havlíčkův Brod',
+            'janských lázních' => 'Janské Lázně',
+            'mariánských lázních' => 'Mariánské Lázně',
+            'karlových varech' => 'Karlovy Vary',
+            'nymburce' => 'Nymburk',
+            'rychnově nad kněžnou' => 'Rychnov nad Kněžnou',
+            'rtyni v podkrkonoší' => 'Rtyně v Podkrkonoší',
+            'českém krumlově' => 'Český Krumlov',
+            'českých budějovicích' => 'České Budějovice',
+        ];
+        $low = mb_strtolower(trim($mesto));
+        if (isset($map[$low])) return $map[$low];
+
+        // Obecná pravidla pro vícekomponentní města (Janské Lázně-style)
+        $words = explode(' ', $mesto);
+        $converted = array_map(fn ($w) => $this->slovoLocativeToNom($w), $words);
+        return implode(' ', $converted);
+    }
+
+    /** Konverze jednoho slova z lokálu do nominativu (rough). */
+    protected function slovoLocativeToNom(string $w): string
+    {
+        $low = mb_strtolower($w);
+        // -ěch / -ích → -y or -e (Lázních → Lázně, Hradech → Hrady)
+        $rules = [
+            '/ích$/u' => 'e',           // Lázních → Lázně, Pardubicích → Pardubice
+            '/ách$/u' => 'y',           // Strakonicích, Klatovách → Klatovy
+            '/ech$/u' => 'y',           // Praze → ne, Hradech → Hrady
+            '/cích$/u' => 'ce',         // Pardubicích → Pardubice
+            '/cich$/u' => 'ce',
+            '/ě$/u' => 'o',             // Brně → Brno (jen u některých!)
+            '/ši$/u' => 'š',            // Litoměřicích → ne
+        ];
+        // POZOR: tyto úpravy jsou hrubé. Lepší by bylo plný morfologický slovník.
+        // Pokud slovo už začíná velkým, vrátíme s velkým prvním písmenem.
+        $orig = $w;
+        foreach ($rules as $pat => $repl) {
+            $w = preg_replace($pat, $repl, $w) ?? $w;
+        }
+        // První písmeno velké (zachovat původní case)
+        if (mb_strlen($orig) > 0 && ctype_upper(mb_substr($orig, 0, 1))) {
+            $w = mb_strtoupper(mb_substr($w, 0, 1)) . mb_substr($w, 1);
+        }
+        return $w;
     }
 
     /**
