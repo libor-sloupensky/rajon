@@ -10,30 +10,27 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
- * Načte `database/data/historicka_data.json` a vloží do DB:
- * - `akce` — kanonické akce (1021 záznamů)
- * - `akce_vykazy` — ročníkové výkazy 2022–2025 (529 záznamů)
+ * Načte `database/data/historicka_data.json` a vloží do DB ve **chunkech**:
+ *   - `akce` (1021 záznamů)
+ *   - `akce_vykazy` (529 záznamů)
  *
- * JSON je vygenerovaný lokálně:
- *   php artisan excel:import temporary --export=database/data/historicka_data.json
+ * Webglobe shared hosting má proxy timeout < 60 s a output buffering, takže
+ * dlouhý seeder spadne na 500 bez výstupu. Tento seeder čte parametry z $_GET
+ * a importuje **jen jeden chunk** (default 200 řádků).
  *
- * Spuštění přes deploy-hook:
- *   ?token=...&seed=ImportHistorickychDatSeeder
- *
- * Optimalizace pro shared hosting (PHP-FPM/proxy timeout):
- *   - Existující akce nahraju do PHP mapy 2× (slug, nazev|misto) → 2 SQL queries.
- *   - Nové akce v dávkách po 200 přes bulk INSERT (`Akce::insert()`).
- *   - Po insertu zpětně dohledám ID podle slugů (1 SELECT na dávku).
- *   - Výkazy přes `AkceVykaz::upsert()` v dávkách po 200 (1 query per dávka,
- *     idempotence díky unique [akce_id, rok]).
- *
- * Tím klesne počet DB queries z ~3000 na ~30 a celé proběhne pod 5 sekund.
+ * URL přes deploy-hook:
+ *   ?token=...&seed=ImportHistorickychDatSeeder&phase=akce&offset=0
+ *   ?token=...&seed=ImportHistorickychDatSeeder&phase=akce&offset=200
+ *   ?token=...&seed=ImportHistorickychDatSeeder&phase=akce&offset=400
+ *   ... až vrátí "phase kompletní" ...
+ *   ?token=...&seed=ImportHistorickychDatSeeder&phase=vykazy&offset=0
+ *   ...
  */
 class ImportHistorickychDatSeeder extends Seeder
 {
     private const JSON_PATH = 'database/data/historicka_data.json';
 
-    private const CHUNK = 200;
+    private const CHUNK_DEFAULT = 200;
 
     public function run(): void
     {
@@ -49,38 +46,64 @@ class ImportHistorickychDatSeeder extends Seeder
             return;
         }
 
-        $this->command->line("Načteno: {$data['meta']['pocet_akci']} akcí, {$data['meta']['pocet_vykazu']} výkazů");
+        $phase = $_GET['phase'] ?? 'akce';
+        $offset = max(0, (int) ($_GET['offset'] ?? 0));
+        $limit = max(1, (int) ($_GET['limit'] ?? self::CHUNK_DEFAULT));
 
-        // 1) Předem nahrát existující akce do paměti — vyhneme se per-row queries
-        $existSlug = Akce::query()->pluck('id', 'slug');                 // [slug => id]
+        $this->command->line(sprintf(
+            'Načteno: %d akcí + %d výkazů. Spouštím phase=%s offset=%d limit=%d',
+            $data['meta']['pocet_akci'] ?? count($data['akce']),
+            $data['meta']['pocet_vykazu'] ?? count($data['vykazy']),
+            $phase, $offset, $limit,
+        ));
+
+        if ($phase === 'akce') {
+            $this->importAkceChunk($data['akce'], $offset, $limit);
+        } elseif ($phase === 'vykazy') {
+            $this->importVykazyChunk($data['vykazy'], $offset, $limit);
+        } else {
+            $this->command->error("Unknown phase: {$phase}. Použijte 'akce' nebo 'vykazy'.");
+        }
+    }
+
+    /**
+     * @param list<array<string,mixed>> $vsechnyAkce
+     */
+    private function importAkceChunk(array $vsechnyAkce, int $offset, int $limit): void
+    {
+        $chunk = array_slice($vsechnyAkce, $offset, $limit);
+        $celkem = count($vsechnyAkce);
+        $end = min($offset + $limit, $celkem);
+
+        if (empty($chunk)) {
+            $this->command->line("Phase 'akce' kompletní (offset {$offset} >= {$celkem}).");
+            return;
+        }
+
+        // Pre-load existující akce do paměti (jen 1× při větším inserte)
+        $existSlug = Akce::query()->pluck('id', 'slug')->all();
         $existByNazevMisto = Akce::query()
             ->select('id', 'nazev', 'misto')
             ->get()
-            ->mapWithKeys(fn ($a) => [$this->klicNazevMisto($a->nazev, $a->misto) => $a->id]);
+            ->mapWithKeys(fn ($a) => [$this->klicNazevMisto($a->nazev, $a->misto) => $a->id])
+            ->all();
 
-        /** @var array<string, int>  externi_klic → akce.id */
-        $mapaKlicu = [];
-        $novych = 0;
-        $matched = 0;
         $now = now();
+        $bufInsert = [];
+        $matched = 0;
 
-        DB::transaction(function () use ($data, &$mapaKlicu, &$novych, &$matched, $existSlug, $existByNazevMisto, $now) {
-            $bufInsert = [];
-            $bufKlice = [];
-
-            foreach ($data['akce'] as $row) {
-                $klic = $row['externi_klic'];
+        DB::transaction(function () use ($chunk, &$bufInsert, &$matched, $existSlug, $existByNazevMisto, $now) {
+            foreach ($chunk as $row) {
                 unset($row['externi_klic']);
 
-                // Match nejdřív podle (nazev, misto) — to byl primární klíč při exportu.
-                $idExist = $existByNazevMisto[$this->klicNazevMisto($row['nazev'] ?? '', $row['misto'] ?? null)] ?? null;
-                if ($idExist) {
-                    $mapaKlicu[$klic] = $idExist;
+                // Match nejdřív podle (nazev, misto)
+                $klicNM = $this->klicNazevMisto($row['nazev'] ?? '', $row['misto'] ?? null);
+                if (isset($existByNazevMisto[$klicNM])) {
                     $matched++;
                     continue;
                 }
 
-                // Vygenerovat unikátní slug podle stávající mapy
+                // Vygenerovat unikátní slug
                 $slug = $row['slug'] ?? Str::slug($row['nazev'] ?? 'akce');
                 if ($slug === '') $slug = 'akce';
                 $finalSlug = $slug;
@@ -90,111 +113,160 @@ class ImportHistorickychDatSeeder extends Seeder
                     if ($i > 9999) break;
                 }
                 $row['slug'] = $finalSlug;
-                $existSlug[$finalSlug] = -1; // rezervovat — ID doplníme po insertu
+                $existSlug[$finalSlug] = -1;
+                $existByNazevMisto[$klicNM] = -1;
 
-                $row = $this->normalizujRadek($row);
-                $row['vytvoreno'] = $now;
-                $row['upraveno'] = $now;
-                $bufInsert[] = $row;
-                $bufKlice[] = $klic;
-
-                if (count($bufInsert) >= self::CHUNK) {
-                    $novych += $this->flushInsertAkce($bufInsert, $bufKlice, $mapaKlicu);
-                }
+                $bufInsert[] = $this->normalizujRadek($row, $now);
             }
+
             if ($bufInsert) {
-                $novych += $this->flushInsertAkce($bufInsert, $bufKlice, $mapaKlicu);
-            }
-
-            // 2) Výkazy — upsert v dávkách
-            $bufVykaz = [];
-            foreach ($data['vykazy'] as $row) {
-                $klic = $row['externi_klic'];
-                if (!isset($mapaKlicu[$klic])) continue; // orphan ochrana
-                $rok = (int) $row['rok'];
-                unset($row['externi_klic'], $row['rok']);
-
-                $bufVykaz[] = [
-                    'akce_id' => $mapaKlicu[$klic],
-                    'rok' => $rok,
-                    'datum_od' => $row['datum_od'] ?? null,
-                    'datum_do' => $row['datum_do'] ?? null,
-                    'trzba' => $row['trzba'] ?? null,
-                    'najem' => $row['najem'] ?? null,
-                    'poznamka' => $row['poznamka'] ?? null,
-                    'zdroj_excel' => $row['zdroj_excel'] ?? null,
-                    'vytvoreno' => $now,
-                    'upraveno' => $now,
-                ];
-
-                if (count($bufVykaz) >= self::CHUNK) {
-                    AkceVykaz::upsert($bufVykaz, ['akce_id', 'rok'], [
-                        'datum_od', 'datum_do', 'trzba', 'najem', 'poznamka', 'zdroj_excel', 'upraveno',
-                    ]);
-                    $bufVykaz = [];
-                }
-            }
-            if ($bufVykaz) {
-                AkceVykaz::upsert($bufVykaz, ['akce_id', 'rok'], [
-                    'datum_od', 'datum_do', 'trzba', 'najem', 'poznamka', 'zdroj_excel', 'upraveno',
-                ]);
+                Akce::insert($bufInsert);
             }
         });
 
-        $this->command->line('');
-        $this->command->line('=== IMPORT HISTORICKÝCH DAT ===');
-        $this->command->line("Nových akcí          : {$novych}");
-        $this->command->line("Match na existující  : {$matched}");
-        $this->command->line("Výkazů (cca)         : " . count($data['vykazy']));
-        $this->command->line('================================');
+        $this->command->line(sprintf(
+            "Akce [%d–%d / %d]: nových=%d, matched=%d, mem=%.1f MB",
+            $offset, $end, $celkem,
+            count($bufInsert), $matched,
+            memory_get_peak_usage(true) / 1048576,
+        ));
+
+        if ($end < $celkem) {
+            $this->command->line("→ pokračuj: ?phase=akce&offset={$end}");
+        } else {
+            $this->command->line("✓ Phase 'akce' kompletní. Pokračuj: ?phase=vykazy&offset=0");
+        }
     }
 
     /**
-     * @param array<int, array<string, mixed>> $bufInsert
-     * @param array<int, string> $bufKlice
-     * @param array<string, int> $mapaKlicu
+     * @param list<array<string,mixed>> $vsechnyVykazy
      */
-    private function flushInsertAkce(array &$bufInsert, array &$bufKlice, array &$mapaKlicu): int
+    private function importVykazyChunk(array $vsechnyVykazy, int $offset, int $limit): void
     {
-        $count = count($bufInsert);
-        if ($count === 0) return 0;
+        $chunk = array_slice($vsechnyVykazy, $offset, $limit);
+        $celkem = count($vsechnyVykazy);
+        $end = min($offset + $limit, $celkem);
 
-        Akce::insert($bufInsert);
-
-        // Dohled ID podle slugů
-        $slugs = array_column($bufInsert, 'slug');
-        $idsBySlug = Akce::whereIn('slug', $slugs)->pluck('id', 'slug');
-        foreach ($bufInsert as $i => $row) {
-            $klic = $bufKlice[$i];
-            $mapaKlicu[$klic] = $idsBySlug[$row['slug']] ?? 0;
+        if (empty($chunk)) {
+            $this->command->line("Phase 'vykazy' kompletní (offset {$offset} >= {$celkem}).");
+            return;
         }
 
-        $bufInsert = [];
-        $bufKlice = [];
-        return $count;
+        // Mapa (nazev|misto) → akce_id z DB — výkaz se napáruje přes externi_klic na akci
+        // (externi_klic v JSON byl spočítán z normalizovaného nazev+misto)
+        $mapaKlicu = $this->nactiMapuKlicuVsechAkci();
+
+        $now = now();
+        $bufVykaz = [];
+        $orphans = 0;
+
+        // V JSONu má každý vykaz vlastní externi_klic. Mapa pro něj musí být
+        // postavena ze stejného algoritmu jako v exportu (NazevNormalizer).
+        // Akce v DB ale nemají externi_klic — musíme ho dohledat přes (nazev, misto).
+        // Načteme všechny akce s normalizovaným klíčem.
+        $akceById = Akce::query()->select('id', 'nazev', 'misto')->get();
+        $klicePerAkceId = [];
+        foreach ($akceById as $a) {
+            $klicePerAkceId[$this->externiKlicNormalized($a->nazev, $a->misto)] = $a->id;
+        }
+
+        foreach ($chunk as $row) {
+            $extKlic = $row['externi_klic'];
+            $rok = (int) ($row['rok'] ?? 0);
+            if ($rok < 2020 || $rok > 2030) continue;
+
+            $akceId = $klicePerAkceId[$extKlic] ?? null;
+            if (!$akceId) {
+                $orphans++;
+                continue;
+            }
+
+            $bufVykaz[] = [
+                'akce_id' => $akceId,
+                'rok' => $rok,
+                'datum_od' => !empty($row['datum_od']) ? Carbon::parse($row['datum_od'])->toDateString() : null,
+                'datum_do' => !empty($row['datum_do']) ? Carbon::parse($row['datum_do'])->toDateString() : null,
+                'trzba' => $row['trzba'] ?? null,
+                'najem' => $row['najem'] ?? null,
+                'poznamka' => $row['poznamka'] ?? null,
+                'zdroj_excel' => $row['zdroj_excel'] ?? null,
+                'vytvoreno' => $now,
+                'upraveno' => $now,
+            ];
+        }
+
+        if ($bufVykaz) {
+            AkceVykaz::upsert($bufVykaz, ['akce_id', 'rok'], [
+                'datum_od', 'datum_do', 'trzba', 'najem', 'poznamka', 'zdroj_excel', 'upraveno',
+            ]);
+        }
+
+        $this->command->line(sprintf(
+            "Výkazy [%d–%d / %d]: zapsáno=%d, orphan=%d, mem=%.1f MB",
+            $offset, $end, $celkem,
+            count($bufVykaz), $orphans,
+            memory_get_peak_usage(true) / 1048576,
+        ));
+
+        if ($end < $celkem) {
+            $this->command->line("→ pokračuj: ?phase=vykazy&offset={$end}");
+        } else {
+            $this->command->line("✓ Hotovo, všechny výkazy nahrány.");
+        }
     }
 
-    /** Klíč pro PHP-side dedup proti existujícím akcím. */
+    /** @return array<string, int> */
+    private function nactiMapuKlicuVsechAkci(): array
+    {
+        $map = [];
+        Akce::query()->select('id', 'nazev', 'misto')->chunk(500, function ($akce) use (&$map) {
+            foreach ($akce as $a) {
+                $map[$this->externiKlicNormalized($a->nazev, $a->misto)] = $a->id;
+            }
+        });
+        return $map;
+    }
+
+    /** Replikuje NazevNormalizer logiku — musí dát stejný výsledek jako export. */
+    private function externiKlicNormalized(?string $nazev, ?string $misto): string
+    {
+        return $this->slugLikeNormalize((string) $nazev) . '|' . $this->slugLikeNormalize((string) ($misto ?? ''));
+    }
+
+    private function slugLikeNormalize(string $s): string
+    {
+        $s = preg_replace('/\b(19|20)\d{2}\b/', ' ', $s);
+        $s = preg_replace('/\b\d+\.?\s*(ročník|ročníku)\b/iu', ' ', $s);
+        $s = preg_replace('/\b\d+\.\s/u', ' ', $s);
+        $s = preg_replace('/\b\d+[tn]ý\b/u', ' ', $s);
+        return trim(Str::slug($s), '-');
+    }
+
     private function klicNazevMisto(?string $nazev, ?string $misto): string
     {
         return mb_strtolower(trim((string) $nazev)) . '|' . mb_strtolower(trim((string) ($misto ?? '')));
     }
 
-    /**
-     * Sjednotí pole pro bulk insert — vyhodí klíče které ne-fillable, převede datumy.
-     * @param array<string, mixed> $row
-     * @return array<string, mixed>
-     */
-    private function normalizujRadek(array $row): array
+    /** @param array<string, mixed> $row */
+    private function normalizujRadek(array $row, $now): array
     {
-        $out = [];
-        foreach (['nazev', 'slug', 'typ', 'misto', 'kraj', 'organizator',
-                  'kontakt_email', 'kontakt_telefon', 'web_url',
-                  'zdroj_typ', 'zdroj_url', 'stav'] as $k) {
-            $out[$k] = $row[$k] ?? null;
-        }
-        $out['datum_od'] = ! empty($row['datum_od']) ? Carbon::parse($row['datum_od'])->toDateString() : null;
-        $out['datum_do'] = ! empty($row['datum_do']) ? Carbon::parse($row['datum_do'])->toDateString() : null;
-        return $out;
+        return [
+            'nazev' => $row['nazev'] ?? null,
+            'slug' => $row['slug'] ?? null,
+            'typ' => $row['typ'] ?? 'jiny',
+            'misto' => $row['misto'] ?? null,
+            'kraj' => $row['kraj'] ?? null,
+            'organizator' => $row['organizator'] ?? null,
+            'kontakt_email' => $row['kontakt_email'] ?? null,
+            'kontakt_telefon' => $row['kontakt_telefon'] ?? null,
+            'web_url' => $row['web_url'] ?? null,
+            'zdroj_typ' => 'excel',
+            'zdroj_url' => $row['zdroj_url'] ?? null,
+            'stav' => $row['stav'] ?? 'navrh',
+            'datum_od' => !empty($row['datum_od']) ? Carbon::parse($row['datum_od'])->toDateString() : null,
+            'datum_do' => !empty($row['datum_do']) ? Carbon::parse($row['datum_do'])->toDateString() : null,
+            'vytvoreno' => $now,
+            'upraveno' => $now,
+        ];
     }
 }
