@@ -131,22 +131,24 @@
     @if($akce->gps_lat && $akce->gps_lng)
         @php $mapyKey = config('services.mapycz.api_key'); @endphp
         @if($mapyKey)
-            <script type="text/javascript" src="https://api.mapy.cz/loader.js"></script>
+            {{-- Mapy.cz v1 přes Leaflet (oficiální postup) --}}
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+                integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+                integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
             <script>
-                Loader.async = true;
-                Loader.load(null, { suggest: false }, function () {
-                    var center = SMap.Coords.fromWGS84({{ $akce->gps_lng }}, {{ $akce->gps_lat }});
-                    var map = new SMap(document.getElementById('mapa'), center, 14);
-                    map.addDefaultLayer(SMap.DEF_BASE).enable();
-                    map.addDefaultControls();
+                document.addEventListener('DOMContentLoaded', function () {
+                    var lat = {{ $akce->gps_lat }};
+                    var lng = {{ $akce->gps_lng }};
+                    var map = L.map('mapa').setView([lat, lng], 14);
 
-                    var marker = new SMap.Marker(center, 'akce', {
-                        title: @json($akce->nazev),
-                        url: SMap.CONFIG.img + '/marker/drop-red.png',
-                    });
-                    var layer = new SMap.Layer.Marker();
-                    map.addLayer(layer).enable();
-                    layer.addMarker(marker);
+                    L.tileLayer('https://api.mapy.cz/v1/maptiles/basic/256/{z}/{x}/{y}?apikey={{ $mapyKey }}', {
+                        attribution: '<a href="https://api.mapy.cz/copyright" target="_blank">&copy; Seznam.cz a.s. a další</a>',
+                        maxZoom: 19,
+                    }).addTo(map);
+
+                    L.marker([lat, lng]).addTo(map)
+                        .bindPopup(@json($akce->nazev));
                 });
             </script>
         @else
