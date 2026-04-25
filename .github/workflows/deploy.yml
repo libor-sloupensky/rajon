@@ -86,6 +86,7 @@ jobs:
           BCRYPT_ROUNDS=12
           LOG_CHANNEL=stack
           LOG_STACK=daily
+          LOG_DAILY_DAYS=60
           LOG_DEPRECATIONS_CHANNEL=null
           LOG_LEVEL=error
           DB_CONNECTION=mysql
