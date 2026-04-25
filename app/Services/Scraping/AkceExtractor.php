@@ -14,10 +14,12 @@ class AkceExtractor
     protected string $apiKey;
     protected string $model;
 
-    public function __construct()
-    {
+    public function __construct(
+        protected ?LokalizaceResolver $lokalizace = null,
+    ) {
         $this->apiKey = (string) config('services.anthropic.key');
         $this->model = (string) config('services.anthropic.model', 'claude-haiku-4-5-20251001');
+        $this->lokalizace ??= app(LokalizaceResolver::class);
     }
 
     /**
@@ -46,19 +48,17 @@ DŮLEŽITÁ PRAVIDLA:
 - velikost_info: STRUČNĚ 1-2 věty max, jen konkrétní fakta (počty návštěvníků, stánkařů, ročník)
 - Nevymýšlej — pokud informaci nemáš, vrať null
 - Datumy vždy ve formátu YYYY-MM-DD
-- KRAJ je povinný pokud znáš obec/město. Pokud kraj v textu není, ODVOĎ ho ze
-  zeměpisné polohy obce/města (např. "Chvalovice u Znojma" → "Jihomoravský kraj",
-  "Brno" → "Jihomoravský kraj", "Ostrava" → "Moravskoslezský kraj"). Vrať vždy
-  oficiální český název kraje s velkým "K" tam, kde to je gramaticky správně:
-  "Jihomoravský kraj", "Moravskoslezský kraj", "Olomoucký kraj", "Pardubický kraj",
-  "Královéhradecký kraj", "Zlínský kraj", "Kraj Vysočina", "Středočeský kraj",
-  "Jihočeský kraj", "Plzeňský kraj", "Karlovarský kraj", "Ústecký kraj",
-  "Liberecký kraj", "Hlavní město Praha".
-- Pokud existují dvě obce stejného názvu, použij tu, která je v textu logická
-  (podle dalších indicií — typ akce, datum, organizátor); jinak nech null.
+- OKRES je povinný pokud znáš obec/město. Vyber jeden z níže uvedeného seznamu
+  okresů ČR podle zeměpisné polohy obce. POZOR: některé obce mají stejný název,
+  rozhoduj podle dalších indicií v textu (PSČ, kraj, blízká města, organizátor).
+  Pokud nemáš dost informací nebo obec nepoznáváš, vrať okres=null.
+- KRAJ není potřeba odvozovat — bude doplněn z okresu automaticky. Pokud je
+  v textu explicitně, můžeš ho vrátit, jinak null.
 
 Formát odpovědi: POUZE platný JSON objekt, bez úvodního/závěrečného textu, bez markdown bloku.
 PROMPT;
+
+        $seznamOkresu = $this->lokalizace->seznamProPrompt();
 
         $userPrompt = <<<PROMPT
 Z následujícího textu stránky o akci extrahuj JSON s tímto schématem:
@@ -73,8 +73,8 @@ Z následujícího textu stránky o akci extrahuj JSON s tímto schématem:
   "adresa": "ulice + číslo",
   "mesto": "obec/město",
   "psc": "PSČ",
-  "okres": "okres",
-  "kraj": "přesný název kraje (např. 'Jihomoravský kraj', 'Kraj Vysočina')",
+  "okres": "PŘESNÝ název okresu z níže uvedeného seznamu, jinak null",
+  "kraj": "název kraje pokud je v textu, jinak null (doplní se z okresu)",
   "gps_lat": číslo nebo null,
   "gps_lng": číslo nebo null,
   "organizator": "název organizátora/pořadatele",
@@ -93,6 +93,9 @@ Z následujícího textu stránky o akci extrahuj JSON s tímto schématem:
     "trvani_dny": číslo (z datum_od/datum_do)
   }
 }
+
+SEZNAM OKRESŮ ČR (vyber jeden, pokud znáš obec/město):
+{$seznamOkresu}
 
 URL stránky: {$url}
 

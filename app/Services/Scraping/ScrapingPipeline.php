@@ -26,6 +26,7 @@ class ScrapingPipeline
         protected AkceExtractor $extractor,
         protected AkceMatcher $matcher,
         protected AkceMerger $merger,
+        protected LokalizaceResolver $lokalizace,
     ) {}
 
     /**
@@ -157,13 +158,31 @@ class ScrapingPipeline
             return ['stav' => 'chyba', 'chyba' => "AI extrakce selhala {$url}"];
         }
 
-        // 3. Statistiky
-        $kraj = $data['kraj'] ?? 'neznámý';
-        $statistiky['podle_kraje'][$kraj] = ($statistiky['podle_kraje'][$kraj] ?? 0) + 1;
+        // 3. Lokalizace — z AI textových názvů zjistíme kraj_id + okres_id z DB.
+        // Preferenčně přes okres (přesnější), kraj se odvodí.
+        $loc = $this->lokalizace->resolve($data['kraj'] ?? null, $data['okres'] ?? null);
+        $data['kraj_id'] = $loc['kraj_id'];
+        $data['okres_id'] = $loc['okres_id'];
 
-        // 4. Region filter
-        if ($pouzeRegion && !in_array($kraj, Akce::KRAJE_VYCHOD, true)) {
-            return ['stav' => 'preskoceny', 'duvod' => "Mimo region: {$kraj}"];
+        // Pokud máme kraj_id, normalizuj i textový kraj (ať máme konzistentní hodnotu)
+        if ($loc['kraj_id']) {
+            $data['kraj'] = \App\Models\Kraj::find($loc['kraj_id'])?->nazev ?? $data['kraj'];
+        }
+
+        // 4. Statistiky
+        $krajStat = $data['kraj'] ?? 'neznámý';
+        $statistiky['podle_kraje'][$krajStat] = ($statistiky['podle_kraje'][$krajStat] ?? 0) + 1;
+
+        // 5. Region filter — přes kraj_id (DB), s fallbackem na text
+        if ($pouzeRegion) {
+            $krajSlug = $loc['kraj_id'] ? (\App\Models\Kraj::find($loc['kraj_id'])?->slug) : null;
+            $jeVRegionu = $krajSlug
+                ? in_array($krajSlug, Akce::KRAJE_VYCHOD_SLUGS, true)
+                : in_array($data['kraj'] ?? null, Akce::KRAJE_VYCHOD, true);
+
+            if (!$jeVRegionu) {
+                return ['stav' => 'preskoceny', 'duvod' => "Mimo region: {$krajStat}"];
+            }
         }
 
         // 5. Velikostní scoring
@@ -296,6 +315,8 @@ class ScrapingPipeline
             'gps_lng' => $data['gps_lng'] ?? null,
             'okres' => $data['okres'] ?? null,
             'kraj' => $data['kraj'] ?? null,
+            'kraj_id' => $data['kraj_id'] ?? null,
+            'okres_id' => $data['okres_id'] ?? null,
             'organizator' => $data['organizator'] ?? null,
             'kontakt_email' => $data['kontakt_email'] ?? null,
             'kontakt_telefon' => $data['kontakt_telefon'] ?? null,
