@@ -147,6 +147,52 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Ceník Anthropic API (per 1M tokenů, USD)
+    |--------------------------------------------------------------------------
+    | Aktualizovat při změně ceníku. Hodnoty: input, output, cache_write, cache_read.
+    | Pro výpočet ceny per AI call.
+    */
+    'cenik' => [
+        'claude-haiku-4-5-20251001' => [
+            'input' => 1.0,
+            'output' => 5.0,
+            'cache_write' => 1.25,
+            'cache_read' => 0.10,
+        ],
+        'claude-sonnet-4-6' => [
+            'input' => 3.0,
+            'output' => 15.0,
+            'cache_write' => 3.75,
+            'cache_read' => 0.30,
+        ],
+        // Default pro neznámé modely (Haiku-level)
+        'default' => [
+            'input' => 1.0,
+            'output' => 5.0,
+            'cache_write' => 1.25,
+            'cache_read' => 0.10,
+        ],
+    ],
+
+    /** Kurz USD/CZK pro zobrazení v UI. */
+    'kurz_usd_czk' => 24.0,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Adaptivní refresh interval podle blízkosti akce
+    |--------------------------------------------------------------------------
+    | Klíč = max počet dní od dnes do datum_od. Hodnota = jak často kontrolovat (dny).
+    */
+    'refresh_interval' => [
+        3 => 1,      // do 3 dnů → každý den
+        14 => 3,     // do 14 dnů → každé 3 dny
+        60 => 7,     // do 60 dnů → týdně
+        365 => 30,   // do 365 dnů → měsíčně
+        // nad 365 dnů → vůbec ne (vrací 0 = vždy)
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Práh pro auto-propojení ročníků
     |--------------------------------------------------------------------------
     */

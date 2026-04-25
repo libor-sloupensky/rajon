@@ -30,6 +30,21 @@ class AkceExtractor
      * okres, kraj, organizator, kontakt_email, kontakt_telefon, web_url, vstupne, popis,
      * velikost_info, velikost_signaly.
      */
+    /** Kontextová data pro logging AI volání (nastavené z venku). */
+    protected array $kontext = [];
+
+    /** Nastavit metadata pro tracking AI volání (zdroj_id, scraping_log_id, uzivatel_id). */
+    public function nastavKontext(array $kontext): void
+    {
+        $this->kontext = $kontext;
+    }
+
+    /** Vrátí aktuální kontext (pro merge dalších polí jako akce_id). */
+    public function kontextProSdileni(): array
+    {
+        return $this->kontext;
+    }
+
     public function extrahuj(string $html, string $url): ?array
     {
         // 1. Pokus zdarma — JSON-LD schema.org/Event přímo z HTML.
@@ -137,14 +152,61 @@ PROMPT;
                     'url' => $url,
                     'body' => mb_substr($response->body(), 0, 500),
                 ]);
+                $this->logAiVolani(0, 0, 0, 0, false, "HTTP {$response->status()}");
                 return null;
             }
+
+            // Cost tracking — uložit usage z odpovědi
+            $usage = $response->json('usage', []);
+            $this->logAiVolani(
+                (int) ($usage['input_tokens'] ?? 0),
+                (int) ($usage['output_tokens'] ?? 0),
+                (int) ($usage['cache_creation_input_tokens'] ?? 0),
+                (int) ($usage['cache_read_input_tokens'] ?? 0),
+                true,
+                null,
+            );
 
             $content = $response->json('content.0.text', '');
             return $this->parseJsonFromResponse($content);
         } catch (\Exception $e) {
             Log::error("AI extraction exception: {$e->getMessage()}", ['url' => $url]);
+            $this->logAiVolani(0, 0, 0, 0, false, mb_substr($e->getMessage(), 0, 500));
             return null;
+        }
+    }
+
+    /** Uložit záznam o AI volání do tabulky ai_volani. */
+    protected function logAiVolani(int $input, int $output, int $cacheWrite, int $cacheRead, bool $uspech, ?string $chyba): void
+    {
+        $cenik = config('scraping.cenik')[$this->model] ?? config('scraping.cenik.default');
+
+        // Cena: input + output + cache write + cache read (vše per 1M tokens)
+        $cena = ($input * $cenik['input']
+            + $output * $cenik['output']
+            + $cacheWrite * $cenik['cache_write']
+            + $cacheRead * $cenik['cache_read']) / 1_000_000.0;
+
+        try {
+            \App\Models\AiVolani::create([
+                'model' => $this->model,
+                'ucel' => $this->kontext['ucel'] ?? 'akce_extrakce',
+                'zdroj_id' => $this->kontext['zdroj_id'] ?? null,
+                'akce_id' => $this->kontext['akce_id'] ?? null,
+                'uzivatel_id' => $this->kontext['uzivatel_id'] ?? null,
+                'scraping_log_id' => $this->kontext['scraping_log_id'] ?? null,
+                'input_tokens' => $input,
+                'output_tokens' => $output,
+                'cache_creation_tokens' => $cacheWrite,
+                'cache_read_tokens' => $cacheRead,
+                'cena_usd' => $cena,
+                'uspech' => $uspech,
+                'chyba' => $chyba,
+                'vytvoreno' => now(),
+            ]);
+        } catch (\Exception $e) {
+            // Neblokovat scraping kvůli logování
+            Log::warning("Cost tracking save failed: {$e->getMessage()}");
         }
     }
 

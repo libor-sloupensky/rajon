@@ -34,6 +34,9 @@ class ScrapingPipeline
     /** Aktuálně zpracovávaný zdroj — pro fetchHtml login session. */
     protected ?Zdroj $aktualniZdroj = null;
 
+    /** Cache: URL → lastmod string ze sitemap (pro pre-filtr ve zpracujAkci). */
+    protected array $lastmodZeSitemap = [];
+
     /**
      * Spustí scraping pro daný zdroj.
      * @param int|null $limit Maximální počet detailů (pro testování)
@@ -50,6 +53,17 @@ class ScrapingPipeline
             'limit_pouzity' => $limit ?: 0,
             'vytvoreno' => now(),
         ]);
+
+        // Cost tracking kontext — kdo spustil, jaký zdroj, jaký běh
+        $this->extractor->nastavKontext([
+            'ucel' => 'akce_extrakce',
+            'zdroj_id' => $zdroj->id,
+            'uzivatel_id' => auth()->id(),
+            'scraping_log_id' => $log->id,
+        ]);
+
+        // Cache lastmod ze sitemap pro pre-filtr
+        $this->lastmodZeSitemap = [];
 
         $chyby = [];
         $statistiky = ['podle_kraje' => [], 'podle_typu' => [], 'podle_velikosti' => []];
@@ -133,7 +147,10 @@ class ScrapingPipeline
         $detailPattern = $zdroj->url_pattern_detail ?: '*';
 
         if ($zdroj->sitemap_url) {
-            $urls = $this->analyzer->seznamUrlZSitemap($zdroj->sitemap_url, $detailPattern);
+            // Vrátí [url => lastmod] — uložíme do property pro pre-filtr v zpracujAkci
+            $sLastmod = $this->analyzer->seznamUrlLastmodZSitemap($zdroj->sitemap_url, $detailPattern);
+            $this->lastmodZeSitemap = $sLastmod;
+            $urls = array_keys($sLastmod);
         } else {
             // Generický paginator — funguje pro libovolný katalog s listingem
             $listingUrl = $zdroj->url_pattern_list
@@ -180,17 +197,15 @@ class ScrapingPipeline
         // (b) DB filter — URL už máme s akcí, jejíž datum proběhlo
         // Pozn.: kvalifikované názvy sloupců (akce_zdroje.X / akce.X), protože
         // po JOIN by zdroj_id i url byly ambiguous.
-        $existujici = \App\Models\AkceZdroj::query()
+        $existujiciStare = \App\Models\AkceZdroj::query()
             ->join('akce', 'akce_zdroje.akce_id', '=', 'akce.id')
             ->where('akce_zdroje.zdroj_id', $zdroj->id)
             ->whereIn('akce_zdroje.url', $urls)
             ->where(function ($q) use ($dnes) {
-                // Buď akce má datum_do v minulosti
                 $q->where(function ($q2) use ($dnes) {
                     $q2->whereNotNull('akce.datum_do')
                        ->whereDate('akce.datum_do', '<', $dnes);
                 })
-                // Nebo nemá datum_do, ale datum_od je v minulosti (jednodenní akce)
                 ->orWhere(function ($q2) use ($dnes) {
                     $q2->whereNull('akce.datum_do')
                        ->whereNotNull('akce.datum_od')
@@ -199,9 +214,56 @@ class ScrapingPipeline
             })
             ->pluck('akce_zdroje.url')
             ->all();
+        $stareSet = array_flip($existujiciStare);
+        $urls = array_values(array_filter($urls, fn ($u) => !isset($stareSet[$u])));
 
-        $existujiciSet = array_flip($existujici);
-        return array_values(array_filter($urls, fn ($u) => !isset($existujiciSet[$u])));
+        // (c) Sitemap lastmod + adaptivní refresh interval
+        // Pro zbylé URL: pokud máme záznam v akce_zdroje, posuďme zda je třeba znova fetchovat
+        $existujiciZaznamy = \App\Models\AkceZdroj::query()
+            ->where('zdroj_id', $zdroj->id)
+            ->whereIn('url', $urls)
+            ->with('akce:id,datum_od')
+            ->get()
+            ->keyBy('url');
+
+        $intervalCfg = config('scraping.refresh_interval', []);
+        ksort($intervalCfg);  // vzestupně dle dnů
+
+        $urls = array_values(array_filter($urls, function ($u) use ($existujiciZaznamy, $intervalCfg) {
+            $zaznam = $existujiciZaznamy->get($u);
+            if (!$zaznam) return true;  // nová URL → zpracovat
+
+            // (c1) Sitemap lastmod check — server řekl že se nic nezměnilo od poslední extrakce
+            $lastmodStr = $this->lastmodZeSitemap[$u] ?? null;
+            if ($lastmodStr && $zaznam->posledni_extrakce) {
+                try {
+                    $lastmod = \Carbon\Carbon::parse($lastmodStr);
+                    if ($lastmod->lessThanOrEqualTo($zaznam->posledni_extrakce)) {
+                        return false;  // SKIP — nezměněno od poslední extrakce
+                    }
+                } catch (\Exception) { /* ignoruj parse error */ }
+            }
+
+            // (c2) Adaptivní interval podle blízkosti akce
+            if (!$zaznam->posledni_kontrola) return true;
+            $datumOd = $zaznam->akce?->datum_od;
+            $dniDoUdalosti = $datumOd ? max(0, now()->diffInDays($datumOd, false)) : 9999;
+
+            // Najdi interval podle blízkosti
+            $interval = null;
+            foreach ($intervalCfg as $maxDni => $intervalDni) {
+                if ($dniDoUdalosti <= $maxDni) {
+                    $interval = $intervalDni;
+                    break;
+                }
+            }
+            if ($interval === null) return false;  // moc daleko v budoucnu
+
+            $stari = now()->diffInDays($zaznam->posledni_kontrola, false);
+            return $stari <= -$interval;  // posledni_kontrola je v minulosti dál než interval
+        }));
+
+        return $urls;
     }
 
     /** Resolvuj URL proti base — vrátí absolutní URL. */
@@ -238,7 +300,29 @@ class ScrapingPipeline
             return ['stav' => 'chyba', 'chyba' => "Nelze stáhnout {$url}"];
         }
 
-        // 2. AI extrakce
+        // 1b. Pre-AI: detekce datumu z HTML zdarma — pokud akce proběhla, skip AI
+        $detekovaneDatum = $this->detekujDatumZHtml($html);
+        if ($detekovaneDatum && $detekovaneDatum < new \DateTime('today')) {
+            $this->aktualizujKontrolu($zdroj, $url, $html, false);
+            return ['stav' => 'preskoceny', 'duvod' => "Akce už proběhla (z HTML: {$detekovaneDatum->format('Y-m-d')})"];
+        }
+
+        // 1c. HTML hash check — pokud máme stejný obsah, AI nevoláme
+        $hashNovy = $this->vypocetHtmlHash($html);
+        $existujici = \App\Models\AkceZdroj::where('zdroj_id', $zdroj->id)
+            ->where('url', $url)
+            ->first();
+
+        if ($existujici && $existujici->html_hash === $hashNovy && $existujici->akce_id) {
+            // Obsah se nezměnil — jen aktualizovat posledni_kontrola
+            $existujici->update(['posledni_kontrola' => now()]);
+            return ['stav' => 'preskoceny', 'duvod' => 'Obsah HTML se nezměnil (hash match)'];
+        }
+
+        // 2. AI extrakce — předat akce_id pro logging
+        $this->extractor->nastavKontext(array_merge($this->extractor->kontextProSdileni(), [
+            'akce_id' => $existujici?->akce_id,
+        ]));
         $data = $this->extractor->extrahuj($html, $url);
         if (!$data) {
             return ['stav' => 'chyba', 'chyba' => "AI extrakce selhala {$url}"];
@@ -255,6 +339,9 @@ class ScrapingPipeline
                 }
             } catch (\Exception) { /* ignoruj chyby parsování */ }
         }
+
+        // Předat hash do data pro uložení
+        $data['_html_hash'] = $hashNovy;
 
         // 3. Lokalizace — z AI textových názvů zjistíme kraj_id + okres_id z DB.
         // Preferenčně přes okres (přesnější), kraj se odvodí.
@@ -312,6 +399,83 @@ class ScrapingPipeline
         }
 
         return ['stav' => $novy ? 'novy' : 'aktualizovany', 'akce_id' => $akce->id];
+    }
+
+    /**
+     * Vypočítej stabilní hash HTML obsahu — strip noise (script/style/nav/header/footer),
+     * pak strip_tags + normalizace whitespace. Vrací SHA-256.
+     */
+    protected function vypocetHtmlHash(string $html): string
+    {
+        $cleaned = preg_replace(
+            '/<(script|style|noscript|nav|footer|header|aside|iframe)[^>]*>.*?<\/\1>/is',
+            '',
+            $html
+        ) ?: $html;
+        $cleaned = preg_replace('/<!--.*?-->/s', '', $cleaned) ?: $cleaned;
+        $text = strip_tags($cleaned);
+        $text = preg_replace('/\s+/', ' ', $text) ?: $text;
+        return hash('sha256', trim($text));
+    }
+
+    /**
+     * Pokus o detekci datumu akce z HTML — bez AI volání.
+     * Hledá: JSON-LD startDate/endDate, <meta>, <time datetime>, regex DD.MM.YYYY.
+     * Vrátí poslední (nejvzdálenější) datum z HTML, nebo null pokud nenalezeno.
+     */
+    protected function detekujDatumZHtml(string $html): ?\DateTime
+    {
+        // 1. JSON-LD Event
+        $jsonLdEvents = (new JsonLdExtractor())->vsechnyEventy($html);
+        foreach ($jsonLdEvents as $e) {
+            $end = $e['endDate'] ?? $e['startDate'] ?? null;
+            if ($end) {
+                try { return new \DateTime($end); } catch (\Exception) { /* ignore */ }
+            }
+        }
+
+        // 2. <time datetime="2026-04-25"> nebo <meta itemprop="endDate">
+        if (preg_match_all('/(?:datetime|content)=["\'](\d{4}-\d{2}-\d{2})/i', $html, $m)) {
+            $datumy = array_map(fn ($d) => new \DateTime($d), $m[1]);
+            usort($datumy, fn ($a, $b) => $b <=> $a);
+            return $datumy[0] ?? null;
+        }
+
+        // 3. Regex pro česká data: DD.MM.YYYY nebo D. M. YYYY
+        if (preg_match_all('/\b(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})\b/', $html, $m)) {
+            $datumy = [];
+            foreach ($m[0] as $i => $_) {
+                try {
+                    $datum = \DateTime::createFromFormat('j.n.Y', $m[1][$i] . '.' . $m[2][$i] . '.' . $m[3][$i]);
+                    if ($datum && (int) $m[3][$i] >= 2000 && (int) $m[3][$i] <= 2099) {
+                        $datumy[] = $datum;
+                    }
+                } catch (\Exception) { /* ignore */ }
+            }
+            if (!empty($datumy)) {
+                usort($datumy, fn ($a, $b) => $b <=> $a);
+                return $datumy[0];
+            }
+        }
+
+        return null;
+    }
+
+    /** Aktualizovat akce_zdroje záznam i bez AI extrakce (jen kontrola). */
+    protected function aktualizujKontrolu(Zdroj $zdroj, string $url, string $html, bool $extractovano): void
+    {
+        $hash = $this->vypocetHtmlHash($html);
+        $lastmodStr = $this->lastmodZeSitemap[$url] ?? null;
+
+        \App\Models\AkceZdroj::updateOrCreate(
+            ['zdroj_id' => $zdroj->id, 'url' => $url],
+            [
+                'html_hash' => $hash,
+                'lastmod_sitemap' => $lastmodStr ? \Carbon\Carbon::parse($lastmodStr) : null,
+                'posledni_kontrola' => now(),
+                'posledni_extrakce' => $extractovano ? now() : null,
+            ]
+        );
     }
 
     /**
@@ -450,15 +614,22 @@ class ScrapingPipeline
         return $akce;
     }
 
-    /** Ulož záznam do akce_zdroje (many-to-many). */
+    /** Ulož záznam do akce_zdroje (many-to-many) + hash + timestamps. */
     protected function ulozAkceZdroj(Akce $akce, Zdroj $zdroj, string $url, array $data): void
     {
+        $lastmodStr = $this->lastmodZeSitemap[$url] ?? null;
+
         AkceZdroj::updateOrCreate(
             ['zdroj_id' => $zdroj->id, 'url' => $url],
             [
                 'akce_id' => $akce->id,
                 'externi_id' => $data['externi_id'] ?? null,
                 'surova_data' => $data,
+                'html_hash' => $data['_html_hash'] ?? null,
+                'lastmod_sitemap' => $lastmodStr ? \Carbon\Carbon::parse($lastmodStr) : null,
+                'posledni_kontrola' => now(),
+                'posledni_extrakce' => now(),
+                'pocet_extrakci' => \DB::raw('pocet_extrakci + 1'),
                 'posledni_ziskani' => now(),
             ]
         );

@@ -277,10 +277,25 @@ class ZdrojAnalyzer
         return ($parsed['scheme'] ?? 'https') . '://' . ($parsed['host'] ?? '');
     }
 
-    /** Stáhnout sitemap a vrátit seznam URL akcí. */
+    /**
+     * Stáhnout sitemap a vrátit seznam URL akcí.
+     * @return array<int, string> seznam absolutních URL (zpětná kompatibilita)
+     */
     public function seznamUrlZSitemap(string $sitemapUrl, string $urlPatternDetail = '/akce/'): array
     {
-        $urls = [];
+        $sLastmody = $this->seznamUrlLastmodZSitemap($sitemapUrl, $urlPatternDetail);
+        return array_keys($sLastmody);
+    }
+
+    /**
+     * Stáhnout sitemap a vrátit pole [url => lastmod_string|null].
+     * lastmod je z <lastmod> tagu sitemapu — pokud chybí, hodnota je null.
+     *
+     * @return array<string, string|null>
+     */
+    public function seznamUrlLastmodZSitemap(string $sitemapUrl, string $urlPatternDetail = '/akce/'): array
+    {
+        $vysledek = [];
         $pattern = $this->normalizujPattern($urlPatternDetail);
 
         try {
@@ -289,37 +304,37 @@ class ZdrojAnalyzer
                 ->get($sitemapUrl);
 
             if (!$response->successful()) {
-                return $urls;
+                return $vysledek;
             }
 
-            // Některé servery (např. stankar.cz) posílají whitespace/BOM před <?xml
             $body = ltrim($response->body(), "\xEF\xBB\xBF \t\n\r\0\x0B");
             $xml = @simplexml_load_string($body);
-            if (!$xml) return $urls;
+            if (!$xml) return $vysledek;
 
             // Sitemap index → načti všechny sub-sitemapy
             if (isset($xml->sitemap)) {
                 foreach ($xml->sitemap as $sm) {
                     $subUrl = (string) $sm->loc;
-                    $urls = array_merge($urls, $this->seznamUrlZSitemap($subUrl, $urlPatternDetail));
+                    $vysledek = array_merge($vysledek, $this->seznamUrlLastmodZSitemap($subUrl, $urlPatternDetail));
                 }
-                return $urls;
+                return $vysledek;
             }
 
             // Regulér sitemap
             if (isset($xml->url)) {
                 foreach ($xml->url as $u) {
                     $loc = (string) $u->loc;
-                    if ($pattern === '*' || str_contains($loc, $pattern)) {
-                        $urls[] = $loc;
-                    }
+                    if ($pattern !== '*' && !str_contains($loc, $pattern)) continue;
+
+                    $lastmod = isset($u->lastmod) ? (string) $u->lastmod : null;
+                    $vysledek[$loc] = $lastmod ?: null;
                 }
             }
         } catch (\Exception $e) {
             Log::warning("Sitemap parse failed: {$sitemapUrl} — {$e->getMessage()}");
         }
 
-        return $urls;
+        return $vysledek;
     }
 
     /**

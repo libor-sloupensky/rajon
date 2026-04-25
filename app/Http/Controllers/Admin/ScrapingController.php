@@ -24,7 +24,62 @@ class ScrapingController extends Controller
         $zdroje = Zdroj::withCount('akce')->orderBy('nazev')->get();
         $posledniLogy = ScrapingLog::with('zdroj')->orderBy('zacatek', 'desc')->take(10)->get();
 
-        return view('admin.scraping.index', compact('zdroje', 'posledniLogy'));
+        // Cost statistiky — dnešek, týden, měsíc + per uživatel
+        $kurz = (float) config('scraping.kurz_usd_czk', 24);
+        $statsZakladni = $this->statsAi();
+        $statsPerUzivatel = $this->statsPerUzivatel();
+
+        return view('admin.scraping.index', compact(
+            'zdroje', 'posledniLogy', 'statsZakladni', 'statsPerUzivatel', 'kurz'
+        ));
+    }
+
+    /** Stats AI volání: dnes / týden / měsíc / celkem. */
+    protected function statsAi(): array
+    {
+        $base = \App\Models\AiVolani::query()->where('uspech', true);
+
+        return [
+            'dnes' => $this->statsRaw((clone $base)->whereDate('vytvoreno', today())),
+            'tyden' => $this->statsRaw((clone $base)->where('vytvoreno', '>=', now()->subDays(7))),
+            'mesic' => $this->statsRaw((clone $base)->where('vytvoreno', '>=', now()->subDays(30))),
+            'celkem' => $this->statsRaw(clone $base),
+        ];
+    }
+
+    protected function statsRaw($q): array
+    {
+        $row = (clone $q)->selectRaw('
+            COUNT(*) as pocet,
+            COALESCE(SUM(input_tokens + cache_creation_tokens + cache_read_tokens), 0) as input,
+            COALESCE(SUM(output_tokens), 0) as output,
+            COALESCE(SUM(cena_usd), 0) as cena
+        ')->first();
+
+        return [
+            'pocet' => (int) ($row->pocet ?? 0),
+            'tokens' => (int) ($row->input ?? 0) + (int) ($row->output ?? 0),
+            'cena_usd' => (float) ($row->cena ?? 0),
+        ];
+    }
+
+    protected function statsPerUzivatel(): array
+    {
+        return \App\Models\AiVolani::query()
+            ->where('uspech', true)
+            ->where('vytvoreno', '>=', now()->subDays(30))
+            ->selectRaw('uzivatel_id, COUNT(*) as pocet, SUM(cena_usd) as cena')
+            ->groupBy('uzivatel_id')
+            ->orderByDesc('cena')
+            ->take(10)
+            ->with('uzivatel:id,jmeno,prijmeni')
+            ->get()
+            ->map(fn ($r) => [
+                'jmeno' => $r->uzivatel?->celejmeno() ?? 'systém',
+                'pocet' => (int) $r->pocet,
+                'cena_usd' => (float) $r->cena,
+            ])
+            ->all();
     }
 
     /** Formulář pro přidání/úpravu zdroje. */
