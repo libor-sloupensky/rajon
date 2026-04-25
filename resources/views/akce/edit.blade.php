@@ -77,8 +77,7 @@
                 $typy = [
                     'pout' => 'Pouť',
                     'food_festival' => 'Food festival',
-                    'slavnosti' => 'Slavnosti',
-                    'mestske_slavnosti' => 'Městské slavnosti',
+                    'slavnosti' => 'Slavnosti a městské akce',
                     'obrani' => 'Obraní (vinobraní/dýňobraní/bramborobraní/jablkobraní/...)',
                     'trhy_jarmarky' => 'Trhy a jarmarky (farmářské/vánoční/velikonoční/jarmark)',
                     'festival' => 'Festival',

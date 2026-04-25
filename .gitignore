@@ -27,3 +27,4 @@ Thumbs.db
 # Průzkumné Python skripty + výstupy k modulu historicka_data
 /temporary/_*.py
 /temporary/_*.txt
+public/diag.php

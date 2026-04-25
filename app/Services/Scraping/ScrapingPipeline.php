@@ -581,6 +581,13 @@ class ScrapingPipeline
     protected function ulozAkci(array $data, string $url, int $skore, string $stav, Zdroj $zdroj): Akce
     {
         $data['typ'] = $this->normalizujTyp($data['typ'] ?? 'jiny');
+
+        // Pokud po normalizaci typ='jiny', zkusíme odhadnout z názvu (jarmark, pouť, …)
+        if ($data['typ'] === 'jiny' && !empty($data['nazev'])) {
+            $odhad = $this->odhadniTypZNazvu($data['nazev']);
+            if ($odhad) $data['typ'] = $odhad;
+        }
+
         $data['_skore'] = $skore;
         $data['_stav'] = $stav;
 
@@ -714,6 +721,34 @@ class ScrapingPipeline
         return $data;
     }
 
+    /**
+     * Doodhadni typ akce podle názvu, když AI/JSON-LD vrátí 'jine'/'jiny'.
+     * Volá se po normalizujTyp v ulozAkci.
+     */
+    protected function odhadniTypZNazvu(string $nazev): ?string
+    {
+        $n = mb_strtolower($nazev);
+
+        $pravidla = [
+            'obrani' => ['vinobran', 'dynobr', 'dýňobr', 'jablkobran', 'bramborobran', 'braní', 'brani'],
+            'trhy_jarmarky' => ['jarmark', 'farmářské trhy', 'farmarske trhy', 'vánoční trh', 'vanocni trh', 'velikonoční trh', 'velikonocni trh', 'řemeslný trh', 'remeslny trh', 'adventní trh', 'adventni trh'],
+            'pout' => ['pouť', 'pout '],
+            'food_festival' => ['food festival', 'gastrofestival', 'pivní fest', 'pivni fest', 'gulášfest', 'gulasfest'],
+            'slavnosti' => ['slavnosti', 'hody', 'posvícení', 'posviceni', 'dny města', 'dny mesta', 'historick', 'rytířs', 'rytirs', 'středověk', 'stredovek', 'folklor', 'národopisn', 'narodopisn'],
+            'festival' => ['festival'],
+            'koncert' => ['koncert'],
+            'vystava' => ['výstav', 'vystav'],
+            'sportovni_akce' => ['závod', 'zavod', 'turnaj', 'běh ', 'beh '],
+        ];
+
+        foreach ($pravidla as $typ => $klicova) {
+            foreach ($klicova as $k) {
+                if (str_contains($n, $k)) return $typ;
+            }
+        }
+        return null;
+    }
+
     /** Normalizace typu akce na hodnoty enum v DB. */
     protected function normalizujTyp(string $typ): string
     {
@@ -740,14 +775,14 @@ class ScrapingPipeline
             'festival' => 'festival',
             'hudebni_festival' => 'festival',
 
-            // Slavnosti — městské vs. obecní/historické
-            'mestske_slavnosti' => 'mestske_slavnosti',
-            'dny_mesta' => 'mestske_slavnosti',
+            // Slavnosti a městské akce — sjednoceno do 'slavnosti'
+            'slavnosti' => 'slavnosti',
+            'mestske_slavnosti' => 'slavnosti',
+            'dny_mesta' => 'slavnosti',
             'historicke_slavnosti' => 'slavnosti',
             'folklor' => 'slavnosti',
             'hody' => 'slavnosti',
             'obecni_slavnosti' => 'slavnosti',
-            'slavnosti' => 'slavnosti',
 
             // Sportovní
             'sportovni' => 'sportovni_akce',

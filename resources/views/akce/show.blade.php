@@ -1,12 +1,22 @@
 <x-layouts.app title="{{ $akce->nazev }} — Rajón">
     <div class="max-w-3xl">
-        <a href="{{ url('/akce') }}" class="text-sm text-primary hover:text-primary-dark mb-4 inline-block">&larr; Zpět na katalog</a>
+        <div class="flex items-center justify-between mb-4">
+            <a href="{{ url('/akce') }}" class="text-sm text-primary hover:text-primary-dark inline-block">&larr; Zpět na katalog</a>
+            @auth
+                <a href="{{ route('akce.edit', $akce) }}" class="rounded-lg border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                    Upravit
+                </a>
+            @endauth
+        </div>
 
         <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ $akce->nazev }}</h1>
 
         <div class="flex flex-wrap gap-3 mb-6">
             @if($akce->typ !== 'jiny')
-                <span class="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium" style="color: var(--c-primary);">{{ str_replace('_', ' ', $akce->typ) }}</span>
+                @php
+                    $typLabel = ['pout' => 'pouť', 'food_festival' => 'food festival', 'slavnosti' => 'slavnosti / městské akce', 'obrani' => 'obraní', 'trhy_jarmarky' => 'trhy & jarmarky', 'festival' => 'festival', 'sportovni_akce' => 'sportovní akce', 'koncert' => 'koncert', 'divadlo' => 'divadlo', 'vystava' => 'výstava'][$akce->typ] ?? str_replace('_', ' ', $akce->typ);
+                @endphp
+                <span class="rounded-full bg-blue-100 text-blue-700 px-3 py-1 text-sm font-medium">{{ $typLabel }}</span>
             @endif
             <span class="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600">
                 {{ $akce->datum_od?->format('j. n. Y') }}

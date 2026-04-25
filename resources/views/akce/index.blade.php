@@ -32,7 +32,7 @@
             <label class="block text-xs text-gray-500 mb-1">Typ</label>
             <select name="typ" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
                 <option value="">Všechny</option>
-                @foreach(['pout' => 'Pouť', 'food_festival' => 'Food festival', 'slavnosti' => 'Slavnosti', 'mestske_slavnosti' => 'Městské slavnosti', 'obrani' => 'Obraní (vino/dýňo/bramboro/jablko/...)', 'trhy_jarmarky' => 'Trhy a jarmarky', 'festival' => 'Festival', 'sportovni_akce' => 'Sportovní akce', 'koncert' => 'Koncert', 'vystava' => 'Výstava', 'jiny' => 'Jiný'] as $val => $label)
+                @foreach(['pout' => 'Pouť', 'food_festival' => 'Food festival', 'slavnosti' => 'Slavnosti a městské akce', 'obrani' => 'Obraní (vino/dýňo/bramboro/jablko/...)', 'trhy_jarmarky' => 'Trhy a jarmarky', 'festival' => 'Festival', 'sportovni_akce' => 'Sportovní akce', 'koncert' => 'Koncert', 'vystava' => 'Výstava', 'jiny' => 'Jiný'] as $val => $label)
                     <option value="{{ $val }}" {{ request('typ') === $val ? 'selected' : '' }}>{{ $label }}</option>
                 @endforeach
             </select>
@@ -110,7 +110,10 @@
                                     <span class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700" title="AI navrhlo propojení s jinou akcí">🔗 {{ count($a->navrh_propojeni) }}</span>
                                 @endif
                                 @if($a->typ && $a->typ !== 'jiny')
-                                    <span class="rounded-full bg-gray-100 text-gray-600 px-2 py-0.5 text-xs">{{ str_replace('_', ' ', $a->typ) }}</span>
+                                    @php
+                                        $typLabel = ['pout' => 'pouť', 'food_festival' => 'food festival', 'slavnosti' => 'slavnosti / městské akce', 'obrani' => 'obraní', 'trhy_jarmarky' => 'trhy & jarmarky', 'festival' => 'festival', 'sportovni_akce' => 'sportovní akce', 'koncert' => 'koncert', 'divadlo' => 'divadlo', 'vystava' => 'výstava'][$a->typ] ?? str_replace('_', ' ', $a->typ);
+                                    @endphp
+                                    <span class="rounded-full bg-blue-100 text-blue-700 px-2 py-0.5 text-xs font-medium">{{ $typLabel }}</span>
                                 @endif
                             </div>
                             <p class="text-xs text-gray-500">
