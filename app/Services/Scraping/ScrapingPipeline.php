@@ -51,6 +51,13 @@ class ScrapingPipeline
             $urls = $this->ziskejUrls($zdroj);
             $log->pocet_nalezenych = count($urls);
 
+            // 2. Pre-filtry (před AI calls — šetří tokeny):
+            //    a) URL s rokem < aktuální v slugu (např. "vinobrani-2018")
+            //    b) URL co už máme v DB jako akce s datum_od < dnes
+            $urlsZneresene = count($urls);
+            $urls = $this->predFiltrujUrls($urls, $zdroj);
+            $log->pocet_preskocenych = $urlsZneresene - count($urls);  // pre-filter skip
+
             if ($limit) {
                 $urls = array_slice($urls, 0, $limit);
             }
@@ -119,6 +126,53 @@ class ScrapingPipeline
         return array_map(fn ($u) => $this->absolutniUrl($u, $baseUrl), $urls);
     }
 
+    /**
+     * Pre-filtr URL — zahodí ty, které:
+     *   a) Mají v slugu rok starší než aktuální rok (např. "vinobrani-2018")
+     *   b) Už máme v DB jako akce s datum_do < dnes (proběhly)
+     *
+     * Tím šetříme AI tokeny — neděláme drahé extrakce na akcích, které už nás nezajímají.
+     */
+    protected function predFiltrujUrls(array $urls, Zdroj $zdroj): array
+    {
+        $aktualniRok = (int) date('Y');
+        $dnes = now()->toDateString();
+
+        // (a) URL pattern filter — slug obsahuje rok < aktuální
+        $urls = array_values(array_filter($urls, function ($url) use ($aktualniRok) {
+            // Hledáme rok 20XX v URL — buď samostatně oddělený pomlčkami nebo lomítky
+            if (preg_match('/[\/-](20\d{2})(?:[\/_-]|$)/', $url, $m)) {
+                $rok = (int) $m[1];
+                if ($rok < $aktualniRok) {
+                    return false;  // skip
+                }
+            }
+            return true;
+        }));
+
+        // (b) DB filter — URL už máme s akcí, jejíž datum proběhlo
+        $existujici = \App\Models\AkceZdroj::query()
+            ->where('zdroj_id', $zdroj->id)
+            ->whereIn('url', $urls)
+            ->join('akce', 'akce_zdroje.akce_id', '=', 'akce.id')
+            ->where(function ($q) use ($dnes) {
+                $q->whereNotNull('akce.datum_do')
+                  ->whereDate('akce.datum_do', '<', $dnes);
+            })
+            ->orWhere(function ($q) use ($dnes, $zdroj, $urls) {
+                $q->where('akce_zdroje.zdroj_id', $zdroj->id)
+                  ->whereIn('akce_zdroje.url', $urls)
+                  ->whereNull('akce.datum_do')
+                  ->whereNotNull('akce.datum_od')
+                  ->whereDate('akce.datum_od', '<', $dnes);
+            })
+            ->pluck('akce_zdroje.url')
+            ->all();
+
+        $existujiciSet = array_flip($existujici);
+        return array_values(array_filter($urls, fn ($u) => !isset($existujiciSet[$u])));
+    }
+
     /** Resolvuj URL proti base — vrátí absolutní URL. */
     protected function absolutniUrl(string $url, string $baseUrl): string
     {
@@ -157,6 +211,18 @@ class ScrapingPipeline
         $data = $this->extractor->extrahuj($html, $url);
         if (!$data) {
             return ['stav' => 'chyba', 'chyba' => "AI extrakce selhala {$url}"];
+        }
+
+        // 2b. Filter minulých akcí — neukládat akce co už proběhly
+        $datumOd = $data['datum_od'] ?? null;
+        $datumDo = $data['datum_do'] ?? $datumOd;
+        if ($datumDo) {
+            try {
+                $konecAkce = new \DateTime($datumDo);
+                if ($konecAkce < new \DateTime('today')) {
+                    return ['stav' => 'preskoceny', 'duvod' => "Akce už proběhla ({$datumDo})"];
+                }
+            } catch (\Exception) { /* ignoruj chyby parsování */ }
         }
 
         // 3. Lokalizace — z AI textových názvů zjistíme kraj_id + okres_id z DB.
