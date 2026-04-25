@@ -40,7 +40,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Platnost pozvánky (dny)</label>
-                    <input type="number" name="platnost_dni" value="{{ old('platnost_dni', 14) }}" min="1" max="365"
+                    <input type="number" name="platnost_dni" value="{{ old('platnost_dni', 30) }}" min="1" max="365"
                         class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
                 </div>
             </div>
