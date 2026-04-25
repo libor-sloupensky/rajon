@@ -86,19 +86,11 @@
                         <div class="flex gap-2 shrink-0 ml-4">
                             <form method="POST" action="{{ route('admin.scraping.spustit', $zdroj) }}">
                                 @csrf
-                                <input type="hidden" name="limit" value="10">
-                                <button type="submit" class="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-dark transition"
-                                        onclick="return confirm('Spustit scraping (test, limit 10 akcí)?')">
-                                    Test (10)
-                                </button>
-                            </form>
-                            <form method="POST" action="{{ route('admin.scraping.spustit', $zdroj) }}">
-                                @csrf
                                 <input type="hidden" name="limit" value="50">
-                                <button type="submit" class="rounded-lg border border-primary px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 transition"
-                                        onclick="return confirm('Spustit větší test (50 URL)? Může trvat ~30-60 sekund.')"
-                                        title="Synchronní limit, prevence Gateway Timeout. Plný scraping bude přes frontu + cron.">
-                                    Test 50
+                                <button type="submit" class="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-dark transition"
+                                        onclick="return confirm('Spustit scraping (50 URL)? Může trvat ~30-60 sekund.')"
+                                        title="Synchronní limit, prevence Gateway Timeout. Plný scraping bude přes cron.">
+                                    Spustit (50)
                                 </button>
                             </form>
                             <a href="{{ route('admin.scraping.edit', $zdroj) }}" class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 transition">

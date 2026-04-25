@@ -357,42 +357,17 @@ class ScrapingPipeline
             } catch (\Exception) { /* ignoruj chyby parsování */ }
         }
 
-        // 2b1. AI rozhodnutí o vhodnosti pro stánkaře — PRIMÁRNÍ filtr
-        // (AI má více kontextu než hardkódovaná pravidla)
+        // 2b1. AI rozhodnutí o vhodnosti pro stánkaře — JEDINÝ filtr blacklistu.
+        // AI má víc kontextu (název + popis + místo + organizátor + datum) než
+        // hardcode pravidla a rozhoduje přesněji. Žádné backup keyword filtry —
+        // ty mohly chybně skrývat dobré akce.
         if (isset($data['vhodne_pro_stankare']) && $data['vhodne_pro_stankare'] === false) {
             $duvod = $data['duvod_nevhodnosti'] ?? 'AI ohodnotila jako nevhodnou';
             return ['stav' => 'preskoceny', 'duvod' => "AI: {$duvod}"];
         }
 
-        // 2c. Filter ignorovaných typů (např. divadlo — nestánkařské, indoor)
+        // Pro normalizaci typu (i když nefiltrujeme — typ se ukládá do DB)
         $normalizovanyTyp = $this->normalizujTyp($data['typ'] ?? 'jiny');
-        $ignorovaneTypy = (array) config('scraping.ignorovane_typy', []);
-        if (in_array($normalizovanyTyp, $ignorovaneTypy, true)) {
-            return ['stav' => 'preskoceny', 'duvod' => "Ignorovaný typ akce ({$normalizovanyTyp})"];
-        }
-
-        // 2c2. Blacklist podle NÁZVU — "prohlídk" = guided tour, indoor aktivita
-        if ($this->nazevJeBlacklisted($data['nazev'] ?? '')) {
-            return ['stav' => 'preskoceny', 'duvod' => "Blacklist klíčové slovo v názvu"];
-        }
-
-        // 2c3. Strict indoor (muzeum / expozice / galerie) — bez výjimky pro typ
-        if ($this->jeStriktneIndoor($data['misto'] ?? '', $data['adresa'] ?? '')) {
-            return ['stav' => 'preskoceny', 'duvod' => "Strict indoor (muzeum/expozice/galerie)"];
-        }
-
-        // 2c4. Dlouhodobá akce (>14 dní) = blacklist (typicky výstava/expozice)
-        $maxDny = (int) config('scraping.max_trvani_dny', 14);
-        if ($this->trvaPrilisDlouho($data['datum_od'] ?? null, $data['datum_do'] ?? null, $maxDny)) {
-            return ['stav' => 'preskoceny', 'duvod' => "Trvání > {$maxDny} dní (dlouhodobá akce)"];
-        }
-
-        // 2d. Soft indoor — pokud akce není trhy_jarmarky ani sportovní + místo
-        // má indoor signál (kino/sál/...) → skip
-        if (!in_array($normalizovanyTyp, ['trhy_jarmarky', 'sportovni_akce'], true)
-            && $this->jeIndoorMisto($data['misto'] ?? '', $data['adresa'] ?? '')) {
-            return ['stav' => 'preskoceny', 'duvod' => "Indoor místo ({$data['misto']})"];
-        }
 
         // Předat hash do data pro uložení
         $data['_html_hash'] = $hashNovy;

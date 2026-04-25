@@ -122,8 +122,12 @@
                                 @elseif($a->velikost_stav === 'nejasna')
                                     <span class="rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">nejasná ({{ $a->velikost_skore }})</span>
                                 @endif
-                                @if(!empty($a->pole_manualni))
-                                    <span class="text-xs text-gray-500" title="Manuálně upravená pole: {{ implode(', ', array_keys($a->pole_manualni)) }}">🔒 {{ count($a->pole_manualni) }}</span>
+                                @php
+                                    // Filtrovat interní markery (klíče s '_' prefix)
+                                    $manualniPole = array_filter(array_keys($a->pole_manualni ?? []), fn ($k) => !str_starts_with($k, '_'));
+                                @endphp
+                                @if(!empty($manualniPole))
+                                    <span class="text-xs text-gray-500" title="Manuálně upravená pole: {{ implode(', ', $manualniPole) }}">🔒 {{ count($manualniPole) }}</span>
                                 @endif
                                 @if(!empty($a->konflikty))
                                     <span class="rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700" title="Konflikty mezi zdroji">⚠️ {{ count($a->konflikty) }}</span>
