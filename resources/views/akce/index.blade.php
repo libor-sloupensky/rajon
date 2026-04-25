@@ -32,7 +32,7 @@
             <label class="block text-xs text-gray-500 mb-1">Typ</label>
             <select name="typ" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
                 <option value="">Všechny</option>
-                @foreach(['pout' => 'Pouť', 'food_festival' => 'Food festival', 'slavnosti' => 'Slavnosti', 'mestske_slavnosti' => 'Městské slavnosti', 'obrani' => 'Obraní (vino/dýňo/...)', 'farmarske_trhy' => 'Farmářské trhy', 'vanocni_trhy' => 'Vánoční trhy', 'velikonocni_trhy' => 'Velikonoční trhy', 'jarmark' => 'Jarmark', 'festival' => 'Festival', 'sportovni_akce' => 'Sportovní akce', 'koncert' => 'Koncert', 'vystava' => 'Výstava', 'workshop' => 'Workshop', 'jiny' => 'Jiný'] as $val => $label)
+                @foreach(['pout' => 'Pouť', 'food_festival' => 'Food festival', 'slavnosti' => 'Slavnosti', 'mestske_slavnosti' => 'Městské slavnosti', 'obrani' => 'Obraní (vino/dýňo/bramboro/jablko/...)', 'trhy_jarmarky' => 'Trhy a jarmarky', 'festival' => 'Festival', 'sportovni_akce' => 'Sportovní akce', 'koncert' => 'Koncert', 'vystava' => 'Výstava', 'jiny' => 'Jiný'] as $val => $label)
                     <option value="{{ $val }}" {{ request('typ') === $val ? 'selected' : '' }}>{{ $label }}</option>
                 @endforeach
             </select>

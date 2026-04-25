@@ -92,7 +92,7 @@ Z následujícího textu stránky o akci extrahuj JSON s tímto schématem:
 
 {
   "nazev": "název akce (bez roku, pokud to jde — ten bude v datum_od)",
-  "typ": "jeden z: pout | hody | mestske_slavnosti | obecni_slavnosti | historicke_slavnosti | folklor | dny_mesta | food_festival | obrani (vinobraní/dýňobraní/bramborobraní/jablkobraní/jakékoliv *braní) | jarmark | farmarske_trhy | vanocni_trhy | velikonocni_trhy | hudebni_festival | koncert | divadlo | vystava | workshop | sportovni | jine",
+  "typ": "jeden z: pout | hody | mestske_slavnosti | obecni_slavnosti | historicke_slavnosti | folklor | dny_mesta | food_festival | obrani (vinobraní/dýňobraní/bramborobraní/jablkobraní/jakékoliv *braní) | trhy_jarmarky (farmářské/vánoční/velikonoční trhy + jarmarky — všechno pod jeden typ) | hudebni_festival | koncert | divadlo | vystava | sportovni | jine",
   "datum_od": "YYYY-MM-DD",
   "datum_do": "YYYY-MM-DD nebo null pokud jednodenní",
   "cas": "textově např. 10:00-22:00 nebo null",
@@ -228,9 +228,10 @@ PROMPT;
 
         // Typ akce → klíčová slova (+30)
         $typyVelke = ['pout', 'hody', 'dny_mesta', 'mestske_slavnosti',
-                      'food_festival', 'obrani', 'vinobrani', 'dynobrani',
-                      'jarmark', 'farmarske_trhy', 'historicke_slavnosti', 'hudebni_festival',
-                      'folklor', 'vanocni_trhy', 'velikonocni_trhy', 'obecni_slavnosti', 'slavnosti'];
+                      'food_festival', 'obrani',
+                      'trhy_jarmarky',
+                      'historicke_slavnosti', 'hudebni_festival', 'festival',
+                      'folklor', 'obecni_slavnosti', 'slavnosti'];
         if (in_array($data['typ'] ?? '', $typyVelke, true)) {
             $skore += 30;
         }

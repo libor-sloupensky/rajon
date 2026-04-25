@@ -729,10 +729,14 @@ class ScrapingPipeline
             'jablkobrani' => 'obrani',
             'bramborobrani' => 'obrani',
 
-            'farmarske_trhy' => 'farmarske_trhy',
-            'vanocni_trhy' => 'vanocni_trhy',
-            'velikonocni_trhy' => 'velikonocni_trhy',
-            'jarmark' => 'jarmark',
+            // Sjednocené trhy + jarmarky (farmářské, vánoční, velikonoční, jarmark)
+            'trhy_jarmarky' => 'trhy_jarmarky',
+            'trhy' => 'trhy_jarmarky',
+            'farmarske_trhy' => 'trhy_jarmarky',
+            'vanocni_trhy' => 'trhy_jarmarky',
+            'velikonocni_trhy' => 'trhy_jarmarky',
+            'jarmark' => 'trhy_jarmarky',
+
             'festival' => 'festival',
             'hudebni_festival' => 'festival',
 
@@ -749,11 +753,10 @@ class ScrapingPipeline
             'sportovni' => 'sportovni_akce',
             'sportovni_akce' => 'sportovni_akce',
 
-            // Doplňkové (nejsou primárně WormUP cíl, ale zachováváme info)
+            // Doplňkové (divadlo zůstává v enumu pro zrušené akce; workshop vyřazen)
             'koncert' => 'koncert',
             'divadlo' => 'divadlo',
             'vystava' => 'vystava',
-            'workshop' => 'workshop',
         ];
         return $mapping[$typ] ?? 'jiny';
     }

@@ -79,19 +79,19 @@
                     'food_festival' => 'Food festival',
                     'slavnosti' => 'Slavnosti',
                     'mestske_slavnosti' => 'Městské slavnosti',
-                    'obrani' => 'Obraní (vinobraní/dýňobraní/...)',
-                    'farmarske_trhy' => 'Farmářské trhy',
-                    'vanocni_trhy' => 'Vánoční trhy',
-                    'velikonocni_trhy' => 'Velikonoční trhy',
-                    'jarmark' => 'Jarmark',
+                    'obrani' => 'Obraní (vinobraní/dýňobraní/bramborobraní/jablkobraní/...)',
+                    'trhy_jarmarky' => 'Trhy a jarmarky (farmářské/vánoční/velikonoční/jarmark)',
                     'festival' => 'Festival',
                     'sportovni_akce' => 'Sportovní akce',
                     'koncert' => 'Koncert',
-                    'divadlo' => 'Divadlo',
                     'vystava' => 'Výstava',
-                    'workshop' => 'Workshop',
                     'jiny' => 'Jiný',
                 ];
+                // 'divadlo' nezobrazujeme jako možnost — ale pokud akce má typ='divadlo' (legacy/zrušená),
+                // přidáme do listu, aby select neselhal.
+                if ($akce->typ === 'divadlo' && !isset($typy['divadlo'])) {
+                    $typy['divadlo'] = 'Divadlo (zastaralé)';
+                }
                 $stavy = ['navrh' => 'Návrh', 'overena' => 'Ověřená', 'zrusena' => 'Zrušená'];
             @endphp
 

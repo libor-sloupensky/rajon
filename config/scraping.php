@@ -187,6 +187,7 @@ return [
     */
     'ignorovane_typy' => [
         'divadlo',
+        'workshop',
     ],
 
     /*

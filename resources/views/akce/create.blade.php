@@ -9,16 +9,12 @@
                 'food_festival' => 'Food festival',
                 'slavnosti' => 'Slavnosti',
                 'mestske_slavnosti' => 'Městské slavnosti',
-                'obrani' => 'Obraní (vinobraní/dýňobraní/...)',
-                'farmarske_trhy' => 'Farmářské trhy',
-                'vanocni_trhy' => 'Vánoční trhy',
-                'velikonocni_trhy' => 'Velikonoční trhy',
-                'jarmark' => 'Jarmark',
+                'obrani' => 'Obraní (vinobraní/dýňobraní/bramborobraní/jablkobraní/...)',
+                'trhy_jarmarky' => 'Trhy a jarmarky (farmářské/vánoční/velikonoční/jarmark)',
                 'festival' => 'Festival',
                 'sportovni_akce' => 'Sportovní akce',
                 'koncert' => 'Koncert',
                 'vystava' => 'Výstava',
-                'workshop' => 'Workshop',
                 'jiny' => 'Jiný',
             ];
         @endphp
