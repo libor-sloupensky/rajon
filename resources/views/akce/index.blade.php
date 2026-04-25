@@ -52,6 +52,14 @@
             <input type="date" name="datum_do" value="{{ request('datum_do') }}"
                 class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
         </div>
+        <div>
+            <label class="block text-xs text-gray-500 mb-1">Původ</label>
+            <select name="zdroj_typ" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+                <option value="">Vše</option>
+                <option value="web" {{ request('zdroj_typ') === 'web' ? 'selected' : '' }}>Z webu (scraping)</option>
+                <option value="excel" {{ request('zdroj_typ') === 'excel' ? 'selected' : '' }}>Z XLS importu</option>
+            </select>
+        </div>
         @if($jeAdmin)
             <div>
                 <label class="block text-xs text-gray-500 mb-1">Stav</label>
@@ -73,7 +81,7 @@
             <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark transition">
                 Filtrovat
             </button>
-            @if(request()->hasAny(['hledat', 'typ', 'kraj', 'mesic', 'rok', 'datum_od', 'datum_do', 'stav', 'vse']))
+            @if(request()->hasAny(['hledat', 'typ', 'kraj', 'mesic', 'rok', 'datum_od', 'datum_do', 'stav', 'vse', 'zdroj_typ']))
                 <a href="{{ url('/akce') }}" class="text-sm text-gray-500 hover:text-primary self-center">Zrušit</a>
             @endif
         </div>

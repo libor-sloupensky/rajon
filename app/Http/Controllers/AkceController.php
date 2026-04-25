@@ -38,6 +38,16 @@ class AkceController extends Controller
             $query->where('typ', $request->typ);
         }
 
+        // Filtr podle původu — z webu (scraping/manual) vs z XLS (excel)
+        if ($request->filled('zdroj_typ')) {
+            if ($request->zdroj_typ === 'web') {
+                $query->whereIn('zdroj_typ', ['scraping', 'manual'])
+                      ->orWhereNull('zdroj_typ');
+            } elseif ($request->zdroj_typ === 'excel') {
+                $query->where('zdroj_typ', 'excel');
+            }
+        }
+
         if ($request->filled('kraj')) {
             $query->where('kraj', 'like', '%' . $request->kraj . '%');
         }

@@ -29,6 +29,7 @@ class ScrapingPipeline
         protected LokalizaceResolver $lokalizace,
         protected ListingPaginator $paginator,
         protected AuthenticatedHttp $http,
+        protected \App\Services\Geokoder $geokoder,
     ) {}
 
     /** Aktuálně zpracovávaný zdroj — pro fetchHtml login session. */
@@ -375,6 +376,21 @@ class ScrapingPipeline
         // Pokud máme kraj_id, normalizuj i textový kraj (ať máme konzistentní hodnotu)
         if ($loc['kraj_id']) {
             $data['kraj'] = \App\Models\Kraj::find($loc['kraj_id'])?->nazev ?? $data['kraj'];
+        }
+
+        // Geokódování — pokud nemáme GPS a máme aspoň město, zkusíme přes Mapy.cz API
+        if (empty($data['gps_lat']) || empty($data['gps_lng'])) {
+            $gps = $this->geokoder->geokoduj(
+                $data['adresa'] ?? null,
+                $data['misto'] ?? null,
+                $data['mesto'] ?? null,
+                $data['okres'] ?? null,
+                $data['kraj'] ?? null,
+            );
+            if ($gps) {
+                $data['gps_lat'] = $gps['gps_lat'];
+                $data['gps_lng'] = $gps['gps_lng'];
+            }
         }
 
         // 4. Statistiky
