@@ -418,6 +418,10 @@ class ScrapingPipeline
         $statistiky['podle_typu'][$data['typ'] ?? 'jiny'] = ($statistiky['podle_typu'][$data['typ'] ?? 'jiny'] ?? 0) + 1;
 
         // 6. Deduplikace + uložení (fuzzy match + merge)
+        // Předat zdroj_url + zdroj_id pro fallback match když chybí datum
+        $data['_zdroj_url'] = $url;
+        $data['_zdroj_id'] = $zdroj->id;
+
         $puvodniPocetKonfliktu = 0;
         if ($existujici = $this->matcher->najdiExistujici($data)) {
             $puvodniPocetKonfliktu = count($existujici->konflikty ?? []);
@@ -610,6 +614,17 @@ class ScrapingPipeline
             $data['misto'] = null;
         }
 
+        // Cleanup web_url — JSON-LD na Stánkař/Kudy vrátí URL stránky katalogu
+        // (např. stankar.cz/events/...). To není web pořadatele — jen scraping URL.
+        // Web_url musí být JINÁ doména než zdroj.
+        if (!empty($data['web_url']) && !empty($zdroj->url)) {
+            $zdrojHost = parse_url($zdroj->url, PHP_URL_HOST);
+            $webHost = parse_url($data['web_url'], PHP_URL_HOST);
+            if ($zdrojHost && $webHost && $this->stejnaDomena($zdrojHost, $webHost)) {
+                $data['web_url'] = null;
+            }
+        }
+
         // Pokud nemáme město, zkusíme extrahovat z názvu (Stánkař často má "v Brně")
         if (empty($data['mesto']) && empty($data['misto']) && !empty($data['nazev'])) {
             $mesto = $this->extrahujMestoZNazvu((string) $data['nazev']);
@@ -750,6 +765,14 @@ class ScrapingPipeline
         }
 
         return $data;
+    }
+
+    /** Porovná hostname bez www. prefixu — stankar.cz === www.stankar.cz */
+    protected function stejnaDomena(string $a, string $b): bool
+    {
+        $a = preg_replace('/^www\./', '', mb_strtolower($a));
+        $b = preg_replace('/^www\./', '', mb_strtolower($b));
+        return $a === $b;
     }
 
     /** Detekuje, jestli string je jen název kraje (např. "Středočeský kraj"). */

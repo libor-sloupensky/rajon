@@ -101,7 +101,7 @@
 
             {{-- Mapa --}}
             @if($akce->gps_lat && $akce->gps_lng)
-                <div id="mapa" class="w-full h-64 rounded-lg border border-gray-200 mt-4"></div>
+                <div id="mapa" class="w-full h-80 rounded-lg border border-gray-200 mt-4 overflow-hidden"></div>
             @endif
         </div>
 
@@ -129,14 +129,34 @@
     </div>
 
     @if($akce->gps_lat && $akce->gps_lng)
-        <script>
-            // Mapy.cz integrace — bude doplněna s API klíčem
-            document.addEventListener('DOMContentLoaded', function() {
-                var mapaEl = document.getElementById('mapa');
-                if (mapaEl) {
-                    mapaEl.innerHTML = '<div class="flex items-center justify-center h-full text-sm text-gray-400">Mapa: {{ $akce->gps_lat }}, {{ $akce->gps_lng }}</div>';
-                }
-            });
-        </script>
+        @php $mapyKey = config('services.mapycz.api_key'); @endphp
+        @if($mapyKey)
+            <script type="text/javascript" src="https://api.mapy.cz/loader.js"></script>
+            <script>
+                Loader.async = true;
+                Loader.load(null, { suggest: false }, function () {
+                    var center = SMap.Coords.fromWGS84({{ $akce->gps_lng }}, {{ $akce->gps_lat }});
+                    var map = new SMap(document.getElementById('mapa'), center, 14);
+                    map.addDefaultLayer(SMap.DEF_BASE).enable();
+                    map.addDefaultControls();
+
+                    var marker = new SMap.Marker(center, 'akce', {
+                        title: @json($akce->nazev),
+                        url: SMap.CONFIG.img + '/marker/drop-red.png',
+                    });
+                    var layer = new SMap.Layer.Marker();
+                    map.addLayer(layer).enable();
+                    layer.addMarker(marker);
+                });
+            </script>
+        @else
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    document.getElementById('mapa').innerHTML =
+                        '<div class="flex items-center justify-center h-full text-sm text-gray-400">' +
+                        'GPS: {{ $akce->gps_lat }}, {{ $akce->gps_lng }} (Mapy.cz API klíč není nastaven)</div>';
+                });
+            </script>
+        @endif
     @endif
 </x-layouts.app>

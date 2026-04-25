@@ -30,8 +30,15 @@ class AkceMatcher
         $nazev = $data['nazev'] ?? null;
         $datumOd = $data['datum_od'] ?? null;
 
-        if (empty($nazev) || empty($datumOd)) {
+        if (empty($nazev)) {
             return null;
+        }
+
+        // Pokud nemáme datum, fuzzy/datum strategie nefungují — použijeme jednoduchý
+        // match na nazev + (zdroj_id NEBO zdroj_url) → zabrání duplikátům když AI
+        // znovu scrapuje stejnou URL bez data.
+        if (empty($datumOd)) {
+            return $this->pokusBezData($data);
         }
 
         // Strategie 1: slug exact match (nejrychlejší)
@@ -47,6 +54,32 @@ class AkceMatcher
         // Strategie 3: fuzzy similarity + datum ± tolerance + GPS proximity
         if ($akce = $this->pokusFuzzy($data)) {
             return $akce;
+        }
+
+        return null;
+    }
+
+    /** Match bez datumu — podle názvu + zdroj_url (nebo nazev + zdroj_id, pokud zdroj_url chybí) */
+    protected function pokusBezData(array $data): ?Akce
+    {
+        $nazev = $data['nazev'];
+
+        // Preferenčně match přes akce_zdroje (URL je unikátní napříč scrapy)
+        if (!empty($data['_zdroj_url']) || !empty($data['zdroj_url'])) {
+            $url = $data['_zdroj_url'] ?? $data['zdroj_url'];
+            $akce = Akce::whereHas('akceZdroje', fn ($q) => $q->where('url', $url))->first();
+            if ($akce) return $akce;
+
+            // Také zdroj_url v akce tabulce
+            $akce = Akce::where('zdroj_url', $url)->first();
+            if ($akce) return $akce;
+        }
+
+        // Fallback: stejný nazev + stejný zdroj_id (zabrání duplikátům uvnitř jednoho zdroje)
+        if (!empty($data['_zdroj_id'])) {
+            return Akce::where('nazev', $nazev)
+                ->where('zdroj_id', $data['_zdroj_id'])
+                ->first();
         }
 
         return null;
