@@ -179,6 +179,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Ignorované typy akcí
+    |--------------------------------------------------------------------------
+    | Akce s těmito typy se při scrapingu vůbec neukládají (skip after AI extrakce).
+    | Existující akce s těmito typy mají stav='zrusena' (skryté z katalogu).
+    | Důvod: nejsou cílem pro WormUP stánkaře (indoor, malé, neveřejné).
+    */
+    'ignorovane_typy' => [
+        'divadlo',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Adaptivní refresh interval podle blízkosti akce
     |--------------------------------------------------------------------------
     | Klíč = max počet dní od dnes do datum_od. Hodnota = jak často kontrolovat (dny).

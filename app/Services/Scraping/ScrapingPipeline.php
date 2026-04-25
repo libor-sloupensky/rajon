@@ -356,6 +356,13 @@ class ScrapingPipeline
             } catch (\Exception) { /* ignoruj chyby parsování */ }
         }
 
+        // 2c. Filter ignorovaných typů (např. divadlo — nestánkařské, indoor)
+        $normalizovanyTyp = $this->normalizujTyp($data['typ'] ?? 'jiny');
+        $ignorovaneTypy = (array) config('scraping.ignorovane_typy', []);
+        if (in_array($normalizovanyTyp, $ignorovaneTypy, true)) {
+            return ['stav' => 'preskoceny', 'duvod' => "Ignorovaný typ akce ({$normalizovanyTyp})"];
+        }
+
         // Předat hash do data pro uložení
         $data['_html_hash'] = $hashNovy;
 
@@ -421,9 +428,9 @@ class ScrapingPipeline
     protected function kategorieSkipu(string $duvod): string
     {
         if (str_contains($duvod, 'už proběhla') || str_contains($duvod, 'z HTML')) {
-            return 'Akce už proběhla (z HTML)';
+            return 'Akce už proběhla';
         }
-        if (str_contains($duvod, 'hash')) {
+        if (str_contains($duvod, 'hash') || str_contains($duvod, 'nezměnil')) {
             return 'Obsah HTML se nezměnil';
         }
         if (str_contains($duvod, 'Mimo region')) {
@@ -431,6 +438,9 @@ class ScrapingPipeline
         }
         if (str_contains($duvod, 'lastmod')) {
             return 'Sitemap lastmod nezměněn';
+        }
+        if (str_contains($duvod, 'Ignorovaný typ')) {
+            return 'Ignorovaný typ akce';
         }
         return 'Jiný důvod: ' . mb_substr($duvod, 0, 60);
     }
