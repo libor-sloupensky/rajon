@@ -187,7 +187,10 @@ return [
     */
     'ignorovane_typy' => [
         'divadlo',
-        'workshop',
+        'workshop',     // kurzy, lekce, dílny — uzavřené malé akce
+        'koncert',      // samostatné koncerty (festivaly mají typ='festival')
+        'vystava',      // galerie, muzea, expozice (veletrhy mají typ='trhy_jarmarky')
+        'prednaska',    // přednášky, besedy
     ],
 
     /*

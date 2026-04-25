@@ -96,6 +96,19 @@ DŮLEŽITÁ PRAVIDLA:
   → mesto="Sobotka", "Slavnosti chřestu v Ivančicích" → mesto="Ivančice".
   Pozor na české skloňování: "v Janských Lázních" → mesto="Janské Lázně",
   "v Brně" → mesto="Brno", "v Praze" → mesto="Praha".
+- TYP — KLÍČOVÁ pravidla (pro WormUP stánkaře jsou DŮLEŽITÉ jen velké veřejné akce):
+  * **kurz / workshop / lekce / školení / dílna** → typ="workshop" (NE "slavnosti")
+  * **přednáška / beseda** → typ="prednaska" (NE "slavnosti")
+  * **samostatný koncert (1 kapela/sólista, klubový sál)** → typ="koncert"
+  * **hudební festival** (víc kapel, program jiných žánrů) → typ="festival"
+  * **malá výstava obrazů / galerie / muzeum / expozice** → typ="vystava"
+  * **veletržní výstava** (prodejní s mnoha vystavovateli) → typ="trhy_jarmarky"
+  * **pouť / slavnosti / hody** — ZŮSTÁVÁ pout/slavnosti i když má v programu
+    koncerty/přednášky/divadlo (jsou doplňky hlavní akce)
+  * Pokud má v názvu "Trio", "Kvartet", "Jazz X" — pravděpodobně samostatný
+    koncert hudební skupiny → typ="koncert"
+  * Pokud akce VYŽADUJE rezervaci/registraci nebo má omezenou kapacitu, je
+    to typicky uzavřená malá akce → typ="workshop" nebo "prednaska"
 - TYP: vyber CO NEJPŘESNĚJI z níže uvedeného seznamu. Pokud akce má v názvu
   "jarmark", "trh", "vánoční trh", musí být typ="trhy_jarmarky" — NIKDY ne "jine".
   Pokud má v názvu "pouť", "pout", musí být "pout". Při pochybnostech radši zvol

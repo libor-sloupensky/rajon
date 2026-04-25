@@ -82,14 +82,19 @@
                     'trhy_jarmarky' => 'Trhy a jarmarky (farmářské/vánoční/velikonoční/jarmark)',
                     'festival' => 'Festival',
                     'sportovni_akce' => 'Sportovní akce',
-                    'koncert' => 'Koncert',
-                    'vystava' => 'Výstava',
                     'jiny' => 'Jiný',
                 ];
-                // 'divadlo' nezobrazujeme jako možnost — ale pokud akce má typ='divadlo' (legacy/zrušená),
-                // přidáme do listu, aby select neselhal.
-                if ($akce->typ === 'divadlo' && !isset($typy['divadlo'])) {
-                    $typy['divadlo'] = 'Divadlo (zastaralé)';
+                // Blacklisted typy: nezobrazujeme jako preferovanou volbu, ale pokud
+                // akce už má takový typ (legacy/zrušená), přidáme do listu.
+                $legacyTypy = [
+                    'divadlo' => 'Divadlo (vyřazené)',
+                    'koncert' => 'Koncert (vyřazené)',
+                    'vystava' => 'Výstava (vyřazené)',
+                    'workshop' => 'Workshop / kurz (vyřazené)',
+                    'prednaska' => 'Přednáška (vyřazené)',
+                ];
+                if (isset($legacyTypy[$akce->typ]) && !isset($typy[$akce->typ])) {
+                    $typy[$akce->typ] = $legacyTypy[$akce->typ];
                 }
                 $stavy = ['navrh' => 'Návrh', 'overena' => 'Ověřená', 'zrusena' => 'Zrušená'];
             @endphp

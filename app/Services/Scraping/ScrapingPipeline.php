@@ -602,6 +602,13 @@ class ScrapingPipeline
     {
         $data['typ'] = $this->normalizujTyp($data['typ'] ?? 'jiny');
 
+        // Silná heuristika podle názvu — overriduje AI klasifikaci pro jasné případy
+        // (kurz/přednáška/výstava — AI je často chybně přiřadí jako "slavnosti")
+        if (!empty($data['nazev'])) {
+            $silny = $this->silnyTypZNazvu($data['nazev'], $data['popis'] ?? '');
+            if ($silny) $data['typ'] = $silny;
+        }
+
         // Pokud po normalizaci typ='jiny', zkusíme odhadnout z názvu (jarmark, pouť, …)
         if ($data['typ'] === 'jiny' && !empty($data['nazev'])) {
             $odhad = $this->odhadniTypZNazvu($data['nazev']);
@@ -922,6 +929,54 @@ class ScrapingPipeline
     }
 
     /**
+     * Silná heuristika — overriduje AI klasifikaci. Použito pro jasné případy
+     * kurz/výstava/přednáška, kde AI často chybně přiřadí 'slavnosti'.
+     *
+     * Vrací typ pokud má jasný match, jinak null.
+     */
+    protected function silnyTypZNazvu(string $nazev, string $popis = ''): ?string
+    {
+        $n = mb_strtolower($nazev);
+        $p = mb_strtolower($popis);
+
+        // Workshop/kurz — název začíná "Kurz" nebo obsahuje workshop/lekce/dílna
+        if (preg_match('/^kurz\s|\bworkshop\b|\blekce\b|\bdílna\b|\bškolení\b|\bskoleni\b/u', $n)) {
+            return 'workshop';
+        }
+
+        // Přednáška/beseda
+        if (preg_match('/\bpřednáška\b|\bprednaska\b|\bbeseda\b/u', $n)) {
+            return 'prednaska';
+        }
+
+        // Výstava — pokud má v názvu "výstava" + není to veletrh / trh
+        if (preg_match('/\bvýstava\b|\bvystava\b/u', $n)
+            && !preg_match('/veletrh|prodejní výstava|fair/u', $n)) {
+            return 'vystava';
+        }
+
+        // Koncert — explicitní "koncert" v názvu
+        if (preg_match('/\bkoncert\b/u', $n)) {
+            return 'koncert';
+        }
+
+        // Trio/Kvartet/Quartet/Quintet — název kapely → koncert
+        // (jen pokud popis nenaznačuje, že je to součást většího programu — pouť/slavnosti)
+        if (preg_match('/\b(trio|kvartet|kvintet|quartet|quintet)\b/u', $n)
+            && !preg_match('/pouť|hody|slavnosti|jarmark|festival/u', $p)) {
+            return 'koncert';
+        }
+
+        // Akce s "rezervace nutná" v popisu (signál malé uzavřené akce)
+        if (preg_match('/rezervace nutná|rezervace povinná|kapacita omezena|omezený počet míst/u', $p)
+            && preg_match('/\bpřednáška\b|\bbeseda\b/u', $p)) {
+            return 'prednaska';
+        }
+
+        return null;
+    }
+
+    /**
      * Doodhadni typ akce podle názvu, když AI/JSON-LD vrátí 'jine'/'jiny'.
      * Volá se po normalizujTyp v ulozAkci.
      */
@@ -988,10 +1043,19 @@ class ScrapingPipeline
             'sportovni' => 'sportovni_akce',
             'sportovni_akce' => 'sportovni_akce',
 
-            // Doplňkové (divadlo zůstává v enumu pro zrušené akce; workshop vyřazen)
+            // Doplňkové (všechny v ignorovane_typy, ale enum musí obsahovat pro existing rows)
             'koncert' => 'koncert',
             'divadlo' => 'divadlo',
             'vystava' => 'vystava',
+            'galerie' => 'vystava',
+            'muzeum' => 'vystava',
+            'expozice' => 'vystava',
+            'prednaska' => 'prednaska',
+            'beseda' => 'prednaska',
+            'workshop' => 'workshop',
+            'kurz' => 'workshop',
+            'lekce' => 'workshop',
+            'skoleni' => 'workshop',
         ];
         return $mapping[$typ] ?? 'jiny';
     }
