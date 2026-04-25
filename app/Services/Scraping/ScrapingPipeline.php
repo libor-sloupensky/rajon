@@ -87,7 +87,9 @@ class ScrapingPipeline
                     };
                 } catch (\Exception $e) {
                     $log->increment('pocet_chyb');
-                    $chyby[] = "URL {$url}: {$e->getMessage()}";
+                    // Ořez chyby — některé exceptions mají dlouhé SQL/stack trace
+                    $chybaText = mb_substr($e->getMessage(), 0, 500);
+                    $chyby[] = "URL {$url}: {$chybaText}";
                     Log::warning("Scraping error {$url}: {$e->getMessage()}");
                 }
             }
@@ -95,11 +97,12 @@ class ScrapingPipeline
             $log->stav = $log->pocet_chyb > 0 && $log->pocet_chyb === count($urls) ? 'chyba'
                 : ($log->pocet_chyb > 0 ? 'castecne' : 'uspech');
 
-            // Aktualizace zdroje
+            // Aktualizace zdroje (ořez na max 60 KB — bezpečnost před DB truncate)
+            $posledniChyby = $chyby ? mb_substr(implode("\n", array_slice($chyby, 0, 10)), 0, 60000) : null;
             $zdroj->update([
                 'posledni_scraping' => now(),
                 'pocet_akci' => $zdroj->akce()->count(),
-                'posledni_chyby' => $chyby ? implode("\n", array_slice($chyby, 0, 10)) : null,
+                'posledni_chyby' => $posledniChyby,
             ]);
         } catch (\Exception $e) {
             $log->stav = 'chyba';
@@ -107,7 +110,8 @@ class ScrapingPipeline
             Log::error("Scraping pipeline failed: {$e->getMessage()}");
         } finally {
             $log->konec = now();
-            $log->chyby_detail = $chyby ? implode("\n", array_slice($chyby, 0, 50)) : null;
+            // MEDIUMTEXT (16 MB) — držíme se pod 1 MB pro výkon
+            $log->chyby_detail = $chyby ? mb_substr(implode("\n", array_slice($chyby, 0, 50)), 0, 1000000) : null;
             $log->statistiky = $statistiky;
             $log->save();
         }
