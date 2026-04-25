@@ -66,7 +66,12 @@ class ScrapingPipeline
         $this->lastmodZeSitemap = [];
 
         $chyby = [];
-        $statistiky = ['podle_kraje' => [], 'podle_typu' => [], 'podle_velikosti' => []];
+        $statistiky = [
+            'podle_kraje' => [],
+            'podle_typu' => [],
+            'podle_velikosti' => [],
+            'preskoceno_z_duvodu' => [],   // klasifikace skipů
+        ];
 
         try {
             // 1. Sitemap → seznam URL
@@ -76,9 +81,15 @@ class ScrapingPipeline
             // 2. Pre-filtry (před AI calls — šetří tokeny):
             //    a) URL s rokem < aktuální v slugu (např. "vinobrani-2018")
             //    b) URL co už máme v DB jako akce s datum_od < dnes
+            //    c) Sitemap lastmod < posledni_extrakce
+            //    d) Adaptivní refresh interval
             $urlsZneresene = count($urls);
             $urls = $this->predFiltrujUrls($urls, $zdroj);
-            $log->pocet_preskocenych = $urlsZneresene - count($urls);  // pre-filter skip
+            $preFilterSkip = $urlsZneresene - count($urls);
+            $log->pocet_preskocenych = $preFilterSkip;
+            if ($preFilterSkip > 0) {
+                $statistiky['preskoceno_z_duvodu']['Pre-filtr (rok v URL / proběhlá / lastmod / interval)'] = $preFilterSkip;
+            }
 
             if ($limit) {
                 $urls = array_slice($urls, 0, $limit);
@@ -92,7 +103,12 @@ class ScrapingPipeline
                     match ($vysledek['stav']) {
                         'novy' => $log->increment('pocet_novych'),
                         'aktualizovany' => $log->increment('pocet_aktualizovanych'),
-                        'preskoceny' => $log->increment('pocet_preskocenych'),
+                        'preskoceny' => (function () use ($log, $vysledek, &$statistiky) {
+                            $log->increment('pocet_preskocenych');
+                            $kategorie = $this->kategorieSkipu($vysledek['duvod'] ?? '');
+                            $statistiky['preskoceno_z_duvodu'][$kategorie]
+                                = ($statistiky['preskoceno_z_duvodu'][$kategorie] ?? 0) + 1;
+                        })(),
                         'chyba' => (function () use ($log, $vysledek, &$chyby) {
                             $log->increment('pocet_chyb');
                             $chyby[] = $vysledek['chyba'] ?? 'Unknown';
@@ -399,6 +415,24 @@ class ScrapingPipeline
         }
 
         return ['stav' => $novy ? 'novy' : 'aktualizovany', 'akce_id' => $akce->id];
+    }
+
+    /** Klasifikace důvodu přeskočení do kategorií pro statistiky. */
+    protected function kategorieSkipu(string $duvod): string
+    {
+        if (str_contains($duvod, 'už proběhla') || str_contains($duvod, 'z HTML')) {
+            return 'Akce už proběhla (z HTML)';
+        }
+        if (str_contains($duvod, 'hash')) {
+            return 'Obsah HTML se nezměnil';
+        }
+        if (str_contains($duvod, 'Mimo region')) {
+            return 'Mimo region';
+        }
+        if (str_contains($duvod, 'lastmod')) {
+            return 'Sitemap lastmod nezměněn';
+        }
+        return 'Jiný důvod: ' . mb_substr($duvod, 0, 60);
     }
 
     /**

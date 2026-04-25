@@ -89,11 +89,21 @@
                         </div>
                     @endif
                     @if(!empty($log->statistiky['podle_typu']))
-                        <div>
+                        <div class="mb-3">
                             <p class="text-xs font-medium text-gray-500 uppercase mb-1">Podle typu</p>
                             <div class="flex flex-wrap gap-2">
                                 @foreach($log->statistiky['podle_typu'] as $typ => $pocet)
                                     <span class="rounded bg-gray-100 px-2 py-0.5 text-xs">{{ $typ }}: {{ $pocet }}</span>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                    @if(!empty($log->statistiky['preskoceno_z_duvodu']))
+                        <div>
+                            <p class="text-xs font-medium text-gray-500 uppercase mb-1">Důvody přeskočení</p>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($log->statistiky['preskoceno_z_duvodu'] as $duvod => $pocet)
+                                    <span class="rounded bg-yellow-100 text-yellow-800 px-2 py-0.5 text-xs">{{ $duvod }}: {{ $pocet }}</span>
                                 @endforeach
                             </div>
                         </div>
