@@ -94,10 +94,11 @@
                             </form>
                             <form method="POST" action="{{ route('admin.scraping.spustit', $zdroj) }}">
                                 @csrf
-                                <input type="hidden" name="limit" value="0">
+                                <input type="hidden" name="limit" value="50">
                                 <button type="submit" class="rounded-lg border border-primary px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 transition"
-                                        onclick="return confirm('Spustit plný scraping? Může trvat dlouho.')">
-                                    Plný scraping
+                                        onclick="return confirm('Spustit větší test (50 URL)? Může trvat ~30-60 sekund.')"
+                                        title="Synchronní limit, prevence Gateway Timeout. Plný scraping bude přes frontu + cron.">
+                                    Test 50
                                 </button>
                             </form>
                             <a href="{{ route('admin.scraping.edit', $zdroj) }}" class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 transition">
