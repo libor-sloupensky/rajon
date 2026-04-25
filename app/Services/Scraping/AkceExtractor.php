@@ -283,6 +283,119 @@ PROMPT;
         return $merged;
     }
 
+    /**
+     * Reklasifikuj DÁVKU existujících akcí — AI rozhodne vhodne_pro_stankare
+     * pro každou akci v seznamu (jedno API volání pro celou dávku).
+     *
+     * Vstup: pole asoc. array s klíči id, nazev, popis, misto, organizator, typ, datum_od, datum_do
+     * Výstup: pole [id => ['vhodne' => bool, 'duvod' => string|null]] nebo null při chybě
+     */
+    public function klasifikujDavku(array $akce): ?array
+    {
+        if (empty($akce) || empty($this->apiKey)) return null;
+
+        $systemPrompt = <<<'PROMPT'
+Jsi analytik specializovaný na hodnocení vhodnosti veřejných akcí pro stánkový prodej (cíloví uživatelé: WormUP stánkaři).
+
+VHODNÉ akce (true): outdoor masové veřejné akce s prostorem pro stánky:
+- Pouti, hody, slavnosti, městské/obecní akce
+- Festivaly (hudební, gastronomické, kulturní s programem v exteriéru)
+- Trhy a jarmarky (i v halách — vánoční trhy v sále jsou OK)
+- Sportovní akce se stánky pro diváky
+- Food festivaly, vinobraní, obraní
+- Veletržní výstavy s mnoha vystavovateli
+
+NEVHODNÉ akce (false): malé/uzavřené/indoor:
+- Klubové koncerty (kapela/sólista v hudebním klubu, jazz baru)
+- Komorní vystoupení, recitály, autorská čtení
+- Galerie, muzea, expozice (i pokud mají outdoor program)
+- Divadla, opery, balet
+- Přednášky, besedy, prezentace
+- Kurzy, workshopy, lekce, dílny, školení
+- Prohlídky (zámků, kostelů, měst)
+- Dlouhodobé výstavy (víc než 2 týdny)
+- Indoor v sálech, kinech, knihovnách, kostelech bez outdoor programu
+
+Vrať POUZE platný JSON pole, žádný markdown/text navíc.
+PROMPT;
+
+        $polozky = [];
+        foreach ($akce as $i => $a) {
+            $datumStr = '';
+            if (!empty($a['datum_od'])) {
+                $datumStr = $a['datum_od'];
+                if (!empty($a['datum_do']) && $a['datum_do'] !== $a['datum_od']) {
+                    $datumStr .= ' až ' . $a['datum_do'];
+                }
+            }
+            $polozky[] = "[{$a['id']}] název='{$a['nazev']}' typ='{$a['typ']}' místo='" .
+                ($a['misto'] ?? '') . "' organizator='" . ($a['organizator'] ?? '') . "'" .
+                ($datumStr ? " datum='{$datumStr}'" : '') .
+                " popis='" . mb_substr((string) ($a['popis'] ?? ''), 0, 300) . "'";
+        }
+        $seznam = implode("\n", $polozky);
+
+        $userPrompt = <<<PROMPT
+Pro každou akci v seznamu rozhodni vhodne_pro_stankare (true/false) a stručný důvod (jen když false, 2-5 slov).
+
+{$seznam}
+
+Vrať JSON pole formátu:
+[{"id": 123, "vhodne": true}, {"id": 456, "vhodne": false, "duvod": "klubový koncert"}, ...]
+PROMPT;
+
+        try {
+            $response = Http::withHeaders([
+                'x-api-key' => $this->apiKey,
+                'anthropic-version' => '2023-06-01',
+                'content-type' => 'application/json',
+            ])->timeout(120)->post('https://api.anthropic.com/v1/messages', [
+                'model' => $this->model,
+                'max_tokens' => 4096,
+                'system' => $systemPrompt,
+                'messages' => [['role' => 'user', 'content' => $userPrompt]],
+            ]);
+
+            if (!$response->successful()) {
+                Log::error('AI bulk classify failed', ['status' => $response->status()]);
+                return null;
+            }
+
+            $usage = $response->json('usage', []);
+            $this->logAiVolani(
+                (int) ($usage['input_tokens'] ?? 0),
+                (int) ($usage['output_tokens'] ?? 0),
+                (int) ($usage['cache_creation_input_tokens'] ?? 0),
+                (int) ($usage['cache_read_input_tokens'] ?? 0),
+                true, null,
+            );
+
+            $content = (string) $response->json('content.0.text', '');
+            // Vystřihnout JSON pole
+            if (preg_match('/\[\s*\{.*\}\s*\]/s', $content, $m)) {
+                $content = $m[0];
+            }
+            $arr = json_decode($content, true);
+            if (!is_array($arr)) {
+                Log::warning('AI bulk classify: invalid JSON response', ['content' => mb_substr($content, 0, 500)]);
+                return null;
+            }
+
+            $vysledek = [];
+            foreach ($arr as $row) {
+                if (!isset($row['id'])) continue;
+                $vysledek[(int) $row['id']] = [
+                    'vhodne' => (bool) ($row['vhodne'] ?? true),
+                    'duvod' => $row['duvod'] ?? null,
+                ];
+            }
+            return $vysledek;
+        } catch (\Throwable $e) {
+            Log::error("AI bulk classify exception: {$e->getMessage()}");
+            return null;
+        }
+    }
+
     /** Uložit záznam o AI volání do tabulky ai_volani. */
     protected function logAiVolani(int $input, int $output, int $cacheWrite, int $cacheRead, bool $uspech, ?string $chyba): void
     {
