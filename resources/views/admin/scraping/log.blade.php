@@ -15,11 +15,30 @@
                 </span>
             </div>
 
-            <div class="grid grid-cols-5 gap-3 text-center">
-                <div class="rounded bg-gray-50 p-3">
-                    <div class="text-2xl font-bold text-gray-800">{{ $log->pocet_nalezenych }}</div>
-                    <div class="text-xs text-gray-500">Nalezených</div>
+            @php
+                $limit = (int) ($log->limit_pouzity ?? 0);
+                $zpracovano = $log->pocet_zpracovanych;
+                $rezim = $limit > 0 ? "Test (limit {$limit})" : 'Plný scraping';
+            @endphp
+
+            <div class="rounded bg-gray-50 border border-gray-200 p-3 text-sm">
+                <div class="flex flex-wrap items-baseline justify-between gap-3">
+                    <div>
+                        <span class="font-medium text-gray-700">Režim:</span>
+                        <strong>{{ $rezim }}</strong>
+                    </div>
+                    <div class="text-gray-600">
+                        <span>V sitemapu / listingu nalezeno <strong>{{ number_format($log->pocet_nalezenych, 0, ',', ' ') }}</strong> URL</span>
+                        <span class="mx-2 text-gray-400">·</span>
+                        <span>zpracováno <strong>{{ $zpracovano }}</strong></span>
+                        @if($limit > 0 && $log->pocet_nalezenych > $limit)
+                            <span class="ml-2 text-xs text-gray-500">(zbývá {{ $log->pocet_nalezenych - $zpracovano }} pro plný běh)</span>
+                        @endif
+                    </div>
                 </div>
+            </div>
+
+            <div class="grid grid-cols-4 gap-3 text-center">
                 <div class="rounded bg-green-50 p-3">
                     <div class="text-2xl font-bold text-green-700">{{ $log->pocet_novych }}</div>
                     <div class="text-xs text-gray-500">Nových</div>

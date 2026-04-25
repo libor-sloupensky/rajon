@@ -18,6 +18,7 @@ class ScrapingLog extends Model
         'zacatek',
         'konec',
         'stav',
+        'limit_pouzity',
         'pocet_nalezenych',
         'pocet_novych',
         'pocet_aktualizovanych',
@@ -27,6 +28,15 @@ class ScrapingLog extends Model
         'statistiky',
         'vytvoreno',
     ];
+
+    /** Skutečně zpracovaných URL (součet všech stavů). */
+    public function getPocetZpracovanychAttribute(): int
+    {
+        return (int) ($this->pocet_novych
+            + $this->pocet_aktualizovanych
+            + $this->pocet_preskocenych
+            + $this->pocet_chyb);
+    }
 
     protected function casts(): array
     {

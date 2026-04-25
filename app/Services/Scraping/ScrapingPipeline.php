@@ -39,6 +39,7 @@ class ScrapingPipeline
             'zdroj_id' => $zdroj->id,
             'zacatek' => now(),
             'stav' => 'probiha',
+            'limit_pouzity' => $limit ?: 0,
             'vytvoreno' => now(),
         ]);
 
