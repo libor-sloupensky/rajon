@@ -1,0 +1,15 @@
+{
+    "Hello!": "Dobrý den,",
+    "Whoops!": "Jejda!",
+    "Regards": "S pozdravem",
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "Pokud se vám tlačítko „:actionText\" nedaří otevřít, zkopírujte následující odkaz a vložte ho do prohlížeče:",
+    "© :year :name. All rights reserved.": "© :year :name. Všechna práva vyhrazena.",
+    "All rights reserved.": "Všechna práva vyhrazena.",
+    "Reset Password Notification": "Obnovení hesla",
+    "You are receiving this email because we received a password reset request for your account.": "Tento e-mail jste obdrželi, protože jsme dostali žádost o obnovení hesla k vašemu účtu.",
+    "This password reset link will expire in :count minutes.": "Platnost odkazu pro obnovení hesla vyprší za :count minut.",
+    "If you did not request a password reset, no further action is required.": "Pokud jste o obnovení hesla nežádali, není potřeba dělat nic dalšího.",
+    "Verify Email Address": "Ověřit e-mail",
+    "Please click the button below to verify your email address.": "Pro ověření e-mailové adresy klikněte na tlačítko níže.",
+    "If you did not create an account, no further action is required.": "Pokud jste si účet nezakládali, není potřeba dělat nic dalšího."
+}
