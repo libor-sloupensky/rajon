@@ -178,20 +178,24 @@ class ScrapingPipeline
         }));
 
         // (b) DB filter — URL už máme s akcí, jejíž datum proběhlo
+        // Pozn.: kvalifikované názvy sloupců (akce_zdroje.X / akce.X), protože
+        // po JOIN by zdroj_id i url byly ambiguous.
         $existujici = \App\Models\AkceZdroj::query()
-            ->where('zdroj_id', $zdroj->id)
-            ->whereIn('url', $urls)
             ->join('akce', 'akce_zdroje.akce_id', '=', 'akce.id')
+            ->where('akce_zdroje.zdroj_id', $zdroj->id)
+            ->whereIn('akce_zdroje.url', $urls)
             ->where(function ($q) use ($dnes) {
-                $q->whereNotNull('akce.datum_do')
-                  ->whereDate('akce.datum_do', '<', $dnes);
-            })
-            ->orWhere(function ($q) use ($dnes, $zdroj, $urls) {
-                $q->where('akce_zdroje.zdroj_id', $zdroj->id)
-                  ->whereIn('akce_zdroje.url', $urls)
-                  ->whereNull('akce.datum_do')
-                  ->whereNotNull('akce.datum_od')
-                  ->whereDate('akce.datum_od', '<', $dnes);
+                // Buď akce má datum_do v minulosti
+                $q->where(function ($q2) use ($dnes) {
+                    $q2->whereNotNull('akce.datum_do')
+                       ->whereDate('akce.datum_do', '<', $dnes);
+                })
+                // Nebo nemá datum_do, ale datum_od je v minulosti (jednodenní akce)
+                ->orWhere(function ($q2) use ($dnes) {
+                    $q2->whereNull('akce.datum_do')
+                       ->whereNotNull('akce.datum_od')
+                       ->whereDate('akce.datum_od', '<', $dnes);
+                });
             })
             ->pluck('akce_zdroje.url')
             ->all();
