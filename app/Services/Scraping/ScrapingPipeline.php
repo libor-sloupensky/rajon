@@ -357,6 +357,13 @@ class ScrapingPipeline
             } catch (\Exception) { /* ignoruj chyby parsování */ }
         }
 
+        // 2b1. AI rozhodnutí o vhodnosti pro stánkaře — PRIMÁRNÍ filtr
+        // (AI má více kontextu než hardkódovaná pravidla)
+        if (isset($data['vhodne_pro_stankare']) && $data['vhodne_pro_stankare'] === false) {
+            $duvod = $data['duvod_nevhodnosti'] ?? 'AI ohodnotila jako nevhodnou';
+            return ['stav' => 'preskoceny', 'duvod' => "AI: {$duvod}"];
+        }
+
         // 2c. Filter ignorovaných typů (např. divadlo — nestánkařské, indoor)
         $normalizovanyTyp = $this->normalizujTyp($data['typ'] ?? 'jiny');
         $ignorovaneTypy = (array) config('scraping.ignorovane_typy', []);

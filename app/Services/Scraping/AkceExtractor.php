@@ -114,6 +114,31 @@ DŮLEŽITÁ PRAVIDLA:
   Pokud má v názvu "pouť", "pout", musí být "pout". Při pochybnostech radši zvol
   typ="jine" než nesprávný.
 
+KRITICKÉ POLE — vhodne_pro_stankare:
+WormUP jsou stánkaři, kteří prodávají na veřejných outdoor akcích. Vhodné jsou jen:
+- Pouti, hody, slavnosti, městské akce, festivaly (outdoor, masové, veřejné)
+- Trhy a jarmarky (vč. vnitřních prostor — vánoční trhy v halách OK)
+- Sportovní akce (závody, turnaje s diváky)
+- Food festivaly, vinobraní, obraní, gastrofestivaly
+
+NEVHODNÉ (vrať vhodne_pro_stankare=false):
+- Klubové koncerty (Jazz Dock, hudební klub) — i když AI typ='slavnosti' nebo 'koncert'
+- Galerie, muzea, expozice, výstavy obrazů (i v exteriéru muzea)
+- Divadelní představení, opery, baletní vystoupení
+- Přednášky, besedy, prezentace, autorské čtení
+- Kurzy, workshopy, lekce, dílny, školení (i pro děti)
+- Komorní vystoupení, recitály, autorské večery
+- Akce pro uzavřené skupiny (členové klubu, žáci školy)
+- Prohlídky (zámky, kostely, města)
+- Dlouhodobé výstavy a expozice (víc než 14 dní)
+- Indoor akce v sálech, divadlech, kinech, kostelech, knihovnách
+
+Při rozhodování zvažuj:
+- Místo: outdoor (náměstí, park, areál) = OK; indoor (klub, sál, galerie) = většinou NE
+- Trvání: dlouhodobé (víc než 2 týdny) = NE
+- Charakter: masová veřejná akce = OK; komorní/exkluzivní = NE
+- Cílovka: každý kdo přijde = OK; jen registrovaní/specifická skupina = NE
+
 Formát odpovědi: POUZE platný JSON objekt, bez úvodního/závěrečného textu, bez markdown bloku.
 PROMPT;
 
@@ -142,6 +167,8 @@ Z následujícího textu stránky o akci extrahuj JSON s tímto schématem:
   "web_url": "oficiální web akce",
   "vstupne": "cena pro návštěvníka (text — 'zdarma', '150 Kč', null)",
   "popis": "1-2 věty max — stručně o čem akce je",
+  "vhodne_pro_stankare": true | false (true = veřejná masová outdoor akce s prostorem pro stánky; false = klub/galerie/muzeum/divadlo/přednáška/kurz/komorní akce — viz pravidla výše),
+  "duvod_nevhodnosti": "krátký důvod 2-5 slov, jen když vhodne_pro_stankare=false (např. 'klubový koncert', 'expozice galerie', 'prohlídka zámku')",
   "rocnik": "číslo ročníku, např. 25, nebo null",
   "velikost_info": "1-2 věty max — konkrétní fakta (návštěvnost, stánkaři, plocha). Pokud nic konkrétního není, null.",
   "velikost_signaly": {
