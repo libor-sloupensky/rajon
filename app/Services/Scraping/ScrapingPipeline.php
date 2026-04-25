@@ -708,12 +708,14 @@ class ScrapingPipeline
     protected function normalizujTyp(string $typ): string
     {
         $mapping = [
+            // Velké veřejné akce (WormUP target)
             'pout' => 'pout',
             'food_festival' => 'food_festival',
             'vinobrani' => 'vinobrani',
             'dynobrani' => 'dynobrani',
             'farmarske_trhy' => 'farmarske_trhy',
             'vanocni_trhy' => 'vanocni_trhy',
+            'velikonocni_trhy' => 'velikonocni_trhy',
             'jarmark' => 'jarmark',
             'festival' => 'festival',
             'hudebni_festival' => 'festival',
@@ -722,7 +724,17 @@ class ScrapingPipeline
             'hody' => 'slavnosti',
             'dny_mesta' => 'slavnosti',
             'obecni_slavnosti' => 'slavnosti',
-            'velikonocni_trhy' => 'jarmark',
+            'slavnosti' => 'slavnosti',
+
+            // Sportovní
+            'sportovni' => 'sportovni_akce',
+            'sportovni_akce' => 'sportovni_akce',
+
+            // Doplňkové (nejsou primárně WormUP cíl, ale zachováváme info)
+            'koncert' => 'koncert',
+            'divadlo' => 'divadlo',
+            'vystava' => 'vystava',
+            'workshop' => 'workshop',
         ];
         return $mapping[$typ] ?? 'jiny';
     }

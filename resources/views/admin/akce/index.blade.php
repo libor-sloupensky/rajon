@@ -28,11 +28,11 @@
                     <div>
                         <div class="flex items-center gap-2 mb-1">
                             <a href="{{ route('admin.akce.edit', $a) }}" class="font-medium text-gray-800 hover:text-primary">{{ $a->nazev }}</a>
-                            <span class="rounded-full px-2 py-0.5 text-xs font-medium
-                                {{ $a->stav === 'overena' ? 'bg-green-100 text-green-700' :
-                                   ($a->stav === 'zrusena' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700') }}">
-                                {{ $a->stav }}
-                            </span>
+                            @if($a->stav === 'zrusena')
+                                <span class="rounded-full bg-red-100 text-red-700 px-2 py-0.5 text-xs font-medium">zrušena</span>
+                            @elseif($a->stav === 'navrh')
+                                <span class="rounded-full bg-yellow-100 text-yellow-700 px-2 py-0.5 text-xs font-medium">návrh</span>
+                            @endif
                             @if($a->velikost_stav === 'ano')
                                 <span class="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium" style="color: var(--c-primary);">velká akce ({{ $a->velikost_skore }})</span>
                             @elseif($a->velikost_stav === 'nejasna')

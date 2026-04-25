@@ -17,7 +17,7 @@
             <label class="block text-xs text-gray-500 mb-1">Typ</label>
             <select name="typ" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
                 <option value="">Všechny</option>
-                @foreach(['pout' => 'Pouť', 'food_festival' => 'Food festival', 'slavnosti' => 'Slavnosti', 'vinobrani' => 'Vinobraní', 'dynobrani' => 'Dýňobraní', 'farmarske_trhy' => 'Farmářské trhy', 'vanocni_trhy' => 'Vánoční trhy', 'jarmark' => 'Jarmark', 'festival' => 'Festival', 'jiny' => 'Jiný'] as $val => $label)
+                @foreach(['pout' => 'Pouť', 'food_festival' => 'Food festival', 'slavnosti' => 'Slavnosti', 'vinobrani' => 'Vinobraní', 'dynobrani' => 'Dýňobraní', 'farmarske_trhy' => 'Farmářské trhy', 'vanocni_trhy' => 'Vánoční trhy', 'velikonocni_trhy' => 'Velikonoční trhy', 'jarmark' => 'Jarmark', 'festival' => 'Festival', 'sportovni_akce' => 'Sportovní akce', 'koncert' => 'Koncert', 'divadlo' => 'Divadlo', 'vystava' => 'Výstava', 'workshop' => 'Workshop', 'jiny' => 'Jiný'] as $val => $label)
                     <option value="{{ $val }}" {{ request('typ') === $val ? 'selected' : '' }}>{{ $label }}</option>
                 @endforeach
             </select>
@@ -41,28 +41,30 @@
     @else
         <div class="space-y-3">
             @foreach($akce as $a)
-                <a href="{{ route('akce.show', $a) }}" class="block rounded-lg border border-gray-200 bg-white p-4 hover:border-primary transition">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <h2 class="font-medium text-gray-800">{{ $a->nazev }}</h2>
+                <div class="rounded-lg border border-gray-200 bg-white p-4 hover:border-primary transition">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="min-w-0 flex-1">
+                            <h2 class="font-medium text-gray-800">
+                                <a href="{{ route('akce.show', $a) }}" class="hover:text-primary">{{ $a->nazev }}</a>
+                            </h2>
                             <p class="text-sm text-gray-500">{{ $a->misto }} {{ $a->okres ? '(' . $a->okres . ')' : '' }}</p>
                             @if($a->organizator)
                                 <p class="text-xs text-gray-400 mt-1">Organizátor: {{ $a->organizator }}</p>
                             @endif
                         </div>
-                        <div class="text-right text-sm shrink-0 ml-4">
+                        <div class="text-right text-sm shrink-0">
                             <div class="font-medium" style="color: var(--c-primary);">
                                 {{ $a->datum_od?->format('j. n. Y') }}
                                 @if($a->datum_do && $a->datum_do->ne($a->datum_od))
                                     — {{ $a->datum_do->format('j. n.') }}
                                 @endif
                             </div>
-                            @if($a->typ !== 'jiny')
+                            @if($a->typ && $a->typ !== 'jiny')
                                 <span class="inline-block mt-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium" style="color: var(--c-primary);">{{ str_replace('_', ' ', $a->typ) }}</span>
                             @endif
                         </div>
                     </div>
-                </a>
+                </div>
             @endforeach
         </div>
 

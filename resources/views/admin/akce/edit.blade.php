@@ -68,7 +68,7 @@
                     'stav' => 'Stav',
                     'poznamka' => 'Poznámka',
                 ];
-                $typy = ['pout' => 'Pouť', 'food_festival' => 'Food festival', 'slavnosti' => 'Slavnosti', 'vinobrani' => 'Vinobraní', 'dynobrani' => 'Dýňobraní', 'farmarske_trhy' => 'Farmářské trhy', 'vanocni_trhy' => 'Vánoční trhy', 'jarmark' => 'Jarmark', 'festival' => 'Festival', 'jiny' => 'Jiný'];
+                $typy = ['pout' => 'Pouť', 'food_festival' => 'Food festival', 'slavnosti' => 'Slavnosti', 'vinobrani' => 'Vinobraní', 'dynobrani' => 'Dýňobraní', 'farmarske_trhy' => 'Farmářské trhy', 'vanocni_trhy' => 'Vánoční trhy', 'velikonocni_trhy' => 'Velikonoční trhy', 'jarmark' => 'Jarmark', 'festival' => 'Festival', 'sportovni_akce' => 'Sportovní akce', 'koncert' => 'Koncert', 'divadlo' => 'Divadlo', 'vystava' => 'Výstava', 'workshop' => 'Workshop', 'jiny' => 'Jiný'];
                 $stavy = ['navrh' => 'Návrh', 'overena' => 'Ověřená', 'zrusena' => 'Zrušená'];
             @endphp
 

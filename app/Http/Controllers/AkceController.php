@@ -12,7 +12,8 @@ class AkceController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Akce::where('stav', 'overena');
+        // Zobrazujeme všechny akce kromě zrušených
+        $query = Akce::where('stav', '!=', 'zrusena');
 
         if ($request->filled('hledat')) {
             $query->where('nazev', 'like', '%' . $request->hledat . '%');
@@ -55,7 +56,7 @@ class AkceController extends Controller
 
     public function mapa(Request $request)
     {
-        $akce = Akce::where('stav', 'overena')
+        $akce = Akce::where('stav', '!=', 'zrusena')
             ->whereNotNull('gps_lat')
             ->whereNotNull('gps_lng')
             ->where('datum_od', '>=', now())
@@ -66,7 +67,7 @@ class AkceController extends Controller
 
     public function mapaJson(Request $request)
     {
-        $akce = Akce::where('stav', 'overena')
+        $akce = Akce::where('stav', '!=', 'zrusena')
             ->whereNotNull('gps_lat')
             ->whereNotNull('gps_lng')
             ->where('datum_od', '>=', now())
