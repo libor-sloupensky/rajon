@@ -150,9 +150,7 @@
                                     <span class="rounded-full bg-yellow-100 text-yellow-700 px-2 py-0.5 text-xs font-medium">návrh</span>
                                 @endif
                                 @if($a->velikost_stav === 'ano')
-                                    <span class="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium" style="color: var(--c-primary);">velká akce ({{ $a->velikost_skore }})</span>
-                                @elseif($a->velikost_stav === 'nejasna')
-                                    <span class="rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">nejasná ({{ $a->velikost_skore }})</span>
+                                    <span class="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium" style="color: var(--c-primary);" title="AI klasifikovala akci jako velkou (skóre {{ $a->velikost_skore }})">velká akce</span>
                                 @endif
                                 @if(!empty($manualniPole))
                                     <span class="text-xs text-gray-500" title="Manuálně upravená pole: {{ implode(', ', $manualniPole) }}">🔒 {{ count($manualniPole) }}</span>
@@ -180,17 +178,20 @@
                         </div>
 
                         <div class="flex flex-col items-end gap-1 shrink-0">
-                            {{-- Palec hodnocení --}}
+                            {{-- Palec hodnocení (inline styly — Tailwind nekompiluje dynamické :class) --}}
                             <div class="flex gap-1">
                                 <button type="button" @click="setPalec('nahoru')"
-                                    :class="palec === 'nahoru' ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400 hover:bg-green-100'"
-                                    class="w-7 h-7 rounded-full text-sm flex items-center justify-center transition" title="Líbí se mi (nahoru v seznamu)">👍</button>
+                                    :style="palec === 'nahoru' ? 'background-color:#22c55e;color:#fff;border-color:#16a34a;' : ''"
+                                    class="w-7 h-7 rounded-full text-sm flex items-center justify-center border border-gray-200 bg-gray-100 transition"
+                                    title="Líbí se mi (nahoru v seznamu)">👍</button>
                                 <button type="button" @click="setPalec('stred')"
-                                    :class="palec === 'stred' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-400 hover:bg-orange-100'"
-                                    class="w-7 h-7 rounded-full text-sm flex items-center justify-center transition" title="Možná (níž v seznamu)">👉</button>
+                                    :style="palec === 'stred' ? 'background-color:#f97316;color:#fff;border-color:#ea580c;' : ''"
+                                    class="w-7 h-7 rounded-full text-sm flex items-center justify-center border border-gray-200 bg-gray-100 transition"
+                                    title="Možná (uprostřed seznamu)">👉</button>
                                 <button type="button" @click="setPalec('dolu')"
-                                    :class="palec === 'dolu' ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-400 hover:bg-red-100'"
-                                    class="w-7 h-7 rounded-full text-sm flex items-center justify-center transition" title="Nezajímá mě (dole)">👎</button>
+                                    :style="palec === 'dolu' ? 'background-color:#ef4444;color:#fff;border-color:#dc2626;' : ''"
+                                    class="w-7 h-7 rounded-full text-sm flex items-center justify-center border border-gray-200 bg-gray-100 transition"
+                                    title="Nezajímá mě (dole)">👎</button>
                             </div>
                             <button type="button" @click="open = !open"
                                 class="rounded-lg border border-gray-300 px-3 py-1 text-xs text-gray-600 hover:bg-gray-50">

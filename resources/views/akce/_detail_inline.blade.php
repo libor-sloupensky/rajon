@@ -45,6 +45,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm"
      x-data="{
         editPole: null,
+        tempVal: '',
         startEdit(pole, val) { this.editPole = pole; this.tempVal = val ?? ''; },
         async ulozPole(pole) {
             const fd = new FormData();
@@ -54,7 +55,8 @@
             fd.append('hodnota', this.tempVal ?? '');
             const r = await fetch('{{ route('akce.inline', $a) }}', { method: 'POST', body: fd });
             if (r.ok) {
-                document.getElementById('val-' + pole + '-{{ $a->id }}').textContent = this.tempVal || '—';
+                const valEl = document.getElementById('val-' + pole + '-{{ $a->id }}');
+                if (valEl) valEl.textContent = this.tempVal || '—';
                 this.editPole = null;
             } else {
                 alert('Chyba při ukládání');
@@ -76,42 +78,47 @@
             $hodnotaZobrazit = $hodnotaZobrazit ?: '—';
             $isLocked = isset(($a->pole_manualni ?? [])[$pole]);
         @endphp
-        <div class="py-0.5">
-            <span class="text-xs text-gray-500">{{ $label }}:</span>
-            <div x-show="editPole !== '{{ $pole }}'" class="inline-flex items-center gap-1">
-                <span id="val-{{ $pole }}-{{ $a->id }}" class="text-gray-700">{{ $hodnotaZobrazit }}</span>
-                @if($isLocked)<span class="text-xs text-orange-500" title="manuálně upraveno">🔒</span>@endif
-                <button type="button" @click="startEdit('{{ $pole }}', @js((string) $hodnota))"
-                    class="text-gray-400 hover:text-primary text-xs ml-1" title="Upravit">✏️</button>
+        <div class="group">
+            {{-- Display mode: celý řádek (label + hodnota) je klikatelný; tužka jen na hover --}}
+            <div x-show="editPole !== '{{ $pole }}'"
+                 @click="startEdit('{{ $pole }}', @js((string) $hodnota))"
+                 class="py-0.5 px-1 -mx-1 rounded cursor-pointer hover:bg-gray-50 flex items-center gap-1">
+                <span class="text-xs text-gray-500">{{ $label }}:</span>
+                <span id="val-{{ $pole }}-{{ $a->id }}" class="text-gray-700 flex-1 truncate">{{ $hodnotaZobrazit }}</span>
+                @if($isLocked)<span class="text-xs text-orange-500 shrink-0" title="manuálně upraveno">🔒</span>@endif
+                <span class="text-gray-400 text-xs shrink-0 opacity-0 group-hover:opacity-100 transition" title="Upravit">✏️</span>
             </div>
-            <div x-show="editPole === '{{ $pole }}'" x-cloak class="inline-flex items-center gap-1">
+
+            {{-- Edit mode --}}
+            <div x-show="editPole === '{{ $pole }}'" x-cloak class="py-0.5 px-1 flex items-center gap-1">
+                <span class="text-xs text-gray-500">{{ $label }}:</span>
                 @if($typInput === 'select')
-                    <select x-model="tempVal" class="rounded border border-gray-300 px-1 py-0.5 text-xs">
+                    <select x-model="tempVal" @click.stop class="rounded border border-gray-300 px-1 py-0.5 text-xs">
                         @foreach($typyOpts as $v => $l)
                             <option value="{{ $v }}">{{ $l }}</option>
                         @endforeach
                     </select>
                 @elseif($typInput === 'select-kraj')
-                    <select x-model="tempVal" class="rounded border border-gray-300 px-1 py-0.5 text-xs">
+                    <select x-model="tempVal" @click.stop class="rounded border border-gray-300 px-1 py-0.5 text-xs">
                         <option value="">—</option>
                         @foreach($krajeOpts as $k)
                             <option value="{{ $k }}">{{ $k }}</option>
                         @endforeach
                     </select>
                 @elseif($typInput === 'select-stav')
-                    <select x-model="tempVal" class="rounded border border-gray-300 px-1 py-0.5 text-xs">
+                    <select x-model="tempVal" @click.stop class="rounded border border-gray-300 px-1 py-0.5 text-xs">
                         @foreach($stavyOpts as $v => $l)
                             <option value="{{ $v }}">{{ $l }}</option>
                         @endforeach
                     </select>
                 @elseif($typInput === 'textarea')
-                    <textarea x-model="tempVal" rows="2" class="rounded border border-gray-300 px-1 py-0.5 text-xs w-64"></textarea>
+                    <textarea x-model="tempVal" @click.stop rows="2" class="rounded border border-gray-300 px-1 py-0.5 text-xs w-64"></textarea>
                 @else
-                    <input type="{{ $typInput }}" x-model="tempVal"
+                    <input type="{{ $typInput }}" x-model="tempVal" @click.stop @keydown.enter="ulozPole('{{ $pole }}')"
                         class="rounded border border-gray-300 px-1 py-0.5 text-xs">
                 @endif
-                <button type="button" @click="ulozPole('{{ $pole }}')" class="text-green-600 text-sm">✓</button>
-                <button type="button" @click="editPole = null" class="text-red-500 text-sm">✕</button>
+                <button type="button" @click.stop="ulozPole('{{ $pole }}')" class="text-green-600 text-sm" title="Uložit">✓</button>
+                <button type="button" @click.stop="editPole = null" class="text-red-500 text-sm" title="Zrušit">✕</button>
             </div>
         </div>
     @endforeach
