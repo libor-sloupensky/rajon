@@ -24,13 +24,27 @@ class ScrapingController extends Controller
         $zdroje = Zdroj::withCount('akce')->orderBy('nazev')->get();
         $posledniLogy = ScrapingLog::with('zdroj')->orderBy('zacatek', 'desc')->take(10)->get();
 
+        // Stav scrapingu: probíhá / dokončeno
+        $bezi = ScrapingLog::where('stav', 'probiha')
+            ->where('zacatek', '>=', now()->subMinutes(15))   // jen čerstvé (nebo zombie z timeoutu)
+            ->with('zdroj')
+            ->get();
+
+        // Posledni cron (po zdrojích) — kdy byl naposled úspěšný scrape
+        $posledniDokonceni = $zdroje->mapWithKeys(fn ($z) => [$z->id => [
+            'nazev' => $z->nazev,
+            'kdy' => $z->posledni_scraping,
+            'frekvence_hodin' => $z->frekvence_hodin,
+        ]]);
+
         // Cost statistiky — dnešek, týden, měsíc + per uživatel
         $kurz = (float) config('scraping.kurz_usd_czk', 24);
         $statsZakladni = $this->statsAi();
         $statsPerUzivatel = $this->statsPerUzivatel();
 
         return view('admin.scraping.index', compact(
-            'zdroje', 'posledniLogy', 'statsZakladni', 'statsPerUzivatel', 'kurz'
+            'zdroje', 'posledniLogy', 'bezi', 'posledniDokonceni',
+            'statsZakladni', 'statsPerUzivatel', 'kurz'
         ));
     }
 

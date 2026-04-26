@@ -1,9 +1,78 @@
 <x-layouts.app title="Scraping — Rajón">
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-bold text-gray-800">Scraping zdrojů</h1>
-        <a href="{{ route('admin.scraping.create') }}" class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark transition">
-            + Přidat zdroj
-        </a>
+        <div class="flex gap-2 items-center">
+            <button type="button" onclick="location.reload()" class="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50" title="Obnovit stav">↻ Obnovit</button>
+            <a href="{{ route('admin.scraping.create') }}" class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark transition">
+                + Přidat zdroj
+            </a>
+        </div>
+    </div>
+
+    {{-- Stav scrapingu — souhrn nahoře --}}
+    <div class="mb-6 rounded-lg border border-gray-200 bg-white p-4">
+        <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Stav scrapingu</h2>
+
+        @if($bezi->isNotEmpty())
+            <div class="rounded-lg bg-blue-50 border border-blue-200 p-3 mb-3">
+                <p class="text-sm font-medium text-blue-800">
+                    🔄 Běží scraping
+                    <span class="text-xs font-normal text-blue-600 ml-2">
+                        (stránka se obnoví za <span id="rj-refresh-sec">30</span> s)
+                    </span>
+                </p>
+                <ul class="mt-2 text-xs text-blue-700 space-y-0.5">
+                    @foreach($bezi as $log)
+                        <li>
+                            <strong>{{ $log->zdroj->nazev }}</strong> — začalo {{ $log->zacatek?->diffForHumans() }},
+                            zatím {{ $log->pocet_novych ?? 0 }} nových / {{ $log->pocet_aktualizovanych ?? 0 }} upd.
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+            <script>
+                // Auto-refresh za 30 s, pokud něco běží
+                (function () {
+                    var s = 30;
+                    var el = document.getElementById('rj-refresh-sec');
+                    var timer = setInterval(function () {
+                        s--;
+                        if (el) el.textContent = s;
+                        if (s <= 0) { clearInterval(timer); location.reload(); }
+                    }, 1000);
+                })();
+            </script>
+        @else
+            <p class="text-sm text-green-700">✅ Žádný scraping aktuálně neběží — vše je dokončeno.</p>
+        @endif
+
+        {{-- Per zdroj: kdy bude další běh --}}
+        <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+            @foreach($posledniDokonceni as $z)
+                @php
+                    $kdy = $z['kdy'];
+                    $hodPred = $kdy ? max(0, abs(now()->diffInHours($kdy, false))) : null;
+                    $dalsi = $kdy ? $hodPred >= $z['frekvence_hodin'] : true;
+                @endphp
+                <div class="rounded bg-gray-50 p-2 border border-gray-100">
+                    <div class="font-medium text-gray-800">{{ $z['nazev'] }}</div>
+                    <div class="text-gray-500">
+                        @if($kdy)
+                            Naposled: <span title="{{ $kdy->format('j. n. Y H:i') }}">{{ $kdy->diffForHumans() }}</span>
+                        @else
+                            Nikdy
+                        @endif
+                    </div>
+                    <div class="{{ $dalsi ? 'text-orange-600' : 'text-gray-400' }}">
+                        @if($dalsi)
+                            Další cron běh: připraveno
+                        @else
+                            Další za {{ $z['frekvence_hodin'] - $hodPred }} h
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        </div>
     </div>
 
     {{-- Cost widget — náklady na AI extrakce --}}
