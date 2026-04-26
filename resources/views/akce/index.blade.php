@@ -8,24 +8,10 @@
     @endphp
 
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">
-            Katalog akcí
-            <span class="text-base font-normal text-gray-500 ml-2">
-                @if($maFiltr)
-                    nalezeno {{ $akce->total() }}
-                @else
-                    celkem {{ $akce->total() }}
-                @endif
-            </span>
-        </h1>
-        <div class="flex gap-2">
-            <a href="{{ url('/mapa') }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
-                Mapa
-            </a>
-            <a href="{{ route('akce.create') }}" class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark transition">
-                + Nová akce
-            </a>
-        </div>
+        <h1 class="text-2xl font-bold text-gray-800">Katalog akcí</h1>
+        <a href="{{ route('akce.create') }}" class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark transition">
+            + Nová akce
+        </a>
     </div>
 
     @if(session('success'))
@@ -119,10 +105,24 @@
                 Filtrovat
             </button>
             @if($maFiltr || request()->boolean('moje_rezervovane'))
-                <a href="{{ url('/akce') }}" class="text-xs text-gray-500 hover:text-primary">Zrušit</a>
+                <a href="{{ url('/akce?_clear=1') }}" class="text-xs text-gray-500 hover:text-primary">Zrušit</a>
             @endif
         </div>
     </form>
+
+    {{-- Souhrn + odkaz na mapu --}}
+    <div class="flex items-center justify-between mb-3">
+        <p class="text-sm text-gray-600">
+            @if($maFiltr)
+                Nalezeno <strong>{{ $akce->total() }}</strong> akcí
+            @else
+                Celkem <strong>{{ $akce->total() }}</strong> akcí
+            @endif
+        </p>
+        <a href="{{ url('/mapa') }}" class="text-sm text-primary hover:text-primary-dark">
+            🗺️ Zobrazit akce na mapě
+        </a>
+    </div>
 
     {{-- Seznam akcí --}}
     @if($akce->isEmpty())

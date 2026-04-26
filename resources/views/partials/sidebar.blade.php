@@ -21,10 +21,15 @@
             <div class="rj-sidebar-section rounded-lg border border-primary bg-primary/5 ring-1 ring-primary p-1">
                 <div class="px-2 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Akce</div>
                 <div class="rj-sidebar-section-body" style="max-height: 20rem;">
+                    @php
+                        $jeKatalog = (request()->is('akce') || request()->is('akce/*')) && !request()->boolean('moje_rezervovane');
+                        $jeMojeRez = (request()->is('akce') || request()->is('akce/*')) && request()->boolean('moje_rezervovane');
+                        $jeMapa = request()->is('mapa');
+                    @endphp
                     <a href="{{ url('/dashboard') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('dashboard') ? 'active' : '' }}">Dashboard</a>
-                    <a href="{{ url('/akce') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('akce.*') ? 'active' : '' }}">Katalog akcí</a>
-                    <a href="{{ url('/akce?moje_rezervovane=1') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->boolean('moje_rezervovane') ? 'active' : '' }}">Moje rezervované</a>
-                    <a href="{{ url('/mapa') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('mapa') ? 'active' : '' }}">Mapa</a>
+                    <a href="{{ url('/akce') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ $jeKatalog ? 'active' : '' }}">Katalog akcí</a>
+                    <a href="{{ url('/akce?moje_rezervovane=1') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ $jeMojeRez ? 'active' : '' }}">Moje rezervované</a>
+                    <a href="{{ url('/mapa') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ $jeMapa ? 'active' : '' }}">Mapa</a>
                 </div>
             </div>
 

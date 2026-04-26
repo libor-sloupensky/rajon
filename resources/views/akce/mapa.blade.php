@@ -1,7 +1,17 @@
 <x-layouts.app title="Mapa akcí — Rajón" :fullWidth="true">
     <div class="flex flex-col h-[calc(100vh-5rem)]">
         <div class="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200">
-            <h1 class="text-lg font-bold text-gray-800">Mapa akcí</h1>
+            <div>
+                <h1 class="text-lg font-bold text-gray-800">Mapa akcí</h1>
+                @if(!empty($f) && count($f) > 0)
+                    <p class="text-xs text-gray-500 mt-0.5">
+                        Aplikován filtr z katalogu:
+                        @foreach($f as $k => $v)
+                            @if($v)<span class="rounded bg-gray-100 px-1.5 py-0.5 text-xs ml-1">{{ $k }}: {{ is_bool($v) ? 'ano' : $v }}</span>@endif
+                        @endforeach
+                    </p>
+                @endif
+            </div>
             <div class="text-sm text-gray-600">
                 <span id="mapa-pocet">{{ count($akce) }}</span> akcí
                 <a href="{{ url('/akce') }}" class="ml-4 text-primary hover:text-primary-dark">Seznam</a>

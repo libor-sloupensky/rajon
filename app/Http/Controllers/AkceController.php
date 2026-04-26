@@ -12,22 +12,25 @@ use Illuminate\Support\Str;
 
 class AkceController extends Controller
 {
-    /** Sjednocený katalog + správa. Každý přihlášený smí editovat. */
-    public function index(Request $request)
-    {
-        $query = Akce::query();
+    /** Klíče filtru (persistované v uzivatele.akce_filtr). */
+    private const FILTR_KLICE = ['hledat', 'typ', 'kraj', 'datum_od', 'datum_do',
+                                  'stav', 'vse', 'moje_rezervovane', 'radius'];
 
+    /**
+     * Aplikuje filtrační parametry na query. Sdíleno mezi index a mapa.
+     * @param array $f filter params (z Request->only nebo user.akce_filtr)
+     */
+    private function aplikujFiltr($query, array $f, ?int $uzivatelId, ?\App\Models\Uzivatel $u): void
+    {
         // Defaultně skryjeme zrušené (pokud admin vyloženě nechce)
-        if ($request->get('stav') !== 'zrusena' && !$request->boolean('vse_stavy')) {
+        if (($f['stav'] ?? null) !== 'zrusena') {
             $query->where('stav', '!=', 'zrusena');
         }
-
-        if ($request->filled('stav')) {
-            $query->where('stav', $request->stav);
+        if (!empty($f['stav'])) {
+            $query->where('stav', $f['stav']);
         }
-
-        if ($request->filled('hledat')) {
-            $h = '%' . $request->hledat . '%';
+        if (!empty($f['hledat'])) {
+            $h = '%' . $f['hledat'] . '%';
             $query->where(function ($q) use ($h) {
                 $q->where('nazev', 'like', $h)
                   ->orWhere('misto', 'like', $h)
@@ -35,70 +38,39 @@ class AkceController extends Controller
                   ->orWhere('organizator', 'like', $h);
             });
         }
+        if (!empty($f['typ'])) $query->where('typ', $f['typ']);
+        if (!empty($f['kraj'])) $query->where('kraj', 'like', '%' . $f['kraj'] . '%');
 
-        if ($request->filled('typ')) {
-            $query->where('typ', $request->typ);
-        }
-
-        // Filtr podle původu — z webu (scraping/manual) vs z XLS (excel)
-        if ($request->filled('zdroj_typ')) {
-            if ($request->zdroj_typ === 'web') {
-                $query->whereIn('zdroj_typ', ['scraping', 'manual'])
-                      ->orWhereNull('zdroj_typ');
-            } elseif ($request->zdroj_typ === 'excel') {
-                $query->where('zdroj_typ', 'excel');
-            }
-        }
-
-        if ($request->filled('kraj')) {
-            $query->where('kraj', 'like', '%' . $request->kraj . '%');
-        }
-
-        // Datum od / do — overlap: akce zasahuje aspoň jedním dnem do rozsahu filtru.
-        // Pokud akce nemá datum_do, bere se jako jednodenní (datum_od).
-        // Akce bez datum_od se při filtraci nezobrazí.
-        if ($request->filled('datum_od')) {
-            $query->whereNotNull('datum_od')->where(function ($q) use ($request) {
-                $q->whereDate('datum_do', '>=', $request->datum_od)
-                  ->orWhere(function ($qq) use ($request) {
-                      $qq->whereNull('datum_do')
-                         ->whereDate('datum_od', '>=', $request->datum_od);
+        // Datum overlap
+        if (!empty($f['datum_od'])) {
+            $query->whereNotNull('datum_od')->where(function ($q) use ($f) {
+                $q->whereDate('datum_do', '>=', $f['datum_od'])
+                  ->orWhere(function ($qq) use ($f) {
+                      $qq->whereNull('datum_do')->whereDate('datum_od', '>=', $f['datum_od']);
                   });
             });
         }
-        if ($request->filled('datum_do')) {
-            $query->whereNotNull('datum_od')->whereDate('datum_od', '<=', $request->datum_do);
+        if (!empty($f['datum_do'])) {
+            $query->whereNotNull('datum_od')->whereDate('datum_od', '<=', $f['datum_do']);
         }
 
-        // Měsíc/rok (zachováváme zpětnou kompatibilitu URL parametrů)
-        if ($request->filled('mesic')) {
-            $query->whereMonth('datum_od', $request->mesic);
-        }
-        if ($request->filled('rok')) {
-            $query->whereYear('datum_od', $request->rok);
-        }
-
-        // Defaultně jen budoucí akce, lze přepnout ?vse=1
-        if (!$request->boolean('vse') && !$request->filled('datum_od') && !$request->filled('datum_do')) {
+        // Default: jen budoucí (pokud není 'vse' a nejsou datum filtry)
+        if (empty($f['vse']) && empty($f['datum_od']) && empty($f['datum_do'])) {
             $query->where(function ($q) {
-                $q->whereNull('datum_od')
-                  ->orWhere('datum_od', '>=', now()->startOfDay());
+                $q->whereNull('datum_od')->orWhere('datum_od', '>=', now()->startOfDay());
             });
         }
 
-        // Filtr "moje rezervované"
-        $uzivatelId = Auth::id();
-        if ($uzivatelId && $request->boolean('moje_rezervovane')) {
+        // Moje rezervované
+        if ($uzivatelId && !empty($f['moje_rezervovane'])) {
             $query->whereHas('rezervace', function ($q) use ($uzivatelId) {
-                $q->where('uzivatel_id', $uzivatelId)
-                  ->where('stav', '!=', 'zrusena');
+                $q->where('uzivatel_id', $uzivatelId)->where('stav', '!=', 'zrusena');
             });
         }
 
-        // Filtr radius — akce do X km od sídla uživatele (haversine)
-        $u = Auth::user();
-        if ($request->filled('radius') && $u?->gps_lat && $u?->gps_lng) {
-            $radius = (float) $request->radius;
+        // Radius
+        if (!empty($f['radius']) && $u?->gps_lat && $u?->gps_lng) {
+            $radius = (float) $f['radius'];
             if ($radius > 0 && $radius <= 1000) {
                 $query->whereNotNull('gps_lat')->whereNotNull('gps_lng')
                       ->whereRaw(
@@ -107,6 +79,56 @@ class AkceController extends Controller
                       );
             }
         }
+    }
+
+    /**
+     * Vrátí aktuální filter — z URL pokud je v ní něco, jinak z uloženého user.akce_filtr.
+     * Současně persistuje URL filter do user.akce_filtr.
+     */
+    private function ziskejFiltr(Request $request, ?\App\Models\Uzivatel $u): array
+    {
+        // Reset filtru přes ?_clear=1
+        if ($request->boolean('_clear')) {
+            if ($u) $u->forceFill(['akce_filtr' => null])->saveQuietly();
+            return [];
+        }
+
+        $urlFiltr = array_filter(
+            $request->only(self::FILTR_KLICE),
+            fn ($v) => $v !== null && $v !== ''
+        );
+
+        // URL má filter → persistuj
+        if (!empty($urlFiltr) && $u) {
+            $u->forceFill(['akce_filtr' => $urlFiltr])->saveQuietly();
+            return $urlFiltr;
+        }
+
+        // URL prázdná → načti uložený
+        if ($u && !empty($u->akce_filtr)) {
+            return (array) $u->akce_filtr;
+        }
+
+        return [];
+    }
+
+    /** Sjednocený katalog + správa. Každý přihlášený smí editovat. */
+    public function index(Request $request)
+    {
+        $u = Auth::user();
+        $uzivatelId = $u?->id;
+
+        // Pokud user má uložený filter ale URL je prázdná → redirect s URL parametry
+        // (aby URL reflektovala aktivní filter, lépe pro pagination/sdílení)
+        if (!$request->boolean('_clear') && empty($request->only(self::FILTR_KLICE))
+            && $u && !empty($u->akce_filtr)) {
+            return redirect('/akce?' . http_build_query((array) $u->akce_filtr));
+        }
+
+        $f = $this->ziskejFiltr($request, $u);
+
+        $query = Akce::query();
+        $this->aplikujFiltr($query, $f, $uzivatelId, $u);
 
         // Order: per-user palec ovlivňuje řazení (nahoru, null, stred, dolu).
         if ($uzivatelId) {
@@ -306,23 +328,26 @@ class AkceController extends Controller
 
     public function mapa(Request $request)
     {
-        $akce = Akce::where('stav', '!=', 'zrusena')
-            ->whereNotNull('gps_lat')
-            ->whereNotNull('gps_lng')
-            ->where('datum_od', '>=', now())
-            ->get(['id', 'nazev', 'typ', 'datum_od', 'datum_do', 'misto', 'gps_lat', 'gps_lng']);
+        $u = Auth::user();
+        $f = $this->ziskejFiltr($request, $u);
 
-        return view('akce.mapa', compact('akce'));
+        $query = Akce::query()->whereNotNull('gps_lat')->whereNotNull('gps_lng');
+        $this->aplikujFiltr($query, $f, $u?->id, $u);
+
+        $akce = $query->get(['id', 'nazev', 'typ', 'datum_od', 'datum_do', 'misto', 'gps_lat', 'gps_lng']);
+
+        return view('akce.mapa', compact('akce', 'f'));
     }
 
     public function mapaJson(Request $request)
     {
-        $akce = Akce::where('stav', '!=', 'zrusena')
-            ->whereNotNull('gps_lat')
-            ->whereNotNull('gps_lng')
-            ->where('datum_od', '>=', now())
-            ->get(['id', 'nazev', 'typ', 'datum_od', 'datum_do', 'misto', 'gps_lat', 'gps_lng', 'slug']);
+        $u = Auth::user();
+        $f = $this->ziskejFiltr($request, $u);
 
+        $query = Akce::query()->whereNotNull('gps_lat')->whereNotNull('gps_lng');
+        $this->aplikujFiltr($query, $f, $u?->id, $u);
+
+        $akce = $query->get(['id', 'nazev', 'typ', 'datum_od', 'datum_do', 'misto', 'gps_lat', 'gps_lng']);
         return response()->json($akce);
     }
 

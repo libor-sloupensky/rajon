@@ -32,6 +32,7 @@ class Uzivatel extends Authenticatable implements MustVerifyEmail
         'psc',
         'gps_lat',
         'gps_lng',
+        'akce_filtr',
         'email_overen_v',
         'posledni_prihlaseni',
     ];
@@ -49,6 +50,7 @@ class Uzivatel extends Authenticatable implements MustVerifyEmail
             'heslo' => 'hashed',
             'gps_lat' => 'float',
             'gps_lng' => 'float',
+            'akce_filtr' => 'array',
         ];
     }
 
