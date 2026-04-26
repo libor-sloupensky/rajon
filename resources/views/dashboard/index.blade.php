@@ -8,7 +8,7 @@
         @else
             <div class="space-y-3 max-w-3xl">
                 @foreach($mojeRezervace as $rez)
-                    <a href="{{ route('akce.show', $rez->akce) }}" class="block rounded-lg border border-gray-200 bg-white p-4 hover:border-primary transition">
+                    <a href="{{ url('/akce?moje_rezervovane=1#akce-' . $rez->akce->id) }}" class="block rounded-lg border border-gray-200 bg-white p-4 hover:border-primary transition">
                         <div class="flex items-start justify-between">
                             <div>
                                 <h3 class="font-medium text-gray-800">{{ $rez->akce->nazev }}</h3>

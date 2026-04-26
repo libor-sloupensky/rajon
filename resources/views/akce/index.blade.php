@@ -57,42 +57,40 @@
             placeholder="Hledat (název, místo, organizátor)…"
             class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:border-primary focus:outline-none">
 
-        {{-- Řádek: Typ | Kraj | Stav (admin) --}}
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            <select name="typ" class="rounded-lg border border-gray-300 px-2 py-1.5 text-xs">
-                <option value="">Typ — všechny</option>
+        {{-- Řádek: Typ | Kraj | Stav — vždy na 1 řádku, kompaktní --}}
+        <div class="flex flex-wrap gap-2">
+            <select name="typ" class="rounded border border-gray-300 px-2 py-1 text-xs flex-1 min-w-0">
+                <option value="">Typ</option>
                 @foreach($typy as $val => $label)
                     <option value="{{ $val }}" {{ request('typ') === $val ? 'selected' : '' }}>{{ $label }}</option>
                 @endforeach
             </select>
 
-            <select name="kraj" class="rounded-lg border border-gray-300 px-2 py-1.5 text-xs">
-                <option value="">Kraj — všechny</option>
+            <select name="kraj" class="rounded border border-gray-300 px-2 py-1 text-xs flex-1 min-w-0">
+                <option value="">Kraj</option>
                 @foreach($kraje as $k)
                     <option value="{{ $k }}" {{ request('kraj') === $k ? 'selected' : '' }}>{{ $k }}</option>
                 @endforeach
             </select>
 
             @if($jeAdmin)
-                <select name="stav" class="rounded-lg border border-gray-300 px-2 py-1.5 text-xs">
-                    <option value="">Stav — všechny</option>
+                <select name="stav" class="rounded border border-gray-300 px-2 py-1 text-xs flex-1 min-w-0">
+                    <option value="">Stav</option>
                     @foreach($stavy as $v => $l)
                         <option value="{{ $v }}" {{ request('stav') === $v ? 'selected' : '' }}>{{ $l }}</option>
                     @endforeach
                 </select>
-            @else
-                <div></div>
             @endif
         </div>
 
-        {{-- Řádek: Datumy + minulé + Filtrovat --}}
+        {{-- Řádek: Datumy + checkboxy + Filtrovat --}}
         <div class="flex flex-wrap items-center gap-3">
             <div class="flex items-center gap-1">
                 <input type="date" name="datum_od" value="{{ request('datum_od') }}"
-                    title="Datum od" class="rounded-lg border border-gray-300 px-2 py-1.5 text-xs">
+                    title="Datum od" class="rounded border border-gray-300 px-2 py-1 text-xs">
                 <span class="text-gray-400 text-xs">–</span>
                 <input type="date" name="datum_do" value="{{ request('datum_do') }}"
-                    title="Datum do" class="rounded-lg border border-gray-300 px-2 py-1.5 text-xs">
+                    title="Datum do" class="rounded border border-gray-300 px-2 py-1 text-xs">
             </div>
 
             <label class="text-xs text-gray-500 flex items-center gap-1">
@@ -105,7 +103,7 @@
                 Moje rezervované
             </label>
 
-            <button type="submit" class="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-dark transition">
+            <button type="submit" class="rounded bg-primary px-3 py-1 text-xs font-medium text-white hover:bg-primary-dark transition">
                 Filtrovat
             </button>
             @if($maFiltr || request()->boolean('moje_rezervovane'))
@@ -169,7 +167,7 @@
                     <div class="flex items-start justify-between gap-4">
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-2 mb-1 flex-wrap">
-                                <a href="{{ route('akce.show', $a) }}" class="font-medium text-gray-800 hover:text-primary">{{ $a->nazev }}</a>
+                                <button type="button" @click="open = !open" class="font-medium text-gray-800 hover:text-primary text-left">{{ $a->nazev }}</button>
                                 @if($a->stav === 'zrusena')
                                     <span class="rounded-full bg-red-100 text-red-700 px-2 py-0.5 text-xs font-medium">zrušena</span>
                                 @elseif($a->stav === 'navrh')

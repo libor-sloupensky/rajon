@@ -1,3 +1,8 @@
+{{-- CSS pro hover tužky — Tailwind v4 group-hover občas nekompiluje, jistější je vlastní CSS --}}
+<style>
+    .rj-edit-row .rj-edit-pencil { opacity: 0; }
+    .rj-edit-row:hover .rj-edit-pencil { opacity: 1; }
+</style>
 @php
     $polePopis = [
         'datum_od' => ['Datum od', 'date'],
@@ -78,7 +83,7 @@
             $hodnotaZobrazit = $hodnotaZobrazit ?: '—';
             $isLocked = isset(($a->pole_manualni ?? [])[$pole]);
         @endphp
-        <div class="group">
+        <div class="rj-edit-row">
             {{-- Display mode: celý řádek (label + hodnota) je klikatelný; tužka jen na hover --}}
             <div x-show="editPole !== '{{ $pole }}'"
                  @click="startEdit('{{ $pole }}', @js((string) $hodnota))"
@@ -86,7 +91,7 @@
                 <span class="text-xs text-gray-500">{{ $label }}:</span>
                 <span id="val-{{ $pole }}-{{ $a->id }}" class="text-gray-700 flex-1 truncate">{{ $hodnotaZobrazit }}</span>
                 @if($isLocked)<span class="text-xs text-orange-500 shrink-0" title="manuálně upraveno">🔒</span>@endif
-                <span class="text-gray-400 text-xs shrink-0 opacity-0 group-hover:opacity-100 transition" title="Upravit">✏️</span>
+                <span class="rj-edit-pencil text-gray-400 text-xs shrink-0 transition" title="Upravit">✏️</span>
             </div>
 
             {{-- Edit mode --}}

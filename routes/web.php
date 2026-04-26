@@ -29,7 +29,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/akce', [AkceController::class, 'index'])->name('akce.index');
     Route::get('/akce/nova', [AkceController::class, 'create'])->name('akce.create');
     Route::post('/akce', [AkceController::class, 'store'])->name('akce.store');
-    Route::get('/akce/{akce:slug}', [AkceController::class, 'show'])->name('akce.show');
     Route::get('/akce/{akce}/upravit', [AkceController::class, 'edit'])->name('akce.edit');
     Route::put('/akce/{akce}', [AkceController::class, 'update'])->name('akce.update');
     Route::post('/akce/{akce}/odemknout-pole', [AkceController::class, 'odemknoutPole'])->name('akce.odemknout-pole');

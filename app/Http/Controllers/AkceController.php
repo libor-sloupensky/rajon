@@ -218,20 +218,6 @@ class AkceController extends Controller
         return response()->json(['ok' => true, 'pole' => $pole, 'hodnota' => $novaHodnota]);
     }
 
-    public function show(Akce $akce)
-    {
-        $uzivatel = Auth::user();
-        $rezervace = null;
-
-        if ($uzivatel) {
-            $rezervace = Rezervace::where('akce_id', $akce->id)
-                ->where('uzivatel_id', $uzivatel->id)
-                ->first();
-        }
-
-        return view('akce.show', compact('akce', 'rezervace'));
-    }
-
     public function create()
     {
         return view('akce.create');
@@ -259,7 +245,7 @@ class AkceController extends Controller
 
         $akce = Akce::create($data);
 
-        return redirect()->route('akce.show', $akce)->with('success', 'Akce vytvořena.');
+        return redirect()->route('akce.index')->with('success', 'Akce vytvořena.');
     }
 
     public function edit(Akce $akce)
