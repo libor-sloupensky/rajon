@@ -319,29 +319,30 @@ NEVHODNÉ akce (false): malé/uzavřené/indoor:
 Vrať POUZE platný JSON pole, žádný markdown/text navíc.
 PROMPT;
 
+        // Sestavit jako JSON pole — vyhne se problémům s apostrofy/uvozovkami v hodnotách
         $polozky = [];
-        foreach ($akce as $i => $a) {
-            $datumStr = '';
-            if (!empty($a['datum_od'])) {
-                $datumStr = $a['datum_od'];
-                if (!empty($a['datum_do']) && $a['datum_do'] !== $a['datum_od']) {
-                    $datumStr .= ' až ' . $a['datum_do'];
-                }
-            }
-            $polozky[] = "[{$a['id']}] název='{$a['nazev']}' typ='{$a['typ']}' místo='" .
-                ($a['misto'] ?? '') . "' organizator='" . ($a['organizator'] ?? '') . "'" .
-                ($datumStr ? " datum='{$datumStr}'" : '') .
-                " popis='" . mb_substr((string) ($a['popis'] ?? ''), 0, 300) . "'";
+        foreach ($akce as $a) {
+            $polozky[] = [
+                'id' => (int) ($a['id'] ?? 0),
+                'nazev' => (string) ($a['nazev'] ?? ''),
+                'typ' => (string) ($a['typ'] ?? ''),
+                'misto' => (string) ($a['misto'] ?? ''),
+                'organizator' => (string) ($a['organizator'] ?? ''),
+                'datum_od' => (string) ($a['datum_od'] ?? ''),
+                'datum_do' => (string) ($a['datum_do'] ?? ''),
+                'popis' => mb_substr((string) ($a['popis'] ?? ''), 0, 300),
+            ];
         }
-        $seznam = implode("\n", $polozky);
+        $seznam = json_encode($polozky, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
         $userPrompt = <<<PROMPT
-Pro každou akci v seznamu rozhodni vhodne_pro_stankare (true/false) a stručný důvod (jen když false, 2-5 slov).
+Pro každou akci v poli níže rozhodni vhodne_pro_stankare (true/false) a stručný důvod (jen když false, 2-5 slov).
 
+INPUT (JSON pole akcí):
 {$seznam}
 
-Vrať JSON pole formátu:
-[{"id": 123, "vhodne": true}, {"id": 456, "vhodne": false, "duvod": "klubový koncert"}, ...]
+OUTPUT (POUZE JSON pole, žádný text/markdown navíc):
+[{"id": 123, "vhodne": true}, {"id": 456, "vhodne": false, "duvod": "klubový koncert"}]
 PROMPT;
 
         try {
@@ -357,7 +358,10 @@ PROMPT;
             ]);
 
             if (!$response->successful()) {
-                Log::error('AI bulk classify failed', ['status' => $response->status()]);
+                Log::error('AI bulk classify failed', [
+                    'status' => $response->status(),
+                    'body' => mb_substr((string) $response->body(), 0, 1000),
+                ]);
                 return null;
             }
 
