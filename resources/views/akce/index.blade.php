@@ -41,7 +41,7 @@
         ];
         $stavy = ['navrh' => 'Návrh', 'overena' => 'Ověřená', 'zrusena' => 'Zrušená'];
     @endphp
-    <form method="GET" class="mb-6 space-y-2">
+    <form method="GET" class="mb-6 space-y-2" onchange="this.submit()">
         <input type="text" name="hledat" value="{{ request('hledat') }}"
             placeholder="Hledat (název, místo, organizátor)…"
             class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:border-primary focus:outline-none">
@@ -101,11 +101,8 @@
                 </label>
             @endif
 
-            <button type="submit" class="rounded bg-primary px-3 py-1 text-xs font-medium text-white hover:bg-primary-dark transition">
-                Filtrovat
-            </button>
             @if($maFiltr || request()->boolean('moje_rezervovane'))
-                <a href="{{ url('/akce?_clear=1') }}" class="text-xs text-gray-500 hover:text-primary">Zrušit</a>
+                <a href="{{ url('/akce?_clear=1') }}" class="text-xs text-gray-500 hover:text-primary">Zrušit filtr</a>
             @endif
         </div>
     </form>
