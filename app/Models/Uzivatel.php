@@ -29,6 +29,7 @@ class Uzivatel extends Authenticatable implements MustVerifyEmail
         'role',
         'region',
         'email_overen_v',
+        'posledni_prihlaseni',
     ];
 
     protected $hidden = [
@@ -40,6 +41,7 @@ class Uzivatel extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_overen_v' => 'datetime',
+            'posledni_prihlaseni' => 'datetime',
             'heslo' => 'hashed',
         ];
     }

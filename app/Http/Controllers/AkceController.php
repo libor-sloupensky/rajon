@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Akce;
+use App\Models\AkceUzivatel;
 use App\Models\Rezervace;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class AkceController extends Controller
@@ -84,9 +86,113 @@ class AkceController extends Controller
             });
         }
 
-        $akce = $query->orderBy('datum_od')->paginate(30)->withQueryString();
+        // Order: per-user palec ovlivňuje řazení (nahoru, null, stred, dolu).
+        // Implementace: LEFT JOIN s akce_uzivatel pro aktuálního uživatele +
+        // FIELD() pro pořadí palce.
+        $uzivatelId = Auth::id();
+        if ($uzivatelId) {
+            $query->leftJoin('akce_uzivatel as au_filter', function ($j) use ($uzivatelId) {
+                $j->on('au_filter.akce_id', '=', 'akce.id')
+                  ->where('au_filter.uzivatel_id', '=', $uzivatelId);
+            })
+            ->select('akce.*', 'au_filter.palec as muj_palec', 'au_filter.osobni_poznamka as moje_poznamka')
+            ->orderByRaw("FIELD(au_filter.palec, 'nahoru', NULL, 'stred', 'dolu')")
+            ->orderBy('akce.datum_od');
+        } else {
+            $query->orderBy('datum_od');
+        }
+
+        $akce = $query->paginate(30)->withQueryString();
 
         return view('akce.index', compact('akce'));
+    }
+
+    /** Uloží osobní palec hodnocení (per-user). */
+    public function palec(Request $request, Akce $akce)
+    {
+        $request->validate(['palec' => ['nullable', 'in:nahoru,stred,dolu']]);
+        $uzivatelId = Auth::id();
+        if (!$uzivatelId) abort(401);
+
+        AkceUzivatel::updateOrCreate(
+            ['akce_id' => $akce->id, 'uzivatel_id' => $uzivatelId],
+            ['palec' => $request->input('palec')],
+        );
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['ok' => true, 'palec' => $request->input('palec')]);
+        }
+        return back();
+    }
+
+    /** Uloží osobní poznámku (per-user). */
+    public function poznamka(Request $request, Akce $akce)
+    {
+        $request->validate(['poznamka' => ['nullable', 'string', 'max:1000']]);
+        $uzivatelId = Auth::id();
+        if (!$uzivatelId) abort(401);
+
+        AkceUzivatel::updateOrCreate(
+            ['akce_id' => $akce->id, 'uzivatel_id' => $uzivatelId],
+            ['osobni_poznamka' => $request->input('poznamka')],
+        );
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['ok' => true, 'poznamka' => $request->input('poznamka')]);
+        }
+        return back();
+    }
+
+    /** Inline update jednoho pole akce (společné pro všechny uživatele). */
+    public function inlineUpdate(Request $request, Akce $akce)
+    {
+        $povolenaPole = ['nazev', 'typ', 'datum_od', 'datum_do', 'misto', 'adresa',
+                         'okres', 'kraj', 'organizator', 'kontakt_email', 'kontakt_telefon',
+                         'web_url', 'vstupne', 'popis', 'najem', 'obrat', 'stav'];
+
+        $pole = $request->input('pole');
+        if (!in_array($pole, $povolenaPole, true)) {
+            return response()->json(['error' => 'Neplatné pole'], 422);
+        }
+
+        $rules = [
+            'nazev' => ['required', 'string', 'max:255'],
+            'typ' => ['required', 'string'],
+            'popis' => ['nullable', 'string'],
+            'datum_od' => ['nullable', 'date'],
+            'datum_do' => ['nullable', 'date', 'after_or_equal:datum_od'],
+            'misto' => ['nullable', 'string', 'max:255'],
+            'adresa' => ['nullable', 'string', 'max:255'],
+            'okres' => ['nullable', 'string', 'max:100'],
+            'kraj' => ['nullable', 'string', 'max:100'],
+            'organizator' => ['nullable', 'string', 'max:255'],
+            'kontakt_email' => ['nullable', 'email', 'max:255'],
+            'kontakt_telefon' => ['nullable', 'string', 'max:50'],
+            'web_url' => ['nullable', 'url', 'max:500'],
+            'vstupne' => ['nullable', 'string', 'max:100'],
+            'najem' => ['nullable', 'integer'],
+            'obrat' => ['nullable', 'integer'],
+            'stav' => ['required', 'string', 'in:navrh,overena,zrusena'],
+        ];
+
+        $data = $request->validate(['hodnota' => $rules[$pole] ?? ['nullable', 'string']]);
+        $novaHodnota = $data['hodnota'] ?? null;
+
+        // Auto-lock: pole se označí jako manuálně upravené
+        $manualni = $akce->pole_manualni ?? [];
+        $zdroje = $akce->pole_zdroje ?? [];
+        if ((string) $akce->$pole !== (string) $novaHodnota) {
+            $manualni[$pole] = now()->toIso8601String();
+            $zdroje[$pole] = 'manual';
+        }
+
+        $akce->update([
+            $pole => $novaHodnota,
+            'pole_manualni' => $manualni,
+            'pole_zdroje' => $zdroje,
+        ]);
+
+        return response()->json(['ok' => true, 'pole' => $pole, 'hodnota' => $novaHodnota]);
     }
 
     public function show(Akce $akce)

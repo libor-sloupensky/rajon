@@ -23,6 +23,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Login tracking — zaznamenat čas posledního přihlášení uživatele
+        \Illuminate\Support\Facades\Event::listen(
+            \Illuminate\Auth\Events\Login::class,
+            function ($event) {
+                if ($event->user && method_exists($event->user, 'forceFill')) {
+                    $event->user->forceFill(['posledni_prihlaseni' => now()])->saveQuietly();
+                }
+            }
+        );
     }
 }

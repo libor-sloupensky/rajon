@@ -36,6 +36,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/akce/{akce}', [AkceController::class, 'destroy'])->name('akce.destroy');
     Route::post('/akce/{akce}/rezervovat', [AkceController::class, 'rezervovat'])->name('akce.rezervovat');
 
+    // Per-user data — palec hodnocení + osobní poznámka
+    Route::post('/akce/{akce}/palec', [AkceController::class, 'palec'])->name('akce.palec');
+    Route::post('/akce/{akce}/poznamka', [AkceController::class, 'poznamka'])->name('akce.poznamka');
+
+    // Inline edit — jedno pole najednou
+    Route::patch('/akce/{akce}/inline', [AkceController::class, 'inlineUpdate'])->name('akce.inline');
+
     Route::get('/mapa', [AkceController::class, 'mapa'])->name('akce.mapa');
 
     // API pro mapu

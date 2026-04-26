@@ -118,6 +118,7 @@
                             <th class="text-left px-4 py-2">Role</th>
                             <th class="text-left px-4 py-2">Region</th>
                             <th class="text-left px-4 py-2">Registrace</th>
+                            <th class="text-left px-4 py-2">Posl. přihlášení</th>
                             <th class="text-left px-4 py-2">Ověřen</th>
                             <th class="text-right px-4 py-2">Akce</th>
                         </tr>
@@ -139,6 +140,15 @@
                                 </td>
                                 <td class="px-4 py-2 text-gray-500">{{ $u->region ?? '—' }}</td>
                                 <td class="px-4 py-2 text-xs text-gray-500">{{ $u->vytvoreno?->format('j. n. Y') }}</td>
+                                <td class="px-4 py-2 text-xs">
+                                    @if($u->posledni_prihlaseni)
+                                        <span class="text-gray-600" title="{{ $u->posledni_prihlaseni->format('j. n. Y H:i') }}">
+                                            {{ $u->posledni_prihlaseni->diffForHumans() }}
+                                        </span>
+                                    @else
+                                        <span class="text-gray-400">nikdy</span>
+                                    @endif
+                                </td>
                                 <td class="px-4 py-2">
                                     @if($u->email_overen_v)
                                         <span class="text-green-600 text-xs">✓</span>
