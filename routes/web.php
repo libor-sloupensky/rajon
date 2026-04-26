@@ -35,6 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/akce/{akce}/odemknout-pole', [AkceController::class, 'odemknoutPole'])->name('akce.odemknout-pole');
     Route::delete('/akce/{akce}', [AkceController::class, 'destroy'])->name('akce.destroy');
     Route::post('/akce/{akce}/rezervovat', [AkceController::class, 'rezervovat'])->name('akce.rezervovat');
+    Route::delete('/akce/{akce}/rezervovat', [AkceController::class, 'zrusitRezervaci'])->name('akce.zrusit-rezervaci');
 
     // Per-user data — palec hodnocení + osobní poznámka
     Route::post('/akce/{akce}/palec', [AkceController::class, 'palec'])->name('akce.palec');

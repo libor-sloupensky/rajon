@@ -86,10 +86,16 @@ class AkceController extends Controller
             });
         }
 
-        // Order: per-user palec ovlivňuje řazení (nahoru, null, stred, dolu).
-        // Implementace: LEFT JOIN s akce_uzivatel pro aktuálního uživatele +
-        // FIELD() pro pořadí palce.
+        // Filtr "moje rezervované"
         $uzivatelId = Auth::id();
+        if ($uzivatelId && $request->boolean('moje_rezervovane')) {
+            $query->whereHas('rezervace', function ($q) use ($uzivatelId) {
+                $q->where('uzivatel_id', $uzivatelId)
+                  ->where('stav', '!=', 'zrusena');
+            });
+        }
+
+        // Order: per-user palec ovlivňuje řazení (nahoru, null, stred, dolu).
         if ($uzivatelId) {
             $query->leftJoin('akce_uzivatel as au_filter', function ($j) use ($uzivatelId) {
                 $j->on('au_filter.akce_id', '=', 'akce.id')
@@ -102,17 +108,34 @@ class AkceController extends Controller
             $query->orderBy('datum_od');
         }
 
+        // Eager load rezervace s uživateli (pro zobrazení "Rezervováno: Jan Novák")
+        $query->with(['rezervace' => fn ($q) => $q->where('stav', '!=', 'zrusena')->with('uzivatel:id,jmeno,prijmeni')]);
+
         $akce = $query->paginate(30)->withQueryString();
 
         return view('akce.index', compact('akce'));
     }
 
-    /** Uloží osobní palec hodnocení (per-user). */
+    /** Uloží osobní palec hodnocení (per-user). Pokud je akce rezervovaná, palec je uzamčen na 'nahoru'. */
     public function palec(Request $request, Akce $akce)
     {
         $request->validate(['palec' => ['nullable', 'in:nahoru,stred,dolu']]);
         $uzivatelId = Auth::id();
         if (!$uzivatelId) abort(401);
+
+        // Pokud má uživatel aktivní rezervaci, palec je uzamčen na 'nahoru'
+        $jeRezervovano = Rezervace::where('akce_id', $akce->id)
+            ->where('uzivatel_id', $uzivatelId)
+            ->where('stav', '!=', 'zrusena')
+            ->exists();
+
+        if ($jeRezervovano) {
+            return response()->json([
+                'ok' => false,
+                'palec' => 'nahoru',
+                'duvod' => 'Akce je rezervovaná — palec uzamčen na nahoru. Pro změnu nejprve zrušte rezervaci.',
+            ], 422);
+        }
 
         AkceUzivatel::updateOrCreate(
             ['akce_id' => $akce->id, 'uzivatel_id' => $uzivatelId],
@@ -312,18 +335,49 @@ class AkceController extends Controller
             ->where('uzivatel_id', $uzivatel->id)
             ->first();
 
-        if ($existujici) {
+        if ($existujici && $existujici->stav !== 'zrusena') {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['ok' => true, 'info' => 'Již rezervováno']);
+            }
             return back()->with('info', 'Na tuto akci jste již přihlášeni.');
         }
 
-        Rezervace::create([
-            'akce_id' => $akce->id,
-            'uzivatel_id' => $uzivatel->id,
-            'stav' => 'zajimam_se',
-            'poznamka' => $request->input('poznamka'),
-        ]);
+        if ($existujici) {
+            // Obnovit zrušenou rezervaci
+            $existujici->update(['stav' => 'zajimam_se', 'poznamka' => $request->input('poznamka')]);
+        } else {
+            Rezervace::create([
+                'akce_id' => $akce->id,
+                'uzivatel_id' => $uzivatel->id,
+                'stav' => 'zajimam_se',
+                'poznamka' => $request->input('poznamka'),
+            ]);
+        }
 
+        // Auto: palec=nahoru (uzamčeno, dokud akce zůstává rezervovaná)
+        AkceUzivatel::updateOrCreate(
+            ['akce_id' => $akce->id, 'uzivatel_id' => $uzivatel->id],
+            ['palec' => 'nahoru'],
+        );
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['ok' => true, 'rezervovano' => true]);
+        }
         return back()->with('success', 'Akce byla přidána do vašeho kalendáře.');
+    }
+
+    /** Zrušit rezervaci. */
+    public function zrusitRezervaci(Request $request, Akce $akce)
+    {
+        $uzivatel = Auth::user();
+        Rezervace::where('akce_id', $akce->id)
+            ->where('uzivatel_id', $uzivatel->id)
+            ->update(['stav' => 'zrusena']);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['ok' => true, 'rezervovano' => false]);
+        }
+        return back()->with('success', 'Rezervace zrušena.');
     }
 
     public function pridatZdroj(Request $request)

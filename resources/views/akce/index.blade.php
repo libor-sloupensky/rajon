@@ -1,7 +1,7 @@
 <x-layouts.app title="Katalog akcí — Rajón">
     @php
         $jeAdmin = Auth::user()?->jeAdmin();
-        $maFiltr = request()->hasAny(['hledat', 'typ', 'kraj', 'mesic', 'rok', 'datum_od', 'datum_do', 'stav', 'vse', 'zdroj_typ']);
+        $maFiltr = request()->hasAny(['hledat', 'typ', 'kraj', 'mesic', 'rok', 'datum_od', 'datum_do', 'stav', 'vse', 'zdroj_typ', 'moje_rezervovane']);
     @endphp
 
     <div class="flex items-center justify-between mb-6">
@@ -100,10 +100,15 @@
                 I minulé
             </label>
 
+            <label class="text-xs text-gray-500 flex items-center gap-1">
+                <input type="checkbox" name="moje_rezervovane" value="1" {{ request('moje_rezervovane') ? 'checked' : '' }} class="rounded">
+                Moje rezervované
+            </label>
+
             <button type="submit" class="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-dark transition">
                 Filtrovat
             </button>
-            @if($maFiltr)
+            @if($maFiltr || request()->boolean('moje_rezervovane'))
                 <a href="{{ url('/akce') }}" class="text-xs text-gray-500 hover:text-primary">Zrušit</a>
             @endif
         </div>
@@ -119,13 +124,20 @@
                     $mujPalec = $a->muj_palec ?? null;
                     $mojePoznamka = $a->moje_poznamka ?? '';
                     $manualniPole = array_filter(array_keys($a->pole_manualni ?? []), fn ($k) => !str_starts_with($k, '_'));
+                    $aktivniRezervace = $a->rezervace ?? collect();
+                    $mojeRezervace = $aktivniRezervace->firstWhere('uzivatel_id', Auth::id());
                 @endphp
                 <div class="rounded-lg border border-gray-200 bg-white p-4 hover:border-primary transition"
                      x-data="{
                         open: false,
                         palec: @js($mujPalec),
                         poznamka: @js($mojePoznamka),
+                        rezervovano: @js((bool) $mojeRezervace),
                         async setPalec(novy) {
+                            if (this.rezervovano) {
+                                alert('Akce je rezervovaná — palec uzamčen na nahoru. Pro změnu nejprve zrušte rezervaci.');
+                                return;
+                            }
                             const value = this.palec === novy ? '' : novy;
                             this.palec = value || null;
                             const fd = new FormData();
@@ -138,6 +150,20 @@
                             fd.append('poznamka', this.poznamka);
                             fd.append('_token', @js(csrf_token()));
                             await fetch('{{ route('akce.poznamka', $a) }}', { method: 'POST', body: fd });
+                        },
+                        async toggleRezervace() {
+                            const url = '{{ route('akce.rezervovat', $a) }}';
+                            const fd = new FormData();
+                            fd.append('_token', @js(csrf_token()));
+                            if (this.rezervovano) {
+                                fd.append('_method', 'DELETE');
+                                await fetch(url, { method: 'POST', body: fd });
+                                this.rezervovano = false;
+                            } else {
+                                await fetch(url, { method: 'POST', body: fd });
+                                this.rezervovano = true;
+                                this.palec = 'nahoru';
+                            }
                         }
                      }">
                     <div class="flex items-start justify-between gap-4">
@@ -173,6 +199,15 @@
                             @if($a->organizator)
                                 <p class="text-xs text-gray-400 mt-0.5">Organizátor: {{ $a->organizator }}</p>
                             @endif
+                            {{-- Aktivní rezervace — viditelné všem uživatelům --}}
+                            @if($aktivniRezervace->isNotEmpty())
+                                <p class="text-xs text-green-700 mt-1">
+                                    ✅ Rezervováno:
+                                    @foreach($aktivniRezervace as $rez)
+                                        <span class="font-medium">{{ $rez->uzivatel?->jmeno }} {{ $rez->uzivatel?->prijmeni }}</span>{{ !$loop->last ? ',' : '' }}
+                                    @endforeach
+                                </p>
+                            @endif
                             {{-- Osobní poznámka — viditelná v hlavním výpise --}}
                             <p x-show="poznamka" x-cloak class="text-xs text-purple-700 mt-1 italic" x-text="'📝 ' + poznamka"></p>
                         </div>
@@ -180,19 +215,25 @@
                         <div class="flex flex-col items-end gap-1 shrink-0">
                             {{-- Palec hodnocení (inline styly — Tailwind nekompiluje dynamické :class) --}}
                             <div class="flex gap-1">
-                                <button type="button" @click="setPalec('nahoru')"
+                                <button type="button" @click="setPalec('nahoru')" :disabled="rezervovano"
                                     :style="palec === 'nahoru' ? 'background-color:#22c55e;color:#fff;border-color:#16a34a;' : ''"
-                                    class="w-7 h-7 rounded-full text-sm flex items-center justify-center border border-gray-200 bg-gray-100 transition"
-                                    title="Líbí se mi (nahoru v seznamu)">👍</button>
-                                <button type="button" @click="setPalec('stred')"
+                                    :title="rezervovano ? 'Uzamčeno — akce je rezervovaná' : 'Líbí se mi (nahoru v seznamu)'"
+                                    class="w-7 h-7 rounded-full text-sm flex items-center justify-center border border-gray-200 bg-gray-100 transition disabled:cursor-not-allowed disabled:opacity-80">👍</button>
+                                <button type="button" @click="setPalec('stred')" :disabled="rezervovano"
                                     :style="palec === 'stred' ? 'background-color:#f97316;color:#fff;border-color:#ea580c;' : ''"
-                                    class="w-7 h-7 rounded-full text-sm flex items-center justify-center border border-gray-200 bg-gray-100 transition"
-                                    title="Možná (uprostřed seznamu)">👉</button>
-                                <button type="button" @click="setPalec('dolu')"
+                                    :title="rezervovano ? 'Uzamčeno — akce je rezervovaná' : 'Možná (uprostřed seznamu)'"
+                                    class="w-7 h-7 rounded-full text-sm flex items-center justify-center border border-gray-200 bg-gray-100 transition disabled:cursor-not-allowed disabled:opacity-50">👉</button>
+                                <button type="button" @click="setPalec('dolu')" :disabled="rezervovano"
                                     :style="palec === 'dolu' ? 'background-color:#ef4444;color:#fff;border-color:#dc2626;' : ''"
-                                    class="w-7 h-7 rounded-full text-sm flex items-center justify-center border border-gray-200 bg-gray-100 transition"
-                                    title="Nezajímá mě (dole)">👎</button>
+                                    :title="rezervovano ? 'Uzamčeno — akce je rezervovaná' : 'Nezajímá mě (dole)'"
+                                    class="w-7 h-7 rounded-full text-sm flex items-center justify-center border border-gray-200 bg-gray-100 transition disabled:cursor-not-allowed disabled:opacity-50">👎</button>
                             </div>
+                            {{-- Rezervovat tlačítko --}}
+                            <button type="button" @click="toggleRezervace"
+                                :class="rezervovano ? 'bg-green-600 text-white border-green-700' : 'bg-white text-primary border-primary hover:bg-primary/10'"
+                                class="rounded-lg border px-3 py-1 text-xs font-medium transition">
+                                <span x-text="rezervovano ? '✓ Rezervováno' : 'Rezervovat'"></span>
+                            </button>
                             <button type="button" @click="open = !open"
                                 class="rounded-lg border border-gray-300 px-3 py-1 text-xs text-gray-600 hover:bg-gray-50">
                                 <span x-text="open ? 'Skrýt detaily ▲' : 'Detaily ▼'"></span>

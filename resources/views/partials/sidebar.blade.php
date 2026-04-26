@@ -23,8 +23,8 @@
                 <div class="rj-sidebar-section-body" style="max-height: 20rem;">
                     <a href="{{ url('/dashboard') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('dashboard') ? 'active' : '' }}">Dashboard</a>
                     <a href="{{ url('/akce') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('akce.*') ? 'active' : '' }}">Katalog akcí</a>
+                    <a href="{{ url('/akce?moje_rezervovane=1') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->boolean('moje_rezervovane') ? 'active' : '' }}">Moje rezervované</a>
                     <a href="{{ url('/mapa') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('mapa') ? 'active' : '' }}">Mapa</a>
-                    <a href="{{ url('/moje-rezervace') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('moje-rezervace') ? 'active' : '' }}">Moje rezervace</a>
                 </div>
             </div>
 
