@@ -119,6 +119,7 @@
                             <th class="text-left px-4 py-2">Region</th>
                             <th class="text-left px-4 py-2">Registrace</th>
                             <th class="text-left px-4 py-2">Posl. přihlášení</th>
+                            <th class="text-left px-4 py-2" title="Počet návštěv za posledních 30 dní (návštěva = série requestů s odstupem do 2h)">Návštěv / měsíc</th>
                             <th class="text-left px-4 py-2">Ověřen</th>
                             <th class="text-right px-4 py-2">Akce</th>
                         </tr>
@@ -147,6 +148,14 @@
                                         </span>
                                     @else
                                         <span class="text-gray-400">nikdy</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-2 text-xs text-center">
+                                    @php $pocet = $navstevyPocet[$u->id] ?? 0; @endphp
+                                    @if($pocet > 0)
+                                        <span class="rounded-full bg-blue-100 text-blue-700 px-2 py-0.5 font-medium">{{ $pocet }}</span>
+                                    @else
+                                        <span class="text-gray-400">—</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-2">
@@ -193,31 +202,4 @@
         @endif
     </div>
 
-    {{-- Historie pozvánek --}}
-    @if($pozvankyHistorie->isNotEmpty())
-        <div>
-            <h2 class="text-lg font-semibold text-gray-700 mb-3">Historie pozvánek (posledních {{ $pozvankyHistorie->count() }})</h2>
-            <div class="space-y-1 text-sm">
-                @foreach($pozvankyHistorie as $p)
-                    <div class="flex items-center justify-between rounded border border-gray-200 bg-white px-3 py-2">
-                        <div class="flex items-center gap-2">
-                            <span>{{ $p->email }}</span>
-                            <span class="rounded-full px-2 py-0.5 text-xs font-medium
-                                @if($p->stav === 'prijata') bg-green-100 text-green-700
-                                @elseif($p->stav === 'zrusena') bg-gray-100 text-gray-700
-                                @else bg-red-100 text-red-700
-                                @endif">{{ $p->stav }}</span>
-                        </div>
-                        <div class="text-xs text-gray-500">
-                            @if($p->prijata_v)
-                                Přijata: {{ $p->prijata_v->format('j. n. Y H:i') }}
-                            @else
-                                {{ $p->vytvoreno?->diffForHumans() }}
-                            @endif
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    @endif
 </x-layouts.app>

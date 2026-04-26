@@ -29,7 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Celý web pouze pro přihlášené s ověřeným e-mailem + s vyplněnou adresou
-Route::middleware(['auth', 'verified', \App\Http\Middleware\VyzadovatAdresu::class])->group(function () {
+Route::middleware(['auth', 'verified', \App\Http\Middleware\VyzadovatAdresu::class, \App\Http\Middleware\TrackNavsteva::class])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Katalog + správa akcí (sjednoceno — každý přihlášený může editovat)
@@ -57,7 +57,7 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\VyzadovatAdresu::cla
 });
 
 // Admin (je_admin middleware) — taky vyžaduje vyplněnou adresu
-Route::middleware(['auth', 'verified', \App\Http\Middleware\VyzadovatAdresu::class, \App\Http\Middleware\JeAdmin::class])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'verified', \App\Http\Middleware\VyzadovatAdresu::class, \App\Http\Middleware\TrackNavsteva::class, \App\Http\Middleware\JeAdmin::class])->prefix('admin')->name('admin.')->group(function () {
     // Uživatelé + pozvánky
     Route::get('/uzivatele', [UzivateleController::class, 'index'])->name('uzivatele');
     Route::post('/uzivatele/pozvat', [UzivateleController::class, 'pozvat'])->name('uzivatele.pozvat');

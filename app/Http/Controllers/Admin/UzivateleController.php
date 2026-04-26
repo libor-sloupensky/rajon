@@ -15,19 +15,23 @@ class UzivateleController extends Controller
     {
         $uzivatele = Uzivatel::orderBy('vytvoreno', 'desc')->paginate(30);
 
-        // Pozvánky: aktivní (čekající) + poslední přijaté/zrušené (10)
+        // Spočítat počet návštěv za poslední měsíc per uživatel (jeden SQL dotaz)
+        $pred30dny = now()->subDays(30);
+        $navstevyPocet = \App\Models\Navsteva::query()
+            ->whereIn('uzivatel_id', $uzivatele->pluck('id'))
+            ->where('zacatek', '>=', $pred30dny)
+            ->select('uzivatel_id', \Illuminate\Support\Facades\DB::raw('COUNT(*) as pocet'))
+            ->groupBy('uzivatel_id')
+            ->pluck('pocet', 'uzivatel_id')
+            ->all();
+
+        // Pozvánky: jen aktivní (čekající)
         $pozvankyAktivni = Pozvanka::with('pozval')
             ->where('stav', 'cekajici')
             ->orderBy('vytvoreno', 'desc')
             ->get();
 
-        $pozvankyHistorie = Pozvanka::with('pozval', 'uzivatel')
-            ->whereIn('stav', ['prijata', 'zrusena', 'expirovana'])
-            ->orderBy('vytvoreno', 'desc')
-            ->take(10)
-            ->get();
-
-        return view('admin.uzivatele.index', compact('uzivatele', 'pozvankyAktivni', 'pozvankyHistorie'));
+        return view('admin.uzivatele.index', compact('uzivatele', 'pozvankyAktivni', 'navstevyPocet'));
     }
 
     /** Rychlé vytvoření pozvánky z formuláře na stránce /admin/uzivatele.
