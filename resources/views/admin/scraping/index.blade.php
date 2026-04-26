@@ -82,15 +82,14 @@
     <div class="mb-6 rounded-lg border border-gray-200 bg-white p-4">
         <div class="flex items-baseline justify-between mb-3">
             <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">Náklady na AI extrakce</h2>
-            <span class="text-xs text-gray-500">kurz {{ $f($kurz, 2) }} Kč/USD · model Haiku 4.5 ($1/$5/Mtok)</span>
+            <span class="text-xs text-gray-500">kurz {{ $f($kurz, 2) }} Kč/USD · model Haiku 4.5</span>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             @foreach (['dnes' => 'Dnes', 'tyden' => 'Posledních 7 dní', 'mesic' => 'Posledních 30 dní', 'celkem' => 'Celkem'] as $klic => $label)
                 @php $s = $statsZakladni[$klic]; @endphp
                 <div class="rounded bg-gray-50 p-3">
                     <div class="text-xs font-medium text-gray-500 uppercase">{{ $label }}</div>
-                    <div class="text-2xl font-bold text-gray-800 mt-1">${{ $f($s['cena_usd'], 4) }}</div>
-                    <div class="text-sm text-gray-600">{{ $f($s['cena_usd'] * $kurz, 2) }} Kč</div>
+                    <div class="text-2xl font-bold text-gray-800 mt-1">{{ $f($s['cena_usd'] * $kurz, 2) }} Kč</div>
                     <div class="mt-1 text-xs text-gray-400">{{ $f($s['pocet'], 0) }} volání · {{ $f($s['tokens'] / 1000, 1) }}k tokenů</div>
                 </div>
             @endforeach
@@ -104,7 +103,6 @@
                         <tr>
                             <th class="text-left py-1">Uživatel</th>
                             <th class="text-right py-1">Volání</th>
-                            <th class="text-right py-1">USD</th>
                             <th class="text-right py-1">Kč</th>
                         </tr>
                     </thead>
@@ -113,7 +111,6 @@
                             <tr>
                                 <td class="py-1">{{ $u['jmeno'] }}</td>
                                 <td class="text-right py-1">{{ $f($u['pocet'], 0) }}</td>
-                                <td class="text-right py-1">${{ $f($u['cena_usd'], 4) }}</td>
                                 <td class="text-right py-1">{{ $f($u['cena_usd'] * $kurz, 2) }} Kč</td>
                             </tr>
                         @endforeach
