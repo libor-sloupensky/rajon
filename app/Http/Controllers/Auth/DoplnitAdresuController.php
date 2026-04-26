@@ -18,7 +18,7 @@ class DoplnitAdresuController extends Controller
     {
         $data = $request->validate([
             'mesto' => ['required', 'string', 'max:100'],
-            'psc' => ['nullable', 'string', 'max:10'],
+            'psc' => ['required', 'string', 'regex:/^\d{3}\s?\d{2}$/'],
         ]);
 
         $gps = $geokoder->geokodujAdresuUzivatele($data['mesto'], $data['psc'] ?? null);

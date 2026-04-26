@@ -3,7 +3,6 @@
         <h1 class="mb-2 text-2xl font-bold text-gray-800">Doplňte své sídlo</h1>
         <p class="mb-6 text-sm text-gray-600">
             Pro výpočet vzdálenosti k akcím potřebujeme vědět, kde sídlíte.
-            Stačí město; PSČ pomáhá odlišit obce se stejným názvem.
         </p>
 
         @if(session('success'))
@@ -24,9 +23,9 @@
                     @error('mesto') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label for="psc" class="mb-1 block text-sm font-medium text-gray-700">PSČ <span class="text-gray-400">(volitelné)</span></label>
-                    <input type="text" id="psc" name="psc" value="{{ old('psc', Auth::user()->psc) }}"
-                        placeholder="11000" maxlength="10"
+                    <label for="psc" class="mb-1 block text-sm font-medium text-gray-700">PSČ <span class="text-red-500">*</span></label>
+                    <input type="text" id="psc" name="psc" value="{{ old('psc', Auth::user()->psc) }}" required
+                        placeholder="11000" maxlength="6" pattern="\d{3}\s?\d{2}"
                         class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none">
                     @error('psc') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>

@@ -40,7 +40,7 @@ class CreateNewUser implements CreatesNewUsers
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('uzivatele', 'email')],
             'telefon' => ['nullable', 'string', 'max:20'],
             'mesto' => ['required', 'string', 'max:100'],
-            'psc' => ['nullable', 'string', 'max:10'],
+            'psc' => ['required', 'string', 'regex:/^\d{3}\s?\d{2}$/'],
             'password' => $this->passwordRules(),
         ])->validate();
 
