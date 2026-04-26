@@ -170,7 +170,10 @@
                     <div class="flex items-start justify-between gap-4">
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-2 mb-1 flex-wrap">
-                                <button type="button" @click="open = !open" class="font-medium text-gray-800 hover:text-primary text-left">{{ $a->nazev }}</button>
+                                <button type="button" @click="open = !open" class="font-medium text-gray-800 hover:text-primary text-left flex items-center gap-1" title="Zobrazit / skrýt detaily">
+                                    <span class="text-gray-400 text-xs transition-transform inline-block" :class="open ? 'rotate-180' : ''">▼</span>
+                                    <span>{{ $a->nazev }}</span>
+                                </button>
                                 @if($a->stav === 'zrusena')
                                     <span class="rounded-full bg-red-100 text-red-700 px-2 py-0.5 text-xs font-medium">zrušena</span>
                                 @elseif($a->stav === 'navrh')
@@ -242,15 +245,12 @@
                                     :title="rezervovano ? 'Uzamčeno — akce je rezervovaná' : 'Nezajímá mě (dole)'"
                                     class="w-7 h-7 rounded-full text-sm flex items-center justify-center border border-gray-200 bg-gray-100 transition disabled:cursor-not-allowed disabled:opacity-50">👎</button>
                             </div>
-                            {{-- Rezervovat tlačítko --}}
+                            {{-- Rezervovat / Zrušit rezervaci --}}
                             <button type="button" @click="toggleRezervace"
-                                :class="rezervovano ? 'bg-green-600 text-white border-green-700' : 'bg-white text-primary border-primary hover:bg-primary/10'"
-                                class="rounded-lg border px-3 py-1 text-xs font-medium transition">
-                                <span x-text="rezervovano ? '✓ Rezervováno' : 'Rezervovat'"></span>
-                            </button>
-                            <button type="button" @click="open = !open"
-                                class="rounded-lg border border-gray-300 px-3 py-1 text-xs text-gray-600 hover:bg-gray-50">
-                                <span x-text="open ? 'Skrýt detaily ▲' : 'Detaily ▼'"></span>
+                                :class="rezervovano ? 'bg-red-50 text-red-700 border-red-300 hover:bg-red-100' : 'bg-white text-primary border-primary hover:bg-primary/10'"
+                                class="rounded-lg border px-3 py-1 text-xs font-medium transition"
+                                title="Vaši rezervaci uvidí i ostatní — berte ji jako ZÁVAZNOU, nebo pouze krátkodobou ve stylu ŘEŠÍM TO.">
+                                <span x-text="rezervovano ? '✕ Zrušit rezervaci' : 'Rezervovat'"></span>
                             </button>
                         </div>
                     </div>
