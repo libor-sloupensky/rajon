@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('navstevy', function (Blueprint $t) {
             $t->id();
             $t->unsignedBigInteger('uzivatel_id');
-            $t->timestamp('zacatek');
-            $t->timestamp('konec');
+            $t->timestamp('zacatek')->nullable();
+            $t->timestamp('konec')->nullable();
 
             $t->index(['uzivatel_id', 'zacatek'], 'navstevy_uzivatel_zacatek');
             $t->foreign('uzivatel_id')->references('id')->on('uzivatele')->onDelete('cascade');
