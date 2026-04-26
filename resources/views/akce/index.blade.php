@@ -1,7 +1,7 @@
 <x-layouts.app title="Katalog akcí — Rajón">
     @php
         $jeAdmin = Auth::user()?->jeAdmin();
-        $maFiltr = request()->hasAny(['hledat', 'typ', 'kraj', 'mesic', 'rok', 'datum_od', 'datum_do', 'stav', 'vse', 'zdroj_typ', 'moje_rezervovane']);
+        $maFiltr = request()->hasAny(['hledat', 'typ', 'kraj', 'mesic', 'rok', 'datum_od', 'datum_do', 'stav', 'vse', 'zdroj_typ', 'moje_rezervovane', 'radius']);
         $u = Auth::user();
         $userLat = $u?->gps_lat;
         $userLng = $u?->gps_lng;
@@ -105,6 +105,15 @@
                 <input type="checkbox" name="moje_rezervovane" value="1" {{ request('moje_rezervovane') ? 'checked' : '' }} class="rounded">
                 Moje rezervované
             </label>
+
+            @if($u?->maAdresu())
+                <label class="text-xs text-gray-500 flex items-center gap-1" title="Pouze akce do X km od mého sídla">
+                    Do
+                    <input type="number" name="radius" value="{{ request('radius') }}" min="1" max="1000" placeholder="—"
+                        class="w-16 rounded border border-gray-300 px-1 py-0.5 text-xs">
+                    km
+                </label>
+            @endif
 
             <button type="submit" class="rounded bg-primary px-3 py-1 text-xs font-medium text-white hover:bg-primary-dark transition">
                 Filtrovat

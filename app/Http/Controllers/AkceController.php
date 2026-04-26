@@ -95,6 +95,19 @@ class AkceController extends Controller
             });
         }
 
+        // Filtr radius — akce do X km od sídla uživatele (haversine)
+        $u = Auth::user();
+        if ($request->filled('radius') && $u?->gps_lat && $u?->gps_lng) {
+            $radius = (float) $request->radius;
+            if ($radius > 0 && $radius <= 1000) {
+                $query->whereNotNull('gps_lat')->whereNotNull('gps_lng')
+                      ->whereRaw(
+                          '(6371 * acos(LEAST(1, cos(radians(?)) * cos(radians(gps_lat)) * cos(radians(gps_lng) - radians(?)) + sin(radians(?)) * sin(radians(gps_lat))))) <= ?',
+                          [$u->gps_lat, $u->gps_lng, $u->gps_lat, $radius]
+                      );
+            }
+        }
+
         // Order: per-user palec ovlivňuje řazení (nahoru, null, stred, dolu).
         if ($uzivatelId) {
             $query->leftJoin('akce_uzivatel as au_filter', function ($j) use ($uzivatelId) {
