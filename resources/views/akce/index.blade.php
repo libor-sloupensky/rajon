@@ -2,6 +2,9 @@
     @php
         $jeAdmin = Auth::user()?->jeAdmin();
         $maFiltr = request()->hasAny(['hledat', 'typ', 'kraj', 'mesic', 'rok', 'datum_od', 'datum_do', 'stav', 'vse', 'zdroj_typ', 'moje_rezervovane']);
+        $u = Auth::user();
+        $userLat = $u?->gps_lat;
+        $userLng = $u?->gps_lng;
     @endphp
 
     <div class="flex items-center justify-between mb-6">
@@ -193,6 +196,19 @@
                                 @endif
                                 · {{ $a->misto }}{{ $a->okres ? ' (' . $a->okres . ')' : '' }}
                                 @if($a->kraj) · {{ $a->kraj }} @endif
+                                {{-- Vzdálenost + směr od sídla uživatele --}}
+                                @if($userLat && $userLng)
+                                    @if($a->gps_lat && $a->gps_lng)
+                                        @php
+                                            $km = \App\Support\Vzdalenost::km($userLat, $userLng, $a->gps_lat, $a->gps_lng);
+                                            $bearing = \App\Support\Vzdalenost::smerStupne($userLat, $userLng, $a->gps_lat, $a->gps_lng);
+                                            $sipka = \App\Support\Vzdalenost::smerSipka($bearing);
+                                        @endphp
+                                        · <span class="font-medium text-gray-700" title="Směr od mého sídla">{{ $sipka }} {{ \App\Support\Vzdalenost::formatuj($km) }}</span>
+                                    @else
+                                        · <span class="text-gray-400" title="Akce nemá GPS souřadnice">?</span>
+                                    @endif
+                                @endif
                             </p>
                             @if($a->organizator)
                                 <p class="text-xs text-gray-400 mt-0.5">Organizátor: {{ $a->organizator }}</p>

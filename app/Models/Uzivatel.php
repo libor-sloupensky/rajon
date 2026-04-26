@@ -28,6 +28,10 @@ class Uzivatel extends Authenticatable implements MustVerifyEmail
         'google_id',
         'role',
         'region',
+        'mesto',
+        'psc',
+        'gps_lat',
+        'gps_lng',
         'email_overen_v',
         'posledni_prihlaseni',
     ];
@@ -43,7 +47,15 @@ class Uzivatel extends Authenticatable implements MustVerifyEmail
             'email_overen_v' => 'datetime',
             'posledni_prihlaseni' => 'datetime',
             'heslo' => 'hashed',
+            'gps_lat' => 'float',
+            'gps_lng' => 'float',
         ];
+    }
+
+    /** Má uživatel vyplněnou adresu s GPS? */
+    public function maAdresu(): bool
+    {
+        return !empty($this->gps_lat) && !empty($this->gps_lng);
     }
 
     public function getAuthPassword(): string

@@ -39,10 +39,22 @@ class CreateNewUser implements CreatesNewUsers
             'prijmeni' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('uzivatele', 'email')],
             'telefon' => ['nullable', 'string', 'max:20'],
+            'mesto' => ['required', 'string', 'max:100'],
+            'psc' => ['nullable', 'string', 'max:10'],
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return DB::transaction(function () use ($input, $pozvanka) {
+        // Geokódovat adresu (město + PSČ) přes Mapy.cz — vyžadováno
+        $geokoder = app(\App\Services\Geokoder::class);
+        $gps = $geokoder->geokodujAdresuUzivatele($input['mesto'], $input['psc'] ?? null);
+
+        if (!$gps) {
+            throw ValidationException::withMessages([
+                'mesto' => 'Tuto obec nelze najít. Zkuste přidat PSČ pro upřesnění (např. obce se stejným názvem).',
+            ]);
+        }
+
+        return DB::transaction(function () use ($input, $pozvanka, $gps) {
             $uzivatel = Uzivatel::create([
                 'jmeno' => $input['jmeno'],
                 'prijmeni' => $input['prijmeni'],
@@ -51,6 +63,10 @@ class CreateNewUser implements CreatesNewUsers
                 'heslo' => Hash::make($input['password']),
                 'role' => $pozvanka->role ?: 'fransizan',
                 'region' => $pozvanka->region,
+                'mesto' => $input['mesto'],
+                'psc' => $input['psc'] ?? null,
+                'gps_lat' => $gps['gps_lat'],
+                'gps_lng' => $gps['gps_lng'],
                 'email_overen_v' => now(),  // z pozvánky = e-mail ověřen
             ]);
 

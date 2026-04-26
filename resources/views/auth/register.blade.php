@@ -47,6 +47,24 @@
                     class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none">
             </div>
 
+            <div class="grid grid-cols-3 gap-4">
+                <div class="col-span-2">
+                    <label for="mesto" class="mb-1 block text-sm font-medium text-gray-700">Sídlo — město <span class="text-red-500">*</span></label>
+                    <input type="text" id="mesto" name="mesto" value="{{ old('mesto') }}" required
+                        placeholder="např. Praha"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none">
+                    @error('mesto') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="psc" class="mb-1 block text-sm font-medium text-gray-700">PSČ <span class="text-gray-400">(volitelné)</span></label>
+                    <input type="text" id="psc" name="psc" value="{{ old('psc') }}"
+                        placeholder="11000" maxlength="10"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none">
+                    @error('psc') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 -mt-2">PSČ pomůže odlišit obce se stejným názvem (např. Lhota). Adresa slouží pro výpočet vzdálenosti k akcím.</p>
+
             <div>
                 <label for="password" class="mb-1 block text-sm font-medium text-gray-700">Heslo</label>
                 <input type="password" id="password" name="password" required

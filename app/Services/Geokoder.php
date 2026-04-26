@@ -27,6 +27,33 @@ class Geokoder
     }
 
     /**
+     * Geokóduj adresu uživatele (město + volitelně PSČ).
+     * PSČ pomáhá disambiguovat obce se stejným názvem.
+     */
+    public function geokodujAdresuUzivatele(string $mesto, ?string $psc = null): ?array
+    {
+        if (empty($this->apiKey)) {
+            \Illuminate\Support\Facades\Log::warning('Geokoder: MAPYCZ_API_KEY není nastaveno');
+            return null;
+        }
+
+        $queries = [];
+        if (!empty($psc)) {
+            $queries[] = trim($mesto) . ' ' . trim($psc) . ', Česká republika';
+        }
+        $queries[] = trim($mesto) . ', Česká republika';
+
+        foreach ($queries as $query) {
+            $cacheKey = 'geokoder.user.' . md5($query);
+            $result = \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addDays(30), function () use ($query) {
+                return $this->volajApi($query);
+            });
+            if ($result) return $result;
+        }
+        return null;
+    }
+
+    /**
      * Geokóduj kombinaci adresa/místo/město/okres/kraj.
      * Vrací array ['gps_lat' => ..., 'gps_lng' => ..., 'okres' => ..., 'kraj' => ...] nebo null.
      *

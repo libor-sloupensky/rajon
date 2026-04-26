@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AkceController;
+use App\Http\Controllers\Auth\DoplnitAdresuController;
 use App\Http\Controllers\Admin\ErrorLogController;
 use App\Http\Controllers\Admin\ScrapingController;
 use App\Http\Controllers\Admin\UzivateleController;
@@ -21,8 +22,14 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name
 Route::get('/registrace', [RegistraceController::class, 'zobrazit'])->name('registrace');
 Route::post('/registrace', [RegistraceController::class, 'registrovat'])->name('registrace.store');
 
-// Celý web pouze pro přihlášené s ověřeným e-mailem
+// Doplnit adresu — uživatelé bez GPS sídla (přihlášení, ale výjimka z VyzadovatAdresu)
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/doplnit-adresu', [DoplnitAdresuController::class, 'zobrazit']);
+    Route::post('/doplnit-adresu', [DoplnitAdresuController::class, 'ulozit']);
+});
+
+// Celý web pouze pro přihlášené s ověřeným e-mailem + s vyplněnou adresou
+Route::middleware(['auth', 'verified', \App\Http\Middleware\VyzadovatAdresu::class])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Katalog + správa akcí (sjednoceno — každý přihlášený může editovat)
@@ -49,8 +56,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/akce-mapa', [AkceController::class, 'mapaJson'])->name('api.akce.mapa');
 });
 
-// Admin (je_admin middleware)
-Route::middleware(['auth', 'verified', \App\Http\Middleware\JeAdmin::class])->prefix('admin')->name('admin.')->group(function () {
+// Admin (je_admin middleware) — taky vyžaduje vyplněnou adresu
+Route::middleware(['auth', 'verified', \App\Http\Middleware\VyzadovatAdresu::class, \App\Http\Middleware\JeAdmin::class])->prefix('admin')->name('admin.')->group(function () {
     // Uživatelé + pozvánky
     Route::get('/uzivatele', [UzivateleController::class, 'index'])->name('uzivatele');
     Route::post('/uzivatele/pozvat', [UzivateleController::class, 'pozvat'])->name('uzivatele.pozvat');
