@@ -111,7 +111,7 @@
     </form>
 
     {{-- Souhrn + odkaz na mapu --}}
-    <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-4 mb-3">
         <p class="text-sm text-gray-600">
             @if($maFiltr)
                 Nalezeno <strong>{{ $akce->total() }}</strong> akcí
