@@ -22,13 +22,11 @@
                 <div class="px-2 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Akce</div>
                 <div class="rj-sidebar-section-body" style="max-height: 20rem;">
                     @php
-                        $jeKatalog = (request()->is('akce') || request()->is('akce/*')) && !request()->boolean('moje_rezervovane');
-                        $jeMojeRez = (request()->is('akce') || request()->is('akce/*')) && request()->boolean('moje_rezervovane');
+                        $jeKatalog = request()->is('akce') || request()->is('akce/*');
                         $jeMapa = request()->is('mapa');
                     @endphp
                     <a href="{{ url('/dashboard') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('dashboard') ? 'active' : '' }}">Dashboard</a>
                     <a href="{{ url('/akce') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ $jeKatalog ? 'active' : '' }}">Katalog akcí</a>
-                    <a href="{{ url('/akce?moje_rezervovane=1') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ $jeMojeRez ? 'active' : '' }}">Moje rezervované</a>
                     <a href="{{ url('/mapa') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ $jeMapa ? 'active' : '' }}">Mapa</a>
                 </div>
             </div>
