@@ -35,10 +35,9 @@
     </div>
 
     @if (config('services.mapycz.api_key'))
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-              integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-                integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        {{-- Leaflet self-hostováno lokálně (nezávislost na unpkg CDN) --}}
+        <link rel="stylesheet" href="{{ asset('js/leaflet/leaflet.css') }}" />
+        <script src="{{ asset('js/leaflet/leaflet.js') }}"></script>
         <script>
             (function () {
                 var akceData = @json($akce);
