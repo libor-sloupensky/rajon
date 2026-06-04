@@ -67,7 +67,7 @@
                         @if($dalsi)
                             Další cron běh: připraveno
                         @else
-                            Další za {{ $z['frekvence_hodin'] - $hodPred }} h
+                            Další za {{ round($z['frekvence_hodin'] - $hodPred) }} h
                         @endif
                     </div>
                 </div>
