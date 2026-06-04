@@ -59,6 +59,44 @@ class KrajeOkresySeeder extends Seeder
                 'Bruntál', 'Frýdek-Místek', 'Karviná', 'Nový Jičín',
                 'Opava', 'Ostrava-město',
             ],
+
+            // --- Slovenská republika (8 samosprávných krajů) ---
+            // Bratislavu a Košice držíme jako jeden okres (stejně jako Prahu),
+            // aby se text "Bratislava" / "Košice" z AI navázal na okres.
+            'Bratislavský kraj' => [
+                'Bratislava', 'Malacky', 'Pezinok', 'Senec',
+            ],
+            'Trnavský kraj' => [
+                'Dunajská Streda', 'Galanta', 'Hlohovec', 'Piešťany',
+                'Senica', 'Skalica', 'Trnava',
+            ],
+            'Trenčiansky kraj' => [
+                'Bánovce nad Bebravou', 'Ilava', 'Myjava', 'Nové Mesto nad Váhom',
+                'Partizánske', 'Považská Bystrica', 'Prievidza', 'Púchov', 'Trenčín',
+            ],
+            'Nitriansky kraj' => [
+                'Komárno', 'Levice', 'Nitra', 'Nové Zámky',
+                'Šaľa', 'Topoľčany', 'Zlaté Moravce',
+            ],
+            'Žilinský kraj' => [
+                'Bytča', 'Čadca', 'Dolný Kubín', 'Kysucké Nové Mesto',
+                'Liptovský Mikuláš', 'Martin', 'Námestovo', 'Ružomberok',
+                'Turčianske Teplice', 'Tvrdošín', 'Žilina',
+            ],
+            'Banskobystrický kraj' => [
+                'Banská Bystrica', 'Banská Štiavnica', 'Brezno', 'Detva',
+                'Krupina', 'Lučenec', 'Poltár', 'Revúca', 'Rimavská Sobota',
+                'Veľký Krtíš', 'Zvolen', 'Žarnovica', 'Žiar nad Hronom',
+            ],
+            'Prešovský kraj' => [
+                'Bardejov', 'Humenné', 'Kežmarok', 'Levoča', 'Medzilaborce',
+                'Poprad', 'Prešov', 'Sabinov', 'Snina', 'Stará Ľubovňa',
+                'Stropkov', 'Svidník', 'Vranov nad Topľou',
+            ],
+            'Košický kraj' => [
+                'Košice', 'Košice-okolie', 'Gelnica', 'Michalovce',
+                'Rožňava', 'Sobrance', 'Spišská Nová Ves', 'Trebišov',
+            ],
         ];
 
         foreach ($data as $krajNazev => $okresy) {

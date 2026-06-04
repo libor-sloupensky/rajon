@@ -2,8 +2,13 @@
 
 ## Stav: Generická pipeline (verze 2)
 
-Pipeline je navržená tak, aby **přidání nového katalogu / kalendáře akcí
-NEVYŽADOVALO úpravu kódu** — stačí vyplnit záznam v tabulce `zdroje`.
+Pipeline má generické stavební bloky (sitemap/paginator, JSON-LD/AI extrakce,
+matcher, merger). **Každý nový zdroj se ale přidává a ladí samostatně** —
+v praxi se ukázalo, že auto-detekce sama o sobě nestačí: u většiny zdrojů je
+potřeba ručně ověřit a doladit `url_pattern_detail`, paginaci, mapování polí
+a chování extrakce na reálných datech. Postup je proto: přidat zdroj →
+Test (10) → zkontrolovat výsledky → doladit konfiguraci zdroje → opakovat,
+než dává Plný scraping smysl.
 
 ## Architektura
 
@@ -36,7 +41,8 @@ NEVYŽADOVALO úpravu kódu** — stačí vyplnit záznam v tabulce `zdroje`.
 │       - Fallback AI (Anthropic Claude Haiku) s seznam okresů    │
 │    c. Filtr datum_do < dnes → preskoceny                        │
 │    d. LokalizaceResolver — text kraj/okres → DB FK              │
-│    e. Region filter (7 krajů východní ČR)                       │
+│    e. Region filter — VOLITELNÝ, default VYPNUTÝ (cron i admin) │
+│       opt-in `pouze_vychod` = jen 7 krajů vých. ČR              │
 │    f. Velikostní scoring (>= 50 = velká, < 40 = malá)           │
 │    g. AkceMatcher — fuzzy match na existující akci              │
 │    h. AkceMerger — field-level merge s trust ranking            │
@@ -129,7 +135,9 @@ config/scraping.php          — trust ranking + thresholds
 4. Klik **Test (10)** — uvidíš statistiky kolik akcí bylo extrahováno přes JSON-LD vs AI
 5. Klik **Plný scraping** — spustí pro všechny URL ze sitemap
 
-**Žádný kód nebyl napsán.**
+**Pozn.:** auto-detekce vyplní rozumný základ, ale u nového zdroje téměř vždy
+následuje ruční ladění (URL pattern, paginace, kontrola extrahovaných polí)
+podle výsledků Testu. Nepovažovat zdroj za hotový, dokud Test nevrací čistá data.
 
 ## Aktuální zdroje (stav 2026-04-25)
 
