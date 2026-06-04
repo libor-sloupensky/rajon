@@ -94,6 +94,12 @@ class ListingPaginator
             return (bool) preg_match('#/(akce|events|akcie|event|kalendar)/[\w\-]+|\?id=\d+#i', $url);
         }
 
+        // Regex pattern (obalený v # delimiterech) — pro custom URL schémata,
+        // např. folklorfest.sk má detaily /{id}-slug/ → pattern '#/\d{2,}-#'
+        if (strlen($detailPattern) >= 2 && $detailPattern[0] === '#' && @preg_match($detailPattern, '') !== false) {
+            return (bool) preg_match($detailPattern, $url);
+        }
+
         return str_contains($url, $detailPattern);
     }
 

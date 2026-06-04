@@ -168,12 +168,18 @@ class ScrapingPipeline
             $this->lastmodZeSitemap = $sLastmod;
             $urls = array_keys($sLastmod);
         } else {
-            // Generický paginator — funguje pro libovolný katalog s listingem
-            $listingUrl = $zdroj->url_pattern_list
-                ? $this->absolutniUrl($zdroj->url_pattern_list, $baseUrl)
-                : $zdroj->url;
+            // Generický paginator — funguje pro libovolný katalog s listingem.
+            // url_pattern_list může obsahovat víc vstupních listingů oddělených čárkou
+            // (např. folklorfest.sk má 7 kategorií, každou nutno projít zvlášť).
+            $listingUrls = $zdroj->url_pattern_list
+                ? array_map(fn ($p) => $this->absolutniUrl(trim($p), $baseUrl), explode(',', $zdroj->url_pattern_list))
+                : [$zdroj->url];
 
-            $urls = $this->paginator->sbirej($listingUrl, $detailPattern, $baseUrl);
+            $urls = [];
+            foreach ($listingUrls as $listingUrl) {
+                $urls = array_merge($urls, $this->paginator->sbirej($listingUrl, $detailPattern, $baseUrl));
+            }
+            $urls = array_values(array_unique($urls));
 
             // Poslední fallback — pokud paginator nenašel nic, jen analyzátor hlavní stránky
             if (empty($urls)) {
