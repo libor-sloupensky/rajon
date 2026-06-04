@@ -15,6 +15,15 @@ class Kraj extends Model
     protected $fillable = [
         'nazev',
         'slug',
+        'zeme',
+    ];
+
+    /** Mapování kódu země → zobrazovaný název (pro filtr Země → Kraj). */
+    public const ZEME_NAZVY = [
+        'CZ' => 'Česko',
+        'SK' => 'Slovensko',
+        'PL' => 'Polsko',
+        'HU' => 'Maďarsko',
     ];
 
     public function getRouteKeyName(): string

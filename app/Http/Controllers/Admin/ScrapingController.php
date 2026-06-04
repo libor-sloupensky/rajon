@@ -173,10 +173,8 @@ class ScrapingController extends Controller
     public function spustit(Request $request, Zdroj $zdroj)
     {
         $limit = (int) $request->input('limit', 10);
-        // Default: ukládat všechny kraje ČR. Filter zapne admin volitelně.
-        $pouzeRegion = $request->boolean('pouze_vychod');
 
-        $log = $this->pipeline->scrapujZdroj($zdroj, $limit, $pouzeRegion);
+        $log = $this->pipeline->scrapujZdroj($zdroj, $limit);
 
         return redirect()->route('admin.scraping.log', $log)
             ->with('success', "Scraping dokončen: {$log->pocet_novych} nových, {$log->pocet_aktualizovanych} aktualizovaných.");

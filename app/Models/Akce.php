@@ -16,28 +16,6 @@ class Akce extends Model
     const CREATED_AT = 'vytvoreno';
     const UPDATED_AT = 'upraveno';
 
-    /** 7 krajů východní ČR (filtr pro scraping). */
-    public const KRAJE_VYCHOD = [
-        'Kraj Vysočina',
-        'Královéhradecký kraj',
-        'Pardubický kraj',
-        'Olomoucký kraj',
-        'Moravskoslezský kraj',
-        'Zlínský kraj',
-        'Jihomoravský kraj',
-    ];
-
-    /** Slugs odpovídajících krajů — pro DB filtr přes kraje.slug. */
-    public const KRAJE_VYCHOD_SLUGS = [
-        'kraj-vysocina',
-        'kralovehradecky-kraj',
-        'pardubicky-kraj',
-        'olomoucky-kraj',
-        'moravskoslezsky-kraj',
-        'zlinsky-kraj',
-        'jihomoravsky-kraj',
-    ];
-
     protected $fillable = [
         'nazev',
         'slug',
@@ -162,15 +140,5 @@ class Akce extends Model
     public function vykazy(): HasMany
     {
         return $this->hasMany(AkceVykaz::class, 'akce_id');
-    }
-
-    /** Je kraj akce ve sledovaném regionu (východní ČR)? */
-    public function jeVRegionu(): bool
-    {
-        // Preferenčně přes FK; fallback na string match (kvůli starým záznamům)
-        if ($this->kraj_id) {
-            return in_array($this->krajRel?->slug, self::KRAJE_VYCHOD_SLUGS, true);
-        }
-        return in_array($this->kraj, self::KRAJE_VYCHOD, true);
     }
 }

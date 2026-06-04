@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 class AkceController extends Controller
 {
     /** Klíče filtru (persistované v uzivatele.akce_filtr). */
-    private const FILTR_KLICE = ['hledat', 'typ', 'kraj', 'datum_od', 'datum_do',
+    private const FILTR_KLICE = ['hledat', 'typ', 'zeme', 'kraj', 'datum_od', 'datum_do',
                                   'stav', 'vse', 'moje_rezervovane', 'radius'];
 
     /**
@@ -39,7 +39,15 @@ class AkceController extends Controller
             });
         }
         if (!empty($f['typ'])) $query->where('typ', $f['typ']);
-        if (!empty($f['kraj'])) $query->where('kraj', 'like', '%' . $f['kraj'] . '%');
+        if (!empty($f['kraj'])) {
+            $query->where('kraj', 'like', '%' . $f['kraj'] . '%');
+        } elseif (!empty($f['zeme'])) {
+            // Země bez konkrétního kraje → akce v krajích dané země (match přes název kraje).
+            $krajeZeme = \App\Models\Kraj::where('zeme', $f['zeme'])->pluck('nazev')->all();
+            if ($krajeZeme) {
+                $query->whereIn('kraj', $krajeZeme);
+            }
+        }
 
         // Datum overlap
         if (!empty($f['datum_od'])) {
@@ -148,7 +156,10 @@ class AkceController extends Controller
 
         $akce = $query->paginate(30)->withQueryString();
 
-        return view('akce.index', compact('akce'));
+        // Kraje pro dvouúrovňový filtr Země → Kraj (DB-driven, ne hardcode)
+        $kraje = \App\Models\Kraj::orderBy('zeme')->orderBy('nazev')->get(['nazev', 'zeme']);
+
+        return view('akce.index', compact('akce', 'kraje'));
     }
 
     /** Uloží osobní palec hodnocení (per-user). Pokud je akce rezervovaná, palec je uzamčen na 'nahoru'. */

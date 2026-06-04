@@ -1,7 +1,7 @@
 <x-layouts.app title="Katalog akcí — Rajón">
     @php
         $jeAdmin = Auth::user()?->jeAdmin();
-        $maFiltr = request()->hasAny(['hledat', 'typ', 'kraj', 'mesic', 'rok', 'datum_od', 'datum_do', 'stav', 'vse', 'zdroj_typ', 'moje_rezervovane', 'radius']);
+        $maFiltr = request()->hasAny(['hledat', 'typ', 'zeme', 'kraj', 'mesic', 'rok', 'datum_od', 'datum_do', 'stav', 'vse', 'zdroj_typ', 'moje_rezervovane', 'radius']);
         $u = Auth::user();
         $userLat = $u?->gps_lat;
         $userLng = $u?->gps_lng;
@@ -22,13 +22,10 @@
 
     {{-- Filtry --}}
     @php
-        $kraje = [
-            'Praha', 'Středočeský kraj', 'Jihočeský kraj', 'Plzeňský kraj',
-            'Karlovarský kraj', 'Ústecký kraj', 'Liberecký kraj',
-            'Královéhradecký kraj', 'Pardubický kraj', 'Kraj Vysočina',
-            'Jihomoravský kraj', 'Olomoucký kraj', 'Zlínský kraj',
-            'Moravskoslezský kraj',
-        ];
+        // Kraje pro filtr přicházejí z controlleru (DB), seskupené dle země.
+        $zemeNazvy = \App\Models\Kraj::ZEME_NAZVY;
+        $krajeDleZeme = collect($kraje ?? [])->groupBy('zeme');
+        $vybranaZeme = request('zeme');
         $typy = [
             'pout' => 'Pouť',
             'food_festival' => 'Food festival',
@@ -55,11 +52,37 @@
                 @endforeach
             </select>
 
+            {{-- Dvouúrovňový filtr: Země → Kraj. Změna země vyčistí kraj a znovu načte
+                 jen kraje dané země; bez vybrané země se kraje zobrazí v optgroup. --}}
+            @if($krajeDleZeme->count() > 1)
+                <select name="zeme" onchange="this.form.kraj.value=''"
+                    class="rounded border border-gray-300 px-2 py-1 text-xs flex-1 min-w-0">
+                    <option value="">Země</option>
+                    @foreach($krajeDleZeme->keys() as $zkod)
+                        <option value="{{ $zkod }}" {{ $vybranaZeme === $zkod ? 'selected' : '' }}>{{ $zemeNazvy[$zkod] ?? $zkod }}</option>
+                    @endforeach
+                </select>
+            @endif
+
             <select name="kraj" class="rounded border border-gray-300 px-2 py-1 text-xs flex-1 min-w-0">
                 <option value="">Kraj</option>
-                @foreach($kraje as $k)
-                    <option value="{{ $k }}" {{ request('kraj') === $k ? 'selected' : '' }}>{{ $k }}</option>
-                @endforeach
+                @if($vybranaZeme)
+                    @foreach($krajeDleZeme->get($vybranaZeme, collect()) as $k)
+                        <option value="{{ $k->nazev }}" {{ request('kraj') === $k->nazev ? 'selected' : '' }}>{{ $k->nazev }}</option>
+                    @endforeach
+                @elseif($krajeDleZeme->count() > 1)
+                    @foreach($krajeDleZeme as $zkod => $skupina)
+                        <optgroup label="{{ $zemeNazvy[$zkod] ?? $zkod }}">
+                            @foreach($skupina as $k)
+                                <option value="{{ $k->nazev }}" {{ request('kraj') === $k->nazev ? 'selected' : '' }}>{{ $k->nazev }}</option>
+                            @endforeach
+                        </optgroup>
+                    @endforeach
+                @else
+                    @foreach($krajeDleZeme->flatten(1) as $k)
+                        <option value="{{ $k->nazev }}" {{ request('kraj') === $k->nazev ? 'selected' : '' }}>{{ $k->nazev }}</option>
+                    @endforeach
+                @endif
             </select>
 
             @if($jeAdmin)

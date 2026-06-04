@@ -5,10 +5,17 @@ namespace Database\Seeders;
 use App\Models\Kraj;
 use App\Models\Okres;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class KrajeOkresySeeder extends Seeder
 {
+    /** Slovenské kraje — pro nastavení zeme='SK' (zbytek = 'CZ'). */
+    private const SK_KRAJE = [
+        'Bratislavský kraj', 'Trnavský kraj', 'Trenčiansky kraj', 'Nitriansky kraj',
+        'Žilinský kraj', 'Banskobystrický kraj', 'Prešovský kraj', 'Košický kraj',
+    ];
+
     public function run(): void
     {
         $data = [
@@ -99,10 +106,18 @@ class KrajeOkresySeeder extends Seeder
             ],
         ];
 
+        // Sloupec zeme nemusí existovat při prvním běhu (migrace 110001 ho přidá
+        // až po seedu) — proto guard. Backfill v migraci 110001 to dorovná.
+        $maZeme = Schema::hasColumn('kraje', 'zeme');
+
         foreach ($data as $krajNazev => $okresy) {
+            $atributy = ['slug' => Str::slug($krajNazev)];
+            if ($maZeme) {
+                $atributy['zeme'] = in_array($krajNazev, self::SK_KRAJE, true) ? 'SK' : 'CZ';
+            }
             $kraj = Kraj::updateOrCreate(
                 ['nazev' => $krajNazev],
-                ['slug' => Str::slug($krajNazev)]
+                $atributy
             );
 
             foreach ($okresy as $okresNazev) {

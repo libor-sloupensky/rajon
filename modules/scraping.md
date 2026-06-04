@@ -40,12 +40,10 @@ než dává Plný scraping smysl.
 │       - JsonLdExtractor — pokud má schema.org/Event → použij    │
 │       - Fallback AI (Anthropic Claude Haiku) s seznam okresů    │
 │    c. Filtr datum_do < dnes → preskoceny                        │
-│    d. LokalizaceResolver — text kraj/okres → DB FK              │
-│    e. Region filter — VOLITELNÝ, default VYPNUTÝ (cron i admin) │
-│       opt-in `pouze_vychod` = jen 7 krajů vých. ČR              │
-│    f. Velikostní scoring (>= 50 = velká, < 40 = malá)           │
-│    g. AkceMatcher — fuzzy match na existující akci              │
-│    h. AkceMerger — field-level merge s trust ranking            │
+│    d. LokalizaceResolver — text kraj/okres → DB FK (CZ + SR)    │
+│    e. Velikostní scoring (>= 50 = velká, < 40 = malá)           │
+│    f. AkceMatcher — fuzzy match na existující akci              │
+│    g. AkceMerger — field-level merge s trust ranking            │
 │                                                                 │
 │ 4. Konflikty mezi zdroji + web pořadatele jako tiebreaker       │
 │ 5. Auto-propojení ročníků při similarity ≥ 90 %                 │

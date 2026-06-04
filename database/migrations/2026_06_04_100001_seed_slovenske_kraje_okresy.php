@@ -12,6 +12,9 @@ use Illuminate\Database\Migrations\Migration;
  *
  * Po naseedování umí LokalizaceResolver navázat slovenské akce na kraj_id/okres_id
  * a seznam okresů v AI promptu se automaticky rozšíří o slovenské.
+ *
+ * Navazuje migrace 110001 (sloupec `zeme`) — seeder zemi nastaví sám, pokud už
+ * sloupec existuje; jinak ji dorovná backfill v 110001 (pořadí-nezávislé).
  */
 return new class extends Migration
 {

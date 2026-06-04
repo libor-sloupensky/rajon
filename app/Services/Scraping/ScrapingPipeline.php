@@ -14,10 +14,9 @@ use Illuminate\Support\Str;
  * Orchestrace scrapingu — pro jeden zdroj:
  * 1. Stáhne seznam URL ze sitemap
  * 2. Pro každou URL extrahuje detail (AkceExtractor)
- * 3. Filtruje podle regionu (7 krajů východní ČR)
- * 4. Klasifikuje velikost akce
- * 5. Dedupluje a ukládá do DB
- * 6. Loguje výsledek
+ * 3. Klasifikuje velikost akce
+ * 4. Dedupluje a ukládá do DB
+ * 5. Loguje výsledek
  */
 class ScrapingPipeline
 {
@@ -42,7 +41,7 @@ class ScrapingPipeline
      * Spustí scraping pro daný zdroj.
      * @param int|null $limit Maximální počet detailů (pro testování)
      */
-    public function scrapujZdroj(Zdroj $zdroj, ?int $limit = null, bool $pouzeRegion = true): ScrapingLog
+    public function scrapujZdroj(Zdroj $zdroj, ?int $limit = null): ScrapingLog
     {
         // Předat zdroj do fetchHtml — pro login session
         $this->aktualniZdroj = $zdroj;
@@ -99,7 +98,7 @@ class ScrapingPipeline
             // 2. Pro každou URL
             foreach ($urls as $url) {
                 try {
-                    $vysledek = $this->zpracujAkci($zdroj, $url, $pouzeRegion, $statistiky);
+                    $vysledek = $this->zpracujAkci($zdroj, $url, $statistiky);
 
                     match ($vysledek['stav']) {
                         'novy' => $log->increment('pocet_novych'),
@@ -309,7 +308,7 @@ class ScrapingPipeline
     }
 
     /** Zpracuj jednu akci — extrakce, filtry, uložení. */
-    protected function zpracujAkci(Zdroj $zdroj, string $url, bool $pouzeRegion, array &$statistiky): array
+    protected function zpracujAkci(Zdroj $zdroj, string $url, array &$statistiky): array
     {
         // 1. Fetch HTML
         $html = $this->fetchHtml($url);
@@ -402,19 +401,6 @@ class ScrapingPipeline
         $krajStat = $data['kraj'] ?? 'neznámý';
         $statistiky['podle_kraje'][$krajStat] = ($statistiky['podle_kraje'][$krajStat] ?? 0) + 1;
 
-        // 5. Region filter — volitelný (default vypnuto, ukládáme všechny kraje ČR).
-        //    Ponecháno pro případnou budoucí filtraci per-franšízant (jeho region).
-        if ($pouzeRegion) {
-            $krajSlug = $loc['kraj_id'] ? (\App\Models\Kraj::find($loc['kraj_id'])?->slug) : null;
-            $jeVRegionu = $krajSlug
-                ? in_array($krajSlug, Akce::KRAJE_VYCHOD_SLUGS, true)
-                : in_array($data['kraj'] ?? null, Akce::KRAJE_VYCHOD, true);
-
-            if (!$jeVRegionu) {
-                return ['stav' => 'preskoceny', 'duvod' => "Mimo region: {$krajStat}"];
-            }
-        }
-
         // 5. Velikostní scoring
         $skore = $this->extractor->vypocetVelikostSkore($data);
         $stav = $this->extractor->urciStavVelikosti($skore);
@@ -457,9 +443,6 @@ class ScrapingPipeline
         }
         if (str_contains($duvod, 'hash') || str_contains($duvod, 'nezměnil')) {
             return 'Obsah HTML se nezměnil';
-        }
-        if (str_contains($duvod, 'Mimo region')) {
-            return 'Mimo region';
         }
         if (str_contains($duvod, 'lastmod')) {
             return 'Sitemap lastmod nezměněn';
