@@ -105,27 +105,32 @@
                     title="Datum do" class="rounded border border-gray-300 px-2 py-1 text-xs">
             </div>
 
-            <label class="text-xs text-gray-500 flex items-center gap-1">
-                <input type="checkbox" name="vse" value="1" {{ request('vse') ? 'checked' : '' }} class="rounded">
+            <label class="text-xs flex items-center gap-1 rounded px-1.5 py-0.5 {{ request('vse') ? 'text-primary font-semibold' : 'text-gray-500' }}"
+                style="{{ request('vse') ? 'background-color: rgba(221,85,0,0.10)' : '' }}">
+                <input type="checkbox" name="vse" value="1" {{ request('vse') ? 'checked' : '' }} class="rounded" style="accent-color:#dd5500">
                 I minulé
             </label>
 
-            <label class="text-xs text-gray-500 flex items-center gap-1">
-                <input type="checkbox" name="moje_rezervovane" value="1" {{ request('moje_rezervovane') ? 'checked' : '' }} class="rounded">
+            <label class="text-xs flex items-center gap-1 rounded px-1.5 py-0.5 {{ request('moje_rezervovane') ? 'text-primary font-semibold' : 'text-gray-500' }}"
+                style="{{ request('moje_rezervovane') ? 'background-color: rgba(221,85,0,0.10)' : '' }}">
+                <input type="checkbox" name="moje_rezervovane" value="1" {{ request('moje_rezervovane') ? 'checked' : '' }} class="rounded" style="accent-color:#dd5500">
                 Moje rezervované
             </label>
 
             @if($u?->maAdresu())
-                <label class="text-xs text-gray-500 flex items-center gap-1" title="Pouze akce do X km od mého sídla">
+                <label class="text-xs flex items-center gap-1 rounded px-1.5 py-0.5 {{ request('radius') ? 'text-primary font-semibold' : 'text-gray-500' }}"
+                    style="{{ request('radius') ? 'background-color: rgba(221,85,0,0.10)' : '' }}" title="Pouze akce do X km od mého sídla">
                     Do
                     <input type="number" name="radius" value="{{ request('radius') }}" min="1" max="1000" placeholder="—"
-                        class="w-16 rounded border border-gray-300 px-1 py-0.5 text-xs">
+                        class="w-16 rounded border px-1 py-0.5 text-xs {{ request('radius') ? 'border-primary' : 'border-gray-300' }}">
                     km
                 </label>
             @endif
 
             @if($maFiltr || request()->boolean('moje_rezervovane'))
-                <a href="{{ url('/akce?_clear=1') }}" class="text-xs text-gray-500 hover:text-primary">Zrušit filtr</a>
+                <a href="{{ url('/akce?_clear=1') }}"
+                    class="text-xs font-semibold text-primary hover:text-primary-dark rounded px-2 py-0.5"
+                    style="background-color: rgba(221,85,0,0.10)">✕ Zrušit filtr</a>
             @endif
         </div>
     </form>
