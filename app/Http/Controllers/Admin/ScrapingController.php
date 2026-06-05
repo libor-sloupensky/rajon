@@ -186,12 +186,18 @@ class ScrapingController extends Controller
                 ob_end_flush();
             }
 
+            // Výplň ~4 KB — prohlížeč u text/plain nezačne vykreslovat, dokud
+            // nedostane ~1 KB. Bez toho zůstane stránka prázdná, než nateče dost dat.
+            echo str_repeat(' ', 4096) . "\n";
+            @flush();
+
             $emit = function (string $line) {
                 echo $line . "\n";
                 @flush();
             };
 
             $emit("… spouštím scraping: {$zdroj->nazev} (limit {$limit} URL)");
+            $emit('… hledám seznam URL (může chvíli trvat)…');
             $emit(str_repeat('─', 56));
 
             $log = $this->pipeline->scrapujZdroj($zdroj, $limit, function ($poradi, $celkem, $url, $vysledek) use ($emit) {
