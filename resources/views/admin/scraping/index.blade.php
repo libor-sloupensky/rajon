@@ -150,12 +150,12 @@
                             @endif
                         </div>
                         <div class="flex gap-2 shrink-0 ml-4">
-                            <form method="POST" action="{{ route('admin.scraping.spustit', $zdroj) }}">
+                            <form method="POST" action="{{ route('admin.scraping.spustit', $zdroj) }}" target="_blank">
                                 @csrf
                                 <input type="hidden" name="limit" value="50">
                                 <button type="submit" class="rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-dark transition"
-                                        onclick="return confirm('Spustit scraping (50 URL)? Může trvat ~30-60 sekund.')"
-                                        title="Synchronní limit, prevence Gateway Timeout. Plný scraping bude přes cron.">
+                                        onclick="return confirm('Spustit scraping (50 URL)? Otevře se nová záložka s živým průběhem.')"
+                                        title="Streamovaný běh — drží spojení, žádný Gateway Timeout. Plný katalog dožene cron.">
                                     Spustit (50)
                                 </button>
                             </form>

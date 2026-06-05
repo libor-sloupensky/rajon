@@ -169,15 +169,53 @@ class ScrapingController extends Controller
         return redirect()->route('admin.scraping.index')->with('success', 'Zdroj aktualizován.');
     }
 
-    /** Spustí scraping (synchronně pro test, později přes queue). */
+    /**
+     * Spustí scraping se STREAMOVANÝM výstupem — po každé URL pošle řádek a flushne.
+     * Drží spojení živé (jako cron.php) → nginx nedá Gateway Timeout ani u velkých
+     * běhů. Prohlížeč zobrazuje průběh živě.
+     */
     public function spustit(Request $request, Zdroj $zdroj)
     {
-        $limit = (int) $request->input('limit', 10);
+        $limit = (int) $request->input('limit', 30);
 
-        $log = $this->pipeline->scrapujZdroj($zdroj, $limit);
+        return response()->stream(function () use ($zdroj, $limit) {
+            @set_time_limit(0);
+            @ini_set('zlib.output_compression', '0');
+            @ini_set('output_buffering', '0');
+            while (ob_get_level() > 0) {
+                ob_end_flush();
+            }
 
-        return redirect()->route('admin.scraping.log', $log)
-            ->with('success', "Scraping dokončen: {$log->pocet_novych} nových, {$log->pocet_aktualizovanych} aktualizovaných.");
+            $emit = function (string $line) {
+                echo $line . "\n";
+                @flush();
+            };
+
+            $emit("… spouštím scraping: {$zdroj->nazev} (limit {$limit} URL)");
+            $emit(str_repeat('─', 56));
+
+            $log = $this->pipeline->scrapujZdroj($zdroj, $limit, function ($poradi, $celkem, $url, $vysledek) use ($emit) {
+                $znak = match ($vysledek['stav'] ?? 'chyba') {
+                    'novy' => '✓ nová',
+                    'aktualizovany' => '↻ aktualizace',
+                    'preskoceny' => '· přeskočeno',
+                    default => '✗ chyba',
+                };
+                $detail = $vysledek['duvod'] ?? $vysledek['chyba'] ?? '';
+                $slug = basename(rtrim((string) $url, '/'));
+                $emit(sprintf('[%d/%d] %-14s %s%s', $poradi, $celkem, $znak, $slug, $detail ? "  ({$detail})" : ''));
+            });
+
+            $emit(str_repeat('─', 56));
+            $emit("Hotovo: {$log->pocet_novych} nových, {$log->pocet_aktualizovanych} aktualizovaných, "
+                . "{$log->pocet_preskocenych} přeskočeno, {$log->pocet_chyb} chyb.");
+            $emit('Detail běhu: ' . route('admin.scraping.log', $log));
+            $emit('Zpět na zdroje: ' . route('admin.scraping.index'));
+        }, 200, [
+            'Content-Type' => 'text/plain; charset=utf-8',
+            'X-Accel-Buffering' => 'no',
+            'Cache-Control' => 'no-cache',
+        ]);
     }
 
     public function log(ScrapingLog $log)

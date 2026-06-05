@@ -41,7 +41,7 @@ class ScrapingPipeline
      * Spustí scraping pro daný zdroj.
      * @param int|null $limit Maximální počet detailů (pro testování)
      */
-    public function scrapujZdroj(Zdroj $zdroj, ?int $limit = null): ScrapingLog
+    public function scrapujZdroj(Zdroj $zdroj, ?int $limit = null, ?callable $onProgress = null): ScrapingLog
     {
         // Předat zdroj do fetchHtml — pro login session
         $this->aktualniZdroj = $zdroj;
@@ -96,7 +96,9 @@ class ScrapingPipeline
             }
 
             // 2. Pro každou URL
-            foreach ($urls as $url) {
+            $celkem = count($urls);
+            foreach ($urls as $i => $url) {
+                $vysledek = ['stav' => 'chyba'];
                 try {
                     $vysledek = $this->zpracujAkci($zdroj, $url, $statistiky);
 
@@ -121,6 +123,13 @@ class ScrapingPipeline
                     $chybaText = mb_substr($e->getMessage(), 0, 500);
                     $chyby[] = "URL {$url}: {$chybaText}";
                     Log::warning("Scraping error {$url}: {$e->getMessage()}");
+                    $vysledek = ['stav' => 'chyba', 'chyba' => $chybaText];
+                }
+
+                // Progress callback — pro streamovaný běh (živý výstup, drží spojení
+                // → žádný Gateway Timeout). Voláno po každé URL.
+                if ($onProgress) {
+                    $onProgress($i + 1, $celkem, $url, $vysledek);
                 }
             }
 
