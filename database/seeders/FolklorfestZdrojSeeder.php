@@ -28,7 +28,7 @@ class FolklorfestZdrojSeeder extends Seeder
                 'url_pattern_list' => '/jarmoky-trhy-a-hody/,/slavnosti-a-festivaly/,/dni-obce-a-mesta/,'
                     . '/ludove-zvyky-a-tradicie/,/vinobranie-a-vino/,/pivne-slavnosti-a-pivo/,/varenie-a-pecenie-dobr-t/',
                 'url_pattern_detail' => '#/\d{2,}-#',
-                'frekvence_hodin' => 168,
+                'frekvence_hodin' => 24,
                 'typ' => 'katalog',
                 'stav' => 'aktivni',
                 'poznamka' => 'SK: jarmoky/hody/slávnosti. Listing-crawl 7 kategorií (sitemap je archiv 2013–2016). '

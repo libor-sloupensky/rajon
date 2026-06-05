@@ -64,14 +64,20 @@ class LokalizaceResolver
     public function seznamProPrompt(): string
     {
         return Cache::remember('lokalizace.seznam_pro_prompt', 3600, function () {
-            $vystup = [];
+            $zemeNazvy = Kraj::ZEME_NAZVY;
             $kraje = Kraj::with(['okresy' => fn ($q) => $q->orderBy('nazev')])
+                ->orderBy('zeme')
                 ->orderBy('nazev')
-                ->get();
+                ->get()
+                ->groupBy('zeme');
 
-            foreach ($kraje as $kraj) {
-                $okresy = $kraj->okresy->pluck('nazev')->all();
-                $vystup[] = "  - **{$kraj->nazev}** (okresy: " . implode(', ', $okresy) . ")";
+            $vystup = [];
+            foreach ($kraje as $zeme => $skupina) {
+                $vystup[] = '### ' . ($zemeNazvy[$zeme] ?? $zeme) . " ({$zeme})";
+                foreach ($skupina as $kraj) {
+                    $okresy = $kraj->okresy->pluck('nazev')->all();
+                    $vystup[] = "  - **{$kraj->nazev}** (okresy: " . implode(', ', $okresy) . ")";
+                }
             }
 
             return implode("\n", $vystup);

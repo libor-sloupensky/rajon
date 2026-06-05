@@ -66,7 +66,7 @@ class AkceExtractor
         $text = $this->ocistiHtml($html);
 
         $systemPrompt = <<<'PROMPT'
-Jsi analytik specializovaný na extrakci strukturovaných dat o veřejných akcích v České republice (pouti, festivaly, hody, slavnosti, vinobraní, jarmarky, food festivaly, farmářské trhy, historické slavnosti).
+Jsi analytik specializovaný na extrakci strukturovaných dat o veřejných akcích v České a Slovenské republice (pouti, festivaly, hody, slavnosti, vinobraní, jarmarky, food festivaly, farmářské trhy, historické slavnosti). Akce může být česká i slovenská — poznáš to podle jazyka stránky a místa konání.
 
 Tvým úkolem je z HTML/textu stránky extrahovat jednu akci a vrátit JSON s přesně definovanými poli. Pokud nějaké pole v textu není, vrať null.
 
@@ -86,11 +86,13 @@ DŮLEŽITÁ PRAVIDLA:
   místo=null a kraj=ten kraj.
 - MESTO: jméno obce/města (např. "Praha", "Tři Studně")
 - OKRES je povinný pokud znáš obec/město. Vyber jeden z níže uvedeného seznamu
-  okresů ČR podle zeměpisné polohy obce. POZOR: některé obce mají stejný název,
-  rozhoduj podle dalších indicií v textu (PSČ, kraj, blízká města, organizátor).
+  okresů (ČR i SR) podle ZEMĚ a zeměpisné polohy obce — u SLOVENSKÉ akce vyber
+  SLOVENSKÝ okres (např. obec Ružomberok → okres Ružomberok, obec Kremnica →
+  okres Žiar nad Hronom), u české akce český okres. POZOR: některé obce mají
+  stejný název, rozhoduj podle dalších indicií (PSČ, kraj, blízká města, jazyk).
   Pokud opravdu nemáš dost informací, vrať okres=null.
 - KRAJ není potřeba odvozovat — bude doplněn z okresu automaticky. Pokud je
-  v textu explicitně, můžeš ho vrátit, jinak null.
+  v textu explicitně (i slovenský, např. "Žilinský kraj"), můžeš ho vrátit, jinak null.
 - EXTRAKCE Z NÁZVU: pokud v textu stránky není město, ZKUS HO NAJÍT v NÁZVU
   akce. Typicky: "Festival X v Brně 2026" → mesto="Brno", "DEN - Sobotka 2026"
   → mesto="Sobotka", "Slavnosti chřestu v Ivančicích" → mesto="Ivančice".
@@ -180,7 +182,7 @@ Z následujícího textu stránky o akci extrahuj JSON s tímto schématem:
   }
 }
 
-SEZNAM OKRESŮ ČR (vyber jeden, pokud znáš obec/město):
+SEZNAM OKRESŮ (ČR i SR — seskupeno podle země; vyber okres ze SPRÁVNÉ země podle polohy obce):
 {$seznamOkresu}
 
 URL stránky: {$url}
