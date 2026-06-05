@@ -78,10 +78,13 @@ class UzivateleController extends Controller
             return back()->with('error', 'Lze odeslat pouze čekající pozvánky.');
         }
 
+        // Obnovit platnost — jinak by znovu odeslaný odkaz zůstal expirovaný (jePlatna() kontroluje plati_do)
+        $pozvanka->update(['plati_do' => now()->addDays(14)]);
+
         try {
             Notification::route('mail', $pozvanka->email)
                 ->notify(new PozvankaNotifikace($pozvanka));
-            return back()->with('success', 'Pozvánka znovu odeslána.');
+            return back()->with('success', 'Pozvánka znovu odeslána (platnost obnovena o 14 dní).');
         } catch (\Exception $e) {
             return back()->with('error', 'E-mail se nepodařilo odeslat: ' . $e->getMessage());
         }

@@ -134,115 +134,151 @@ jobs:
           # Public — obsah public/
           rsync -a public/ deploy-public/
 
-      - name: Deploy app via lftp FTP
+      # Archivní deploy: místo stovek souborů přes FTP zabalíme změny do JEDNOHO
+      # .tar.gz na cíl (app/public). Jediné TCP spojení = rychlé a minimální
+      # expozice firewallu Webglobe. Rozbalí se na serveru přes public/extract.php.
+      - name: Build deploy archives
+        id: archives
+        run: |
+          mkdir -p /tmp/deploy
+          APP_HAS=false; PUB_HAS=false
+
+          if [ "${{ steps.changes.outputs.full_deploy }}" = "true" ]; then
+            echo "=== FULL — app archiv ==="
+            ( cd deploy-app && find . -type f \
+                ! -path './storage/logs/*' \
+                ! -path './storage/framework/sessions/*' \
+                | sed 's|^\./||' > /tmp/deploy/app-files.txt )
+            tar czf /tmp/deploy/app.tar.gz -C deploy-app -T /tmp/deploy/app-files.txt
+            APP_HAS=true
+
+            echo "=== FULL — public archiv ==="
+            ( cd deploy-public && find . -type f | sed 's|^\./||' > /tmp/deploy/pub-files.txt )
+            tar czf /tmp/deploy/public.tar.gz -C deploy-public -T /tmp/deploy/pub-files.txt
+            PUB_HAS=true
+          else
+            echo "=== SMART ==="
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || true)
+
+            # --- APP ---
+            : > /tmp/deploy/app-files.txt
+            : > /tmp/deploy/delete-app.txt
+            echo ".env" >> /tmp/deploy/app-files.txt   # .env není v gitu, posíláme vždy
+            for file in $CHANGED_FILES; do
+              [[ "$file" == public/* ]] && continue
+              if [ -f "deploy-app/$file" ]; then
+                echo "$file" >> /tmp/deploy/app-files.txt
+                echo "  app +: $file"
+              else
+                echo "$file" >> /tmp/deploy/delete-app.txt
+                echo "  app -: $file"
+              fi
+            done
+            if [ "${{ steps.changes.outputs.vendor_changed }}" = "true" ]; then
+              ( cd deploy-app && find vendor -type f | sed 's|^\./||' >> /tmp/deploy/app-files.txt )
+            else
+              echo "vendor/autoload.php" >> /tmp/deploy/app-files.txt
+              ( cd deploy-app && find vendor/composer -type f | sed 's|^\./||' >> /tmp/deploy/app-files.txt )
+            fi
+            sort -u /tmp/deploy/app-files.txt -o /tmp/deploy/app-files.txt
+            if [ -s /tmp/deploy/app-files.txt ]; then
+              tar czf /tmp/deploy/app.tar.gz -C deploy-app -T /tmp/deploy/app-files.txt
+              APP_HAS=true
+            fi
+            [ -s /tmp/deploy/delete-app.txt ] && APP_HAS=true
+
+            # --- PUBLIC ---
+            : > /tmp/deploy/pub-files.txt
+            : > /tmp/deploy/delete-public.txt
+            for file in $CHANGED_FILES; do
+              [[ "$file" != public/* ]] && continue
+              REL="${file#public/}"
+              if [ -f "deploy-public/$REL" ]; then
+                echo "$REL" >> /tmp/deploy/pub-files.txt
+                echo "  public +: $REL"
+              else
+                echo "$REL" >> /tmp/deploy/delete-public.txt
+                echo "  public -: $REL"
+              fi
+            done
+            if [ "${{ steps.changes.outputs.assets_changed }}" = "true" ]; then
+              ( cd deploy-public && find build -type f | sed 's|^\./||' >> /tmp/deploy/pub-files.txt )
+            fi
+            sort -u /tmp/deploy/pub-files.txt -o /tmp/deploy/pub-files.txt
+            if [ -s /tmp/deploy/pub-files.txt ]; then
+              tar czf /tmp/deploy/public.tar.gz -C deploy-public -T /tmp/deploy/pub-files.txt
+              PUB_HAS=true
+            fi
+            [ -s /tmp/deploy/delete-public.txt ] && PUB_HAS=true
+          fi
+
+          echo "app_has=$APP_HAS" >> $GITHUB_OUTPUT
+          echo "pub_has=$PUB_HAS" >> $GITHUB_OUTPUT
+          echo "--- obsah /tmp/deploy ---"
+          ls -la /tmp/deploy/
+
+      - name: Upload archives via lftp FTP
+        timeout-minutes: 12
         run: |
           sudo apt-get install -y lftp > /dev/null 2>&1
 
-          # === APP deploy → /tuptudu.cz/rajon/ ===
-          LFTP_SCRIPT=""
-
-          if [ "${{ steps.changes.outputs.full_deploy }}" = "true" ]; then
-            echo "=== FULL DEPLOY — APP ==="
-            LFTP_SCRIPT="mirror --reverse --no-perms --exclude storage/logs/ --exclude storage/framework/sessions/ --parallel=1 --verbose deploy-app/ ${{ env.APP_DIR }}/;"
-          else
-            echo "=== SMART DEPLOY — APP ==="
-            LFTP_SCRIPT="put -O ${{ env.APP_DIR }}/ .env;"
-
-            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || true)
-            for file in $CHANGED_FILES; do
-              [[ "$file" == public/* ]] && continue
-              if [ ! -f "$file" ]; then
-                LFTP_SCRIPT="${LFTP_SCRIPT} rm -f ${{ env.APP_DIR }}/$file;"
-              else
-                dir=$(dirname "$file")
-                if [ "$dir" != "." ]; then
-                  LFTP_SCRIPT="${LFTP_SCRIPT} mkdir -pf ${{ env.APP_DIR }}/$dir;"
-                fi
-                LFTP_SCRIPT="${LFTP_SCRIPT} put -O ${{ env.APP_DIR }}/$dir/ $file;"
-                echo "  Upload (app): $file"
-              fi
-            done
-
-            if [ "${{ steps.changes.outputs.vendor_changed }}" = "true" ]; then
-              LFTP_SCRIPT="${LFTP_SCRIPT} mirror --reverse --delete --no-perms --parallel=1 vendor ${{ env.APP_DIR }}/vendor;"
+          # Sestavit seznam put příkazů jen pro existující soubory.
+          # Archivy i delete-listy jdou do APP_DIR/_deploy/ (odtud je čte extract.php).
+          LFTP_SCRIPT="mkdir -pf ${{ env.APP_DIR }}/_deploy;"
+          for f in app.tar.gz public.tar.gz delete-app.txt delete-public.txt; do
+            if [ -s "/tmp/deploy/$f" ]; then
+              LFTP_SCRIPT="${LFTP_SCRIPT} put -O ${{ env.APP_DIR }}/_deploy/ /tmp/deploy/$f;"
+              echo "  upload: $f ($(stat -c%s /tmp/deploy/$f) B)"
             fi
+          done
 
-            LFTP_SCRIPT="${LFTP_SCRIPT} put -O ${{ env.APP_DIR }}/vendor/ vendor/autoload.php;"
-            LFTP_SCRIPT="${LFTP_SCRIPT} mirror --reverse --no-perms vendor/composer ${{ env.APP_DIR }}/vendor/composer;"
+          # Retry smyčka: krátký timeout + ČERSTVÉ spojení při zaseknutí (firewall
+          # Webglobe nahodile blokuje IP runneru). Automatizuje ruční "cancel + rerun".
+          OK=0
+          for attempt in $(seq 1 10); do
+            echo ">>> upload archivů, pokus $attempt/10"
+            if timeout 120 lftp -e "
+              set ftp:ssl-allow no;
+              set xfer:clobber on;
+              set net:timeout 15;
+              set net:max-retries 1;
+              set net:reconnect-interval-base 3;
+              open ftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@ftp.tuptudu.cz;
+              ${LFTP_SCRIPT}
+              quit
+            "; then
+              OK=1; echo ">>> upload OK (pokus $attempt)"; break
+            fi
+            echo ">>> Pokus $attempt selhal/timeout, čekám 5 s a zkouším čerstvé spojení…"
+            sleep 5
+          done
+          [ "$OK" = "1" ] || { echo "✗ upload archivů se nepodařil ani po 10 pokusech"; exit 1; }
+          echo "=== upload complete ==="
+
+      - name: Extract on server + post-deploy
+        timeout-minutes: 10
+        run: |
+          TOKEN="${{ secrets.MIGRATE_TOKEN }}"
+
+          # Pomocná funkce: zavolat URL s retry (firewall blokuje i HTTP z runneru)
+          call() {
+            local url="$1" label="$2"
+            for attempt in $(seq 1 8); do
+              echo ">>> ${label}, pokus $attempt/8"
+              if curl -fsSL --max-time 90 "$url"; then
+                echo ">>> ${label} OK"; return 0
+              fi
+              echo ">>> ${label} pokus $attempt selhal, čekám 5 s…"; sleep 5
+            done
+            echo "✗ ${label} se nepodařil ani po 8 pokusech"; return 1
+          }
+
+          if [ "${{ steps.archives.outputs.app_has }}" = "true" ]; then
+            call "https://rajon.tuptudu.cz/extract.php?token=${TOKEN}&target=app" "extract app" || exit 1
+          fi
+          if [ "${{ steps.archives.outputs.pub_has }}" = "true" ]; then
+            call "https://rajon.tuptudu.cz/extract.php?token=${TOKEN}&target=public" "extract public" || exit 1
           fi
 
-          echo "--- APP lftp script ---"
-          echo "$LFTP_SCRIPT"
-          echo "---"
-
-          lftp -e "
-            set ftp:ssl-allow no;
-            set xfer:clobber on;
-            set net:timeout 30;
-            set net:max-retries 3;
-            set net:reconnect-interval-base 5;
-            open ftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@ftp.tuptudu.cz;
-            ${LFTP_SCRIPT}
-            quit
-          "
-          echo "=== APP deploy complete ==="
-
-      - name: Deploy public via lftp FTP
-        run: |
-          # === PUBLIC deploy → /tuptudu.cz/_sub/rajon/ ===
-          LFTP_SCRIPT=""
-
-          if [ "${{ steps.changes.outputs.full_deploy }}" = "true" ]; then
-            echo "=== FULL DEPLOY — PUBLIC ==="
-            LFTP_SCRIPT="mirror --reverse --no-perms --parallel=1 --verbose deploy-public/ ${{ env.PUBLIC_DIR }}/;"
-          else
-            echo "=== SMART DEPLOY — PUBLIC ==="
-            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || true)
-            HAS_PUBLIC=false
-
-            for file in $CHANGED_FILES; do
-              [[ "$file" != public/* ]] && continue
-              HAS_PUBLIC=true
-              REL_PATH="${file#public/}"
-              dir=$(dirname "$REL_PATH")
-
-              if [ ! -f "$file" ]; then
-                LFTP_SCRIPT="${LFTP_SCRIPT} rm -f ${{ env.PUBLIC_DIR }}/$REL_PATH;"
-              else
-                if [ "$dir" != "." ]; then
-                  LFTP_SCRIPT="${LFTP_SCRIPT} mkdir -pf ${{ env.PUBLIC_DIR }}/$dir;"
-                fi
-                LFTP_SCRIPT="${LFTP_SCRIPT} put -O ${{ env.PUBLIC_DIR }}/$dir/ $file;"
-                echo "  Upload (public): $REL_PATH"
-              fi
-            done
-
-            if [ "${{ steps.changes.outputs.assets_changed }}" = "true" ]; then
-              LFTP_SCRIPT="${LFTP_SCRIPT} mirror --reverse --delete --no-perms --parallel=1 public/build ${{ env.PUBLIC_DIR }}/build;"
-            fi
-
-            if [ "$HAS_PUBLIC" = "false" ] && [ "${{ steps.changes.outputs.assets_changed }}" != "true" ]; then
-              echo "  No public changes, skipping"
-              exit 0
-            fi
-          fi
-
-          echo "--- PUBLIC lftp script ---"
-          echo "$LFTP_SCRIPT"
-          echo "---"
-
-          lftp -e "
-            set ftp:ssl-allow no;
-            set xfer:clobber on;
-            set net:timeout 30;
-            set net:max-retries 3;
-            set net:reconnect-interval-base 5;
-            open ftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@ftp.tuptudu.cz;
-            ${LFTP_SCRIPT}
-            quit
-          "
-          echo "=== PUBLIC deploy complete ==="
-
-      - name: Post-deploy cache clear + migrate
-        run: |
-          curl -sL --max-time 60 "https://rajon.tuptudu.cz/deploy-hook.php?token=${{ secrets.MIGRATE_TOKEN }}&migrate" 2>&1 || echo "Deploy hook failed"
+          # Cache clear + migrace
+          call "https://rajon.tuptudu.cz/deploy-hook.php?token=${TOKEN}&migrate" "deploy hook" || exit 1
