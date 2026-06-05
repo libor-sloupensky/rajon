@@ -6,6 +6,12 @@ on:
       - main
   workflow_dispatch:
 
+# Serializace deployů: kdyby pushovaly dvě AI/procesy naráz, deploye se zařadí
+# do fronty (jeden po druhém) místo závodění o server _deploy/ adresář.
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
 env:
   APP_DIR: /tuptudu.cz/rajon
   PUBLIC_DIR: /tuptudu.cz/_sub/rajon
