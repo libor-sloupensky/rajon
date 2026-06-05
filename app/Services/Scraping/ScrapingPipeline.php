@@ -388,14 +388,23 @@ class ScrapingPipeline
             $data['kraj'] = \App\Models\Kraj::find($loc['kraj_id'])?->nazev ?? $data['kraj'];
         }
 
-        // Geokódování — pokud nemáme GPS a máme aspoň město, zkusíme přes Mapy.cz API
+        // Geokódování — pokud nemáme GPS a máme aspoň město, zkusíme přes Mapy.cz API.
+        // Zdroj s nastavenou zemí (např. folklorfest=SK) ji vynutí — i kdyby AI
+        // netrefila kraj, obec se hledá ve správné zemi.
         if (empty($data['gps_lat']) || empty($data['gps_lng'])) {
+            $zemeOverride = match ($zdroj->zeme ?? null) {
+                'SK' => 'Slovensko',
+                'PL' => 'Polsko',
+                'HU' => 'Maďarsko',
+                default => null,
+            };
             $gps = $this->geokoder->geokoduj(
                 $data['adresa'] ?? null,
                 $data['misto'] ?? null,
                 $data['mesto'] ?? null,
                 $data['okres'] ?? null,
                 $data['kraj'] ?? null,
+                $zemeOverride,
             );
             if ($gps) {
                 $data['gps_lat'] = $gps['gps_lat'];

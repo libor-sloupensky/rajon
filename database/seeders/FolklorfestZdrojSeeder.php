@@ -30,6 +30,7 @@ class FolklorfestZdrojSeeder extends Seeder
                 'url_pattern_detail' => '#/\d{2,}-#',
                 'frekvence_hodin' => 24,
                 'typ' => 'katalog',
+                'zeme' => 'SK',
                 'stav' => 'aktivni',
                 'poznamka' => 'SK: jarmoky/hody/slávnosti. Listing-crawl 7 kategorií (sitemap je archiv 2013–2016). '
                     . 'Detaily /{id}-slug/ přes regex pattern. Custom CMS, bez JSON-LD → AI extrakce.',

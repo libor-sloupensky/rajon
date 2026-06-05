@@ -59,16 +59,17 @@ class Geokoder
      *
      * Zkouší více variant query — pokud první selže, postupně zjednodušuje.
      */
-    public function geokoduj(?string $adresa, ?string $misto, ?string $mesto, ?string $okres, ?string $kraj): ?array
+    public function geokoduj(?string $adresa, ?string $misto, ?string $mesto, ?string $okres, ?string $kraj, ?string $zemeOverride = null): ?array
     {
         if (empty($this->apiKey)) {
             Log::warning('Geokoder: MAPYCZ_API_KEY není nastaveno');
             return null;
         }
 
-        // Zjisti zemi akce z kraje/okresu — jinak by se SK obce (Trnava) navázaly
-        // na stejnojmennou českou obec.
-        $zemeQuery = $this->jeSlovensko($kraj, $okres) ? 'Slovensko' : 'Česká republika';
+        // Zemi určuje buď override (zdroj víme že je SK/PL/…), jinak ji odhadneme
+        // z kraje/okresu — bez toho by se SK obce (Trnava) navázaly na stejnojmennou
+        // českou obec.
+        $zemeQuery = $zemeOverride ?: ($this->jeSlovensko($kraj, $okres) ? 'Slovensko' : 'Česká republika');
 
         // Postupné varianty queries — od specifické po obecnou
         $queries = $this->sestavQueries($adresa, $misto, $mesto, $okres, $kraj, $zemeQuery);

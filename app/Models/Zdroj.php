@@ -34,6 +34,7 @@ class Zdroj extends Model
         'login_session_until',
         'je_web_poradatele',
         'typ',
+        'zeme',
         'stav',
         'posledni_scraping',
         'pocet_akci',
