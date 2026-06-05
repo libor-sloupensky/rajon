@@ -47,6 +47,7 @@
             <div class="rj-sidebar-section rounded-lg border border-primary bg-primary/5 ring-1 ring-primary p-1">
                 <div class="px-2 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Účet</div>
                 <div class="rj-sidebar-section-body" style="max-height: 20rem;">
+                    <a href="{{ url('/doplnit-adresu') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('doplnit-adresu') ? 'active' : '' }}">Moje adresa</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="block w-full text-left px-3 py-1.5 text-sm text-gray-600 rounded hover:text-primary">Odhlásit</button>
