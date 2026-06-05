@@ -37,15 +37,19 @@
             'jiny' => 'Jiný',
         ];
         $stavy = ['navrh' => 'Návrh', 'overena' => 'Ověřená', 'zrusena' => 'Zrušená'];
+        // Zvýraznění aktivního filtru (má hodnotu) — oranžový rámeček/text + pozadí.
+        $aktTrida = fn ($v) => ($v !== null && $v !== '') ? 'border-primary text-primary font-medium' : 'border-gray-300';
+        $aktStyl = fn ($v) => ($v !== null && $v !== '') ? 'background-color: rgba(221,85,0,0.10)' : '';
     @endphp
     <form method="GET" class="mb-6 space-y-2" onchange="this.submit()">
         <input type="text" name="hledat" value="{{ request('hledat') }}"
             placeholder="Hledat (název, místo, organizátor)…"
-            class="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:border-primary focus:outline-none">
+            class="w-full rounded-lg border px-3 py-1.5 text-sm focus:border-primary focus:outline-none {{ $aktTrida(request('hledat')) }}"
+            style="{{ $aktStyl(request('hledat')) }}">
 
         {{-- Řádek: Typ | Kraj | Stav — vždy na 1 řádku, kompaktní --}}
         <div class="flex flex-wrap gap-2">
-            <select name="typ" class="rounded border border-gray-300 px-2 py-1 text-xs flex-1 min-w-0">
+            <select name="typ" class="rounded border px-2 py-1 text-xs flex-1 min-w-0 {{ $aktTrida(request('typ')) }}" style="{{ $aktStyl(request('typ')) }}">
                 <option value="">Typ</option>
                 @foreach($typy as $val => $label)
                     <option value="{{ $val }}" {{ request('typ') === $val ? 'selected' : '' }}>{{ $label }}</option>
@@ -56,7 +60,7 @@
                  jen kraje dané země; bez vybrané země se kraje zobrazí v optgroup. --}}
             @if($krajeDleZeme->count() > 1)
                 <select name="zeme" onchange="this.form.kraj.value=''"
-                    class="rounded border border-gray-300 px-2 py-1 text-xs flex-1 min-w-0">
+                    class="rounded border px-2 py-1 text-xs flex-1 min-w-0 {{ $aktTrida($vybranaZeme) }}" style="{{ $aktStyl($vybranaZeme) }}">
                     <option value="">Země</option>
                     @foreach($krajeDleZeme->keys() as $zkod)
                         <option value="{{ $zkod }}" {{ $vybranaZeme === $zkod ? 'selected' : '' }}>{{ $zemeNazvy[$zkod] ?? $zkod }}</option>
@@ -64,7 +68,7 @@
                 </select>
             @endif
 
-            <select name="kraj" class="rounded border border-gray-300 px-2 py-1 text-xs flex-1 min-w-0">
+            <select name="kraj" class="rounded border px-2 py-1 text-xs flex-1 min-w-0 {{ $aktTrida(request('kraj')) }}" style="{{ $aktStyl(request('kraj')) }}">
                 <option value="">Kraj</option>
                 @if($vybranaZeme)
                     @foreach($krajeDleZeme->get($vybranaZeme, collect()) as $k)
@@ -86,7 +90,7 @@
             </select>
 
             @if($jeAdmin)
-                <select name="stav" class="rounded border border-gray-300 px-2 py-1 text-xs flex-1 min-w-0">
+                <select name="stav" class="rounded border px-2 py-1 text-xs flex-1 min-w-0 {{ $aktTrida(request('stav')) }}" style="{{ $aktStyl(request('stav')) }}">
                     <option value="">Stav</option>
                     @foreach($stavy as $v => $l)
                         <option value="{{ $v }}" {{ request('stav') === $v ? 'selected' : '' }}>{{ $l }}</option>
@@ -99,10 +103,10 @@
         <div class="flex flex-wrap items-center gap-3">
             <div class="flex items-center gap-1">
                 <input type="date" name="datum_od" value="{{ request('datum_od') }}"
-                    title="Datum od" class="rounded border border-gray-300 px-2 py-1 text-xs">
+                    title="Datum od" class="rounded border px-2 py-1 text-xs {{ $aktTrida(request('datum_od')) }}" style="{{ $aktStyl(request('datum_od')) }}">
                 <span class="text-gray-400 text-xs">–</span>
                 <input type="date" name="datum_do" value="{{ request('datum_do') }}"
-                    title="Datum do" class="rounded border border-gray-300 px-2 py-1 text-xs">
+                    title="Datum do" class="rounded border px-2 py-1 text-xs {{ $aktTrida(request('datum_do')) }}" style="{{ $aktStyl(request('datum_do')) }}">
             </div>
 
             <label class="text-xs flex items-center gap-1 rounded px-1.5 py-0.5 {{ request('vse') ? 'text-primary font-semibold' : 'text-gray-500' }}"

@@ -66,8 +66,12 @@ class Geokoder
             return null;
         }
 
+        // Zjisti zemi akce z kraje/okresu — jinak by se SK obce (Trnava) navázaly
+        // na stejnojmennou českou obec.
+        $zemeQuery = $this->jeSlovensko($kraj, $okres) ? 'Slovensko' : 'Česká republika';
+
         // Postupné varianty queries — od specifické po obecnou
-        $queries = $this->sestavQueries($adresa, $misto, $mesto, $okres, $kraj);
+        $queries = $this->sestavQueries($adresa, $misto, $mesto, $okres, $kraj, $zemeQuery);
 
         foreach ($queries as $query) {
             $cacheKey = 'geokoder.' . md5($query);
@@ -80,84 +84,66 @@ class Geokoder
     }
 
     /** Sestaví seznam queries (od nejvíc specifické po obecnou) pro fallback. */
-    protected function sestavQueries(?string $adresa, ?string $misto, ?string $mesto, ?string $okres, ?string $kraj): array
+    protected function sestavQueries(?string $adresa, ?string $misto, ?string $mesto, ?string $okres, ?string $kraj, string $zemeQuery = 'Česká republika'): array
     {
         $queries = [];
 
         // 1) Adresa + misto + kraj — nejúplnější
         if (!empty($adresa) && !empty($misto) && !$this->jeJenKraj($misto)) {
-            $queries[] = $this->joinQuery([$adresa, $misto, $kraj]);
+            $queries[] = $this->joinQuery([$adresa, $misto, $kraj], $zemeQuery);
         }
         // 2) Misto + kraj — pro známé objekty (zámek Telč, vinařství...)
         if (!empty($misto) && !$this->jeJenKraj($misto)) {
-            $queries[] = $this->joinQuery([$misto, $kraj]);
+            $queries[] = $this->joinQuery([$misto, $kraj], $zemeQuery);
         }
         // 3) Adresa + kraj
         if (!empty($adresa) && !$this->jeJenKraj($adresa)) {
-            $queries[] = $this->joinQuery([$adresa, $kraj]);
+            $queries[] = $this->joinQuery([$adresa, $kraj], $zemeQuery);
         }
         // 4) Adresa + město
         if (!empty($adresa) && !empty($mesto)) {
-            $queries[] = $this->joinQuery([$adresa, $mesto]);
+            $queries[] = $this->joinQuery([$adresa, $mesto], $zemeQuery);
         }
         // 5) Misto + okres
         if (!empty($misto) && !empty($okres) && !$this->jeJenKraj($misto)) {
-            $queries[] = $this->joinQuery([$misto, $okres]);
+            $queries[] = $this->joinQuery([$misto, $okres], $zemeQuery);
         }
         // 6) Adresa sama
         if (!empty($adresa) && !$this->jeJenKraj($adresa)) {
-            $queries[] = $this->joinQuery([$adresa]);
+            $queries[] = $this->joinQuery([$adresa], $zemeQuery);
         }
 
         // Deduplikuj
         return array_values(array_unique(array_filter($queries)));
     }
 
-    protected function joinQuery(array $parts): ?string
+    protected function joinQuery(array $parts, string $zemeQuery = 'Česká republika'): ?string
     {
         $parts = array_map('trim', array_filter($parts));
         $parts = array_filter($parts, fn ($p) => !$this->jeJenKraj($p) || count($parts) > 1);
         if (empty($parts)) return null;
-        $parts[] = 'Česká republika';
+        $parts[] = $zemeQuery;
         $q = implode(', ', $parts);
         return mb_strlen($q) < 5 ? null : $q;
     }
 
-    /** Sestaví query string z dostupných polí. Preferuje úplnost. */
-    protected function sestavQuery(?string $adresa, ?string $misto, ?string $mesto, ?string $okres, ?string $kraj): ?string
+    /**
+     * Patří kraj/okres do Slovenska? Rozhoduje podle sloupce zeme v DB.
+     * Kvůli stejnojmenným obcím (Trnava CZ × SK) musíme znát zemi akce.
+     */
+    protected function jeSlovensko(?string $kraj, ?string $okres): bool
     {
-        $parts = [];
+        $skKraje = Cache::remember('geokoder.sk_kraje', 3600, fn () =>
+            \App\Models\Kraj::where('zeme', 'SK')->pluck('nazev')->map(fn ($n) => mb_strtolower($n))->all());
+        $skOkresy = Cache::remember('geokoder.sk_okresy', 3600, fn () =>
+            \App\Models\Okres::whereIn('kraj_id', \App\Models\Kraj::where('zeme', 'SK')->select('id'))
+                ->pluck('nazev')->map(fn ($n) => mb_strtolower($n))->all());
 
-        // Adresa (ulice + číslo) má nejvyšší prioritu
-        if (!empty($adresa) && !$this->jeJenKraj($adresa)) {
-            $parts[] = trim($adresa);
-        }
+        $k = mb_strtolower(trim((string) $kraj));
+        $o = mb_strtolower(trim((string) $okres));
 
-        // Místo (např. náměstí) — pomáhá pokud nemáme adresu
-        // POZOR: některé Stánkař akce mají misto="Středočeský kraj" — to ignorujeme
-        if (!empty($misto) && $misto !== $adresa && !$this->jeJenKraj($misto)) {
-            $parts[] = trim($misto);
-        }
-
-        // Město
-        if (!empty($mesto) && !$this->jeJenKraj($mesto)) {
-            $parts[] = trim($mesto);
-        }
-
-        // Okres jako zpřesnění (jen pokud nemáme adresu/město)
-        if (empty($parts) && !empty($okres)) {
-            $parts[] = trim($okres);
-        }
-
-        // Pokud máme jen kraj (žádné konkrétní místo), nemá smysl geokódovat
-        // — vrátilo by to střed kraje, což není užitečné GPS pro akci.
-        if (empty($parts)) return null;
-
-        // Přidat ČR pro disambiguaci
-        $parts[] = 'Česká republika';
-
-        $q = implode(', ', $parts);
-        return mb_strlen($q) < 5 ? null : $q;
+        return ($k !== '' && in_array($k, $skKraje, true))
+            || ($o !== '' && in_array($o, $skOkresy, true));
     }
 
     /** Detekuje, jestli string obsahuje jen název kraje (bez konkrétního místa). */
@@ -202,9 +188,10 @@ class Geokoder
             $lng = $first['position']['lon'] ?? null;
             if (!is_numeric($lat) || !is_numeric($lng)) return null;
 
-            // Kontrola, že je to v ČR (49-51 lat, 12-19 lng)
-            if ($lat < 48.5 || $lat > 51.5 || $lng < 12 || $lng > 19) {
-                Log::info('Geokoder: výsledek mimo ČR, ignoruji', ['query' => $query, 'lat' => $lat, 'lng' => $lng]);
+            // Kontrola, že je to v ČR nebo SR (lat 47.6–51.2, lng 11.9–22.7).
+            // Box pokrývá obě země — Slovensko sahá na východ až k lng ~22.6.
+            if ($lat < 47.6 || $lat > 51.2 || $lng < 11.9 || $lng > 22.7) {
+                Log::info('Geokoder: výsledek mimo ČR/SR, ignoruji', ['query' => $query, 'lat' => $lat, 'lng' => $lng]);
                 return null;
             }
 
