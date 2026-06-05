@@ -2,67 +2,50 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 /**
- * Přepočítá GPS u existujících slovenských akcí.
+ * Připraví existující slovenské akce k přegeokódování.
  *
- * Akce naskrapované před opravou geokodéru mají špatné souřadnice (slovenské
- * obce navázané na stejnojmenné české → body na české straně mapy). Tady je
- * znovu geokódujeme s VYNUCENÝM Slovenskem. Běží na serveru přes deploy-hook
- * migrate (server má MAPYCZ_API_KEY i dosah na Mapy.cz).
- *
- * Cílí akce z folklorfestu + akce s vyřešeným slovenským krajem.
+ * Akce naskrapované před opravou mají špatné GPS (slovenské obce navázané na
+ * stejnojmenné české → body na české straně mapy). Vlastní geokódování ale
+ * NEDĚLÁME tady — stovky HTTP volání na Mapy.cz v synchronní deploy migraci
+ * shazovaly deploy-hook (HTTP 500 / timeout). Místo toho jen:
+ *   - vynulujeme špatné GPS (merger je při dalším scrapu doplní novou),
+ *   - vynutíme re-extrakci (html_hash/kontrola) + přeplánujeme zdroj hned.
+ * Geokódování pak proběhne v pipeline (má vynucenou zemi zdroje + opravený
+ * geokodér) při nejbližším cron běhu nebo ručním "Spustit".
  */
 return new class extends Migration
 {
     public function up(): void
     {
-        $geokoder = app(\App\Services\Geokoder::class);
-
-        $folklorfestId = DB::table('zdroje')->where('url', 'https://www.folklorfest.sk')->value('id');
+        $fid = DB::table('zdroje')->where('url', 'https://www.folklorfest.sk')->value('id');
         $skKrajeIds = DB::table('kraje')->where('zeme', 'SK')->pluck('id')->all();
 
-        if (! $folklorfestId && empty($skKrajeIds)) {
+        if (! $fid && empty($skKrajeIds)) {
             return;
         }
 
-        $akce = DB::table('akce')
-            ->where(function ($q) use ($folklorfestId, $skKrajeIds) {
-                if ($folklorfestId) {
-                    $q->where('zdroj_id', $folklorfestId);
+        DB::table('akce')
+            ->where(function ($q) use ($fid, $skKrajeIds) {
+                if ($fid) {
+                    $q->where('zdroj_id', $fid);
                 }
                 if (! empty($skKrajeIds)) {
                     $q->orWhereIn('kraj_id', $skKrajeIds);
                 }
             })
-            ->limit(200)   // pojistka proti timeoutu deploy-hooku (300 s); zbytek dožene cron
-            ->get(['id', 'adresa', 'misto', 'mesto', 'okres', 'kraj']);
+            ->update(['gps_lat' => null, 'gps_lng' => null]);
 
-        $opraveno = 0;
-        $bezVysledku = 0;
-        foreach ($akce as $a) {
-            try {
-                $gps = $geokoder->geokoduj($a->adresa, $a->misto, $a->mesto, $a->okres, $a->kraj, 'Slovensko');
-                if ($gps) {
-                    DB::table('akce')->where('id', $a->id)->update([
-                        'gps_lat' => $gps['gps_lat'],
-                        'gps_lng' => $gps['gps_lng'],
-                    ]);
-                    $opraveno++;
-                } else {
-                    $bezVysledku++;
-                }
-            } catch (\Throwable) {
-                $bezVysledku++;
-            }
+        if ($fid) {
+            DB::table('akce_zdroje')->where('zdroj_id', $fid)
+                ->update(['html_hash' => null, 'posledni_kontrola' => null]);
+            DB::table('zdroje')->where('id', $fid)->update(['posledni_scraping' => null]);
         }
-
-        Log::info("Re-geokódování SK akcí: celkem={$akce->count()}, opraveno={$opraveno}, bez_výsledku={$bezVysledku}");
     }
 
     public function down(): void
     {
-        // Jednorázová oprava dat — bez reverzace.
+        // Jednorázová příprava dat — bez reverzace.
     }
 };
