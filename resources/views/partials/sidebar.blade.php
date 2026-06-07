@@ -42,6 +42,9 @@
                         {{-- Informace — dočasně zde v adminu, později přesun do běžného menu --}}
                         <div class="px-3 pt-2 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Informace</div>
                         <a href="{{ url('/informace/fransizanti') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/fransizanti') ? 'active' : '' }}">Informace pro Franšízanty</a>
+                        <a href="{{ url('/informace/jak-prodavat') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/jak-prodavat') ? 'active' : '' }}">Jak prodávat jedlý hmyz</a>
+                        <a href="{{ url('/informace/vybaveni') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/vybaveni') ? 'active' : '' }}">Vybavení na akci</a>
+                        <a href="{{ url('/informace/faq') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/faq') ? 'active' : '' }}">Časté dotazy (FAQ)</a>
                     </div>
                 </div>
             @endif

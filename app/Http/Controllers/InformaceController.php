@@ -13,4 +13,19 @@ class InformaceController extends Controller
     {
         return view('informace.fransizanti');
     }
+
+    public function faq()
+    {
+        return view('informace.faq');
+    }
+
+    public function jakProdavat()
+    {
+        return view('informace.jak-prodavat');
+    }
+
+    public function vybaveni()
+    {
+        return view('informace.vybaveni');
+    }
 }

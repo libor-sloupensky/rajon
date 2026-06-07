@@ -58,6 +58,9 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\VyzadovatAdresu::cla
 
     // Informace (stránky dostupné všem přihlášeným; odkaz zatím jen v admin sidebaru)
     Route::get('/informace/fransizanti', [InformaceController::class, 'fransizanti'])->name('informace.fransizanti');
+    Route::get('/informace/faq', [InformaceController::class, 'faq'])->name('informace.faq');
+    Route::get('/informace/jak-prodavat', [InformaceController::class, 'jakProdavat'])->name('informace.jak-prodavat');
+    Route::get('/informace/vybaveni', [InformaceController::class, 'vybaveni'])->name('informace.vybaveni');
 });
 
 // Admin (je_admin middleware) — taky vyžaduje vyplněnou adresu
