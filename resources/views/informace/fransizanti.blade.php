@@ -1,11 +1,5 @@
 <x-layouts.app title="Informace pro franšízanty — Rajón">
-    {{-- Zkušebně písmo Nunito jen na této stránce (pokud zůstane, self-hostneme jako Roboto). --}}
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
-        .font-test { font-family: 'Nunito', ui-sans-serif, system-ui, sans-serif; }
-    </style>
-
-    <div class="font-test max-w-2xl">
+    <div class="max-w-2xl">
         <h1 class="mb-6 text-2xl font-extrabold text-gray-900">Informace pro franšízanty</h1>
 
         <div class="space-y-7 text-[15px] leading-relaxed text-gray-700">

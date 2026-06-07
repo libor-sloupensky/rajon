@@ -6,7 +6,7 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
     --color-primary: #dd5500;
     --color-primary-dark: #bb4400;
     --color-primary-light: #ff7722;
