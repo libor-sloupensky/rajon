@@ -215,6 +215,14 @@ class ScrapingController extends Controller
             $emit(str_repeat('─', 56));
             $emit("Hotovo: {$log->pocet_novych} nových, {$log->pocet_aktualizovanych} aktualizovaných, "
                 . "{$log->pocet_preskocenych} přeskočeno, {$log->pocet_chyb} chyb.");
+
+            // Verdikt o kompletnosti — pomáhá poznat, jestli je zdroj načtený celý.
+            if ($log->pocet_novych > 0) {
+                $emit("→ Přibylo {$log->pocet_novych} nových akcí. Zřejmě ještě nejsou všechny — spusť Spustit znovu pro další dávku.");
+            } else {
+                $emit('→ Žádné nové akce v této dávce — zdroj je nejspíš kompletně načtený. ✅ (Pro jistotu můžeš spustit ještě jednou.)');
+            }
+
             $emit('Detail běhu: ' . route('admin.scraping.log', $log));
             $emit('Zpět na zdroje: ' . route('admin.scraping.index'));
         }, 200, [
