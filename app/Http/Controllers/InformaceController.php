@@ -28,4 +28,9 @@ class InformaceController extends Controller
     {
         return view('informace.vybaveni');
     }
+
+    public function keStazeni()
+    {
+        return view('informace.ke-stazeni');
+    }
 }

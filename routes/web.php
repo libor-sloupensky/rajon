@@ -61,6 +61,7 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\VyzadovatAdresu::cla
     Route::get('/informace/faq', [InformaceController::class, 'faq'])->name('informace.faq');
     Route::get('/informace/jak-prodavat', [InformaceController::class, 'jakProdavat'])->name('informace.jak-prodavat');
     Route::get('/informace/vybaveni', [InformaceController::class, 'vybaveni'])->name('informace.vybaveni');
+    Route::get('/informace/ke-stazeni', [InformaceController::class, 'keStazeni'])->name('informace.ke-stazeni');
 });
 
 // Admin (je_admin middleware) — taky vyžaduje vyplněnou adresu
