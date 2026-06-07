@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\UzivateleController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\RegistraceController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InformaceController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +55,9 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\VyzadovatAdresu::cla
 
     // API pro mapu
     Route::get('/api/akce-mapa', [AkceController::class, 'mapaJson'])->name('api.akce.mapa');
+
+    // Informace (stránky dostupné všem přihlášeným; odkaz zatím jen v admin sidebaru)
+    Route::get('/informace/fransizanti', [InformaceController::class, 'fransizanti'])->name('informace.fransizanti');
 });
 
 // Admin (je_admin middleware) — taky vyžaduje vyplněnou adresu
