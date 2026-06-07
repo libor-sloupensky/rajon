@@ -67,19 +67,19 @@
         ];
     @endphp
 
-    <div class="max-w-3xl">
-        <h1 class="mb-1 text-2xl font-bold text-gray-800">Časté dotazy</h1>
-        <p class="mb-5 text-sm text-gray-500">Vše, co se hodí vědět o křupavých červících — pro klidné odpovědi zákazníkům.</p>
+    <div class="max-w-2xl">
+        <h1 class="mb-1 text-2xl font-bold text-gray-900">Časté dotazy</h1>
+        <p class="mb-7 text-sm text-gray-500">Vše, co se hodí vědět o křupavých červících — pro klidné odpovědi zákazníkům.</p>
 
-        <div class="divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white px-5">
+        <div class="space-y-6">
             @foreach($faq as $item)
-                <div class="py-4">
-                    <h2 class="mb-1.5 flex gap-2 text-[15px] font-semibold text-gray-800">
+                <div>
+                    <h2 class="mb-1.5 text-[15px] font-bold text-gray-900">
                         <span class="text-primary">{{ $loop->iteration }}.</span>
-                        <span>{{ $item['q'] }}</span>
+                        {{ $item['q'] }}
                     </h2>
                     @foreach($item['a'] as $odstavec)
-                        <p class="mb-2 pl-5 text-sm leading-relaxed text-gray-600 last:mb-0">{{ $odstavec }}</p>
+                        <p class="mb-2 text-[15px] leading-relaxed text-gray-700 last:mb-0">{{ $odstavec }}</p>
                     @endforeach
                 </div>
             @endforeach

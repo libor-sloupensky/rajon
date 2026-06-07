@@ -21,6 +21,11 @@ jobs:
     name: Build & Deploy via FTP
     runs-on: ubuntu-latest
     steps:
+      # Vypíše veřejnou IP runneru — pro doložení blokace Webglobe (legitimní
+      # IP, co se nemůže připojit na FTP). Při selhání deploye = blokovaná IP.
+      - name: Runner IP
+        run: echo "Runner public IP:"; curl -s --max-time 10 https://api.ipify.org || curl -s --max-time 10 https://ifconfig.me; echo
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:

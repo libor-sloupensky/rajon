@@ -36,27 +36,29 @@
         ];
     @endphp
 
-    <div class="max-w-3xl space-y-4">
-        <h1 class="text-2xl font-bold text-gray-800">Vybavení na akci</h1>
-        <p class="text-sm text-gray-500">Checklist, ať na stánku nic nechybí.</p>
+    <div class="max-w-2xl">
+        <h1 class="mb-1 text-2xl font-bold text-gray-900">Vybavení na akci</h1>
+        <p class="mb-7 text-sm text-gray-500">Checklist, ať na stánku nic nechybí.</p>
 
-        @foreach($sekce as $nazev => $polozky)
-            <section class="rounded-lg border border-gray-200 bg-white p-5">
-                <h2 class="mb-3 text-base font-semibold text-gray-800">{{ $nazev }}</h2>
-                <ul class="space-y-2 text-sm leading-relaxed text-gray-700">
-                    @foreach($polozky as $p)
-                        <li class="flex gap-2">
-                            <span class="mt-0.5 text-primary">☐</span>
-                            <span>
-                                {{ $p['t'] }}
-                                @if(!empty($p['n']))
-                                    <span class="text-gray-500">— {{ $p['n'] }}</span>
-                                @endif
-                            </span>
-                        </li>
-                    @endforeach
-                </ul>
-            </section>
-        @endforeach
+        <div class="space-y-7">
+            @foreach($sekce as $nazev => $polozky)
+                <section>
+                    <h2 class="mb-2.5 text-base font-bold text-gray-900">{{ $nazev }}</h2>
+                    <ul class="space-y-2 text-[15px] leading-relaxed text-gray-700">
+                        @foreach($polozky as $p)
+                            <li class="flex gap-2.5">
+                                <span class="mt-px text-primary">☐</span>
+                                <span>
+                                    {{ $p['t'] }}
+                                    @if(!empty($p['n']))
+                                        <span class="text-gray-500">— {{ $p['n'] }}</span>
+                                    @endif
+                                </span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </section>
+            @endforeach
+        </div>
     </div>
 </x-layouts.app>

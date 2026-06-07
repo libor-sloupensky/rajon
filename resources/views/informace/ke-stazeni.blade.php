@@ -28,8 +28,8 @@
         ];
     @endphp
 
-    <div class="max-w-3xl space-y-4">
-        <h1 class="text-2xl font-bold text-gray-800">Soubory ke stažení</h1>
+    <div class="max-w-2xl space-y-4">
+        <h1 class="text-2xl font-bold text-gray-900">Soubory ke stažení</h1>
         <p class="text-sm text-gray-500">Bannery a logo pro tisk a prezentaci na akcích.</p>
 
         <div class="divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white">
