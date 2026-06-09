@@ -2,35 +2,33 @@
     @php
         $sekce = [
             'Prezentace' => [
-                ['t' => 'Laminovaný ceník na stůl'],
-                ['t' => 'Laminovaná „ochutnávka zdarma“ na stůl', 'n' => 'případně stačí na banneru'],
-                ['t' => 'Označení provozovny', 'n' => 'prodejní místo musí být řádně označené, jinak hrozí prodejci pokuta'],
+                ['t' => 'Laminovaný ceník na stůl', 'n' => 'hlavně pokud máme akci 3+1 a podobně'],
+                ['t' => 'Cedulka „ochutnávka zdarma“'],
+                ['t' => 'Označení provozovny', 'n' => 'tvůj název firmy/osoby, adresa, IČ atd.'],
                 ['t' => 'FAQ — mít alespoň nastudované'],
                 ['t' => 'Stánek'],
                 ['t' => 'Prodejní stůl'],
                 ['t' => 'Banner na stůl, případně na čelo stánku'],
-                ['t' => 'Slevové kupóny'],
             ],
             'Zázemí' => [
                 ['t' => 'Box kapesníčků / vlhčené ubrousky'],
                 ['t' => 'Nůžky'],
                 ['t' => 'Nůž'],
                 ['t' => 'Kobercová lepicí páska (ideálně bílá)', 'n' => 'NE klasická izolepa — ta poškozuje vybavení'],
-                ['t' => 'Propisky'],
+                ['t' => 'Propisky/cenovky'],
                 ['t' => 'Lepicí guma (žvýkačka)'],
                 ['t' => 'Paragony', 'n' => 'prodejce je povinen na žádost vystavit daňový doklad; případně stačí poslat elektronicky, např. e-mailem'],
-                ['t' => 'Igelitové sáčky'],
-                ['t' => 'Židlička'],
+                ['t' => 'Igelitové či papírové sáčky', 'n' => 'někdy je zákazníci potřebují'],
+                ['t' => 'Barová židlička', 'n' => 'nízkou nedoporučujeme, budete pak zákazníkovi daleko'],
                 ['t' => 'Drobné na vrácení + kasírka'],
-                ['t' => 'Platební terminál', 'n' => 'nebo aspoň zprovoznit platby přes QR kód'],
+                ['t' => 'Platební terminál', 'n' => 'nebo si aspoň zprovoznit platby přes QR kód'],
             ],
             'Zboží a ochutnávky' => [
-                ['t' => 'Muffinové košíčky na ochutnávky'],
-                ['t' => 'Obrázky koření k ochutnávkám'],
+                ['t' => 'Muffinové košíčky', 'odkaz' => 'https://www.vikpap.cz/wimex-72624-cukrarsky-kosicek-prumer-24-18-mm-bily-1000-ks', 'n' => 'na ochutnávky, nebo můžeš dávat jen na dlaň, ale doporučuji alespoň nějaké košíčky mít. Máme skladem a na požádání vám je přidáme k objednávce'],
                 ['t' => 'Koš na stůl'],
-                ['t' => 'Lžičky'],
-                ['t' => 'Uzavíratelné misky na dávkování ochutnávek'],
-                ['t' => 'Vzorky na ochutnávku'],
+                ['t' => 'Lžičky', 'n' => 'na podávání červíků'],
+                ['t' => 'Uzavíratelné misky na dávkování ochutnávek', 'n' => 'nedoporučujeme podávat z pytlíků 80 g, protože častým otevíráním mohou navlhnout. Přesypte si to do menších uzavíratelných skleniček/kořenek — v Pepco za pár korun'],
+                ['t' => 'Vzorky na ochutnávku 80 g'],
                 ['t' => 'Zboží na prodej'],
             ],
         ];
@@ -49,7 +47,11 @@
                             <li class="flex gap-2.5">
                                 <span class="mt-px text-primary">☐</span>
                                 <span>
-                                    {{ $p['t'] }}
+                                    @if(!empty($p['odkaz']))
+                                        <a href="{{ $p['odkaz'] }}" target="_blank" rel="noopener" class="font-semibold text-primary hover:underline">{{ $p['t'] }}</a>
+                                    @else
+                                        {{ $p['t'] }}
+                                    @endif
                                     @if(!empty($p['n']))
                                         <span class="text-gray-500">— {{ $p['n'] }}</span>
                                     @endif

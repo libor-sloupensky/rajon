@@ -5,7 +5,7 @@
         <div class="space-y-7 text-[15px] leading-relaxed text-gray-700">
             <section>
                 <h2 class="mb-2 text-base font-bold text-gray-900">Reprezentace značky</h2>
-                <p>Reprezentuj <strong>WormUP</strong> a <strong>Grig</strong> s péčí — vystupuj, jako bys byl součástí firmy, a dělej jí dobré jméno.</p>
+                <p>Buď ambasadorem značek <strong>WormUP</strong> a <strong>Grig</strong> — vystupuj, jako bys byl součástí firmy, a dělej jí dobré jméno.</p>
             </section>
 
             <section>
@@ -22,7 +22,7 @@
                         Produkty se zvýhodněnou cenou najdeš zde:
                         <a href="https://www.gogrig.com/fransiza/" target="_blank" rel="noopener" class="font-semibold text-primary hover:underline">gogrig.com/fransiza</a>.
                     </li>
-                    <li>Objednat si můžeš i ostatní produkty — ty jsou za běžné velkoobchodní ceny.</li>
+                    <li>Objednat si můžeš i ostatní produkty — ale ty jsou za běžné velkoobchodní ceny. Ne za franšízantské.</li>
                 </ul>
             </section>
 
