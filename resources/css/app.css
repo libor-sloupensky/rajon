@@ -25,6 +25,7 @@ body {
     font-size: 15px;
     line-height: 1.65;
     color: #374151;
+    counter-reset: clanek-ol;
 }
 .clanek > :first-child { margin-top: 0; }
 .clanek h1, .clanek h2 {
@@ -36,9 +37,20 @@ body {
 }
 .clanek p { margin-bottom: 0.75rem; }
 .clanek ul { list-style-type: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; }
-.clanek ol { list-style-type: decimal; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+.clanek ul li::marker { color: var(--color-primary); }
+/* Číslované seznamy: průběžné číslování přes více <ol>. Trix rozseká seznam
+   podnadpisy na víc <ol> (každý začne od 1), ale CSS counter čísluje plynule
+   1–N přes všechny <ol> v článku — start atributy ani Trix to nerozbijí. */
+.clanek ol { list-style: none; padding-left: 0; margin-bottom: 0.75rem; }
+.clanek ol > li { counter-increment: clanek-ol; padding-left: 1.75rem; position: relative; }
+.clanek ol > li::before {
+    content: counter(clanek-ol) ".";
+    position: absolute;
+    left: 0;
+    color: var(--color-primary);
+    font-weight: 700;
+}
 .clanek li { margin-bottom: 0.4rem; }
-.clanek li::marker { color: var(--color-primary); }
 .clanek a { color: var(--color-primary); font-weight: 600; }
 .clanek a:hover { text-decoration: underline; }
 .clanek strong, .clanek b { font-weight: 700; color: #111827; }
