@@ -145,7 +145,9 @@ class AkceController extends Controller
                   ->where('au_filter.uzivatel_id', '=', $uzivatelId);
             })
             ->select('akce.*', 'au_filter.palec as muj_palec', 'au_filter.osobni_poznamka as moje_poznamka')
-            ->orderByRaw("FIELD(au_filter.palec, 'nahoru', NULL, 'stred', 'dolu')")
+            // CASE místo FIELD — FIELD(NULL,…) vrací 0, takže nehodnocené (NULL) by
+            // sortily PŘED 'nahoru'. CASE dá NULL hodnotu 2 (až za rezervované 'nahoru').
+            ->orderByRaw("CASE au_filter.palec WHEN 'nahoru' THEN 1 WHEN 'stred' THEN 3 WHEN 'dolu' THEN 4 ELSE 2 END")
             ->orderBy('akce.datum_od');
         } else {
             $query->orderBy('datum_od');
