@@ -31,6 +31,21 @@ class InformaceController extends Controller
 
     public function keStazeni()
     {
-        return view('informace.ke-stazeni');
+        $soubory = \App\Models\SouborKeStazeni::orderBy('poradi')->orderBy('id')->get();
+
+        return view('informace.ke-stazeni', compact('soubory'));
+    }
+
+    /** Stažení souboru uloženého ve storage (nahraného adminem). */
+    public function stahnoutSoubor(\App\Models\SouborKeStazeni $soubor)
+    {
+        if ($soubor->zdroj === 'public') {
+            return redirect(asset('soubory/' . $soubor->cesta));
+        }
+
+        $cesta = storage_path('app/soubory/' . $soubor->cesta);
+        abort_unless(is_file($cesta), 404);
+
+        return response()->download($cesta, $soubor->download_nazev ?: $soubor->cesta);
     }
 }

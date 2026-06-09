@@ -4,6 +4,7 @@ use App\Http\Controllers\AkceController;
 use App\Http\Controllers\Auth\DoplnitAdresuController;
 use App\Http\Controllers\Admin\ErrorLogController;
 use App\Http\Controllers\Admin\ScrapingController;
+use App\Http\Controllers\Admin\SouboryController;
 use App\Http\Controllers\Admin\UzivateleController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\RegistraceController;
@@ -62,6 +63,7 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\VyzadovatAdresu::cla
     Route::get('/informace/jak-prodavat', [InformaceController::class, 'jakProdavat'])->name('informace.jak-prodavat');
     Route::get('/informace/vybaveni', [InformaceController::class, 'vybaveni'])->name('informace.vybaveni');
     Route::get('/informace/ke-stazeni', [InformaceController::class, 'keStazeni'])->name('informace.ke-stazeni');
+    Route::get('/informace/soubor/{soubor}/stahnout', [InformaceController::class, 'stahnoutSoubor'])->name('informace.soubor.stahnout');
 });
 
 // Admin (je_admin middleware) — taky vyžaduje vyplněnou adresu
@@ -90,4 +92,9 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\VyzadovatAdresu::cla
     Route::put('/scraping/{zdroj}', [ScrapingController::class, 'update'])->name('scraping.update');
     Route::post('/scraping/{zdroj}/spustit', [ScrapingController::class, 'spustit'])->name('scraping.spustit');
     Route::get('/scraping/log/{log}', [ScrapingController::class, 'log'])->name('scraping.log');
+
+    // Soubory ke stažení — správa
+    Route::post('/soubory', [SouboryController::class, 'store'])->name('soubory.store');
+    Route::put('/soubory/{soubor}', [SouboryController::class, 'update'])->name('soubory.update');
+    Route::delete('/soubory/{soubor}', [SouboryController::class, 'destroy'])->name('soubory.destroy');
 });

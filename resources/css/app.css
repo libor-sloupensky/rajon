@@ -16,6 +16,10 @@ body {
     font-weight: 500;
 }
 
+[x-cloak] {
+    display: none !important;
+}
+
 main a:hover,
 footer a:hover {
     text-decoration: underline;
