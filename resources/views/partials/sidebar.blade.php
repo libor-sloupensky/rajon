@@ -30,6 +30,18 @@
                 </div>
             </div>
 
+            {{-- INFORMACE (pro všechny přihlášené) --}}
+            <div class="rj-sidebar-section rounded-lg border border-primary bg-primary/5 ring-1 ring-primary p-1">
+                <div class="px-2 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Informace</div>
+                <div class="rj-sidebar-section-body" style="max-height: 24rem;">
+                    <a href="{{ url('/informace/fransizanti') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/fransizanti') ? 'active' : '' }}">Informace pro franšízanty</a>
+                    <a href="{{ url('/informace/jak-prodavat') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/jak-prodavat') ? 'active' : '' }}">Jak prodávat jedlý hmyz</a>
+                    <a href="{{ url('/informace/vybaveni') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/vybaveni') ? 'active' : '' }}">Vybavení na akci</a>
+                    <a href="{{ url('/informace/faq') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/faq') ? 'active' : '' }}">Časté dotazy (FAQ)</a>
+                    <a href="{{ url('/informace/ke-stazeni') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/ke-stazeni') ? 'active' : '' }}">Soubory ke stažení</a>
+                </div>
+            </div>
+
             {{-- ADMIN --}}
             @if($navIsAdmin)
                 <div class="rj-sidebar-section rounded-lg border border-primary bg-primary/5 ring-1 ring-primary p-1">
@@ -38,14 +50,6 @@
                         <a href="{{ route('admin.scraping.index') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.scraping.*') ? 'active' : '' }}">Scraping zdrojů</a>
                         <a href="{{ route('admin.uzivatele') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.uzivatele') ? 'active' : '' }}">Uživatelé a pozvánky</a>
                         <a href="{{ route('admin.error-logy.index') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->routeIs('admin.error-logy.*') ? 'active' : '' }}">Error logy</a>
-
-                        {{-- Informace — dočasně zde v adminu, později přesun do běžného menu --}}
-                        <div class="px-3 pt-2 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Informace</div>
-                        <a href="{{ url('/informace/fransizanti') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/fransizanti') ? 'active' : '' }}">Informace pro Franšízanty</a>
-                        <a href="{{ url('/informace/jak-prodavat') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/jak-prodavat') ? 'active' : '' }}">Jak prodávat jedlý hmyz</a>
-                        <a href="{{ url('/informace/vybaveni') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/vybaveni') ? 'active' : '' }}">Vybavení na akci</a>
-                        <a href="{{ url('/informace/faq') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/faq') ? 'active' : '' }}">Časté dotazy (FAQ)</a>
-                        <a href="{{ url('/informace/ke-stazeni') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/ke-stazeni') ? 'active' : '' }}">Soubory ke stažení</a>
                     </div>
                 </div>
             @endif

@@ -6,7 +6,7 @@
             <div class="mb-6 rounded-lg border border-primary/30 bg-primary/5 p-4">
                 <p class="text-sm text-gray-700">
                     <strong>{{ $pozvanka->pozval?->celejmeno() ?? 'Tým Rajón' }}</strong>
-                    vás zve do aplikace Rajón jako
+                    tě zve do aplikace Rajón jako
                     <strong>{{ $pozvanka->role === 'admin' ? 'administrátora' : 'franšízanta' }}</strong>.
                 </p>
                 @if($pozvanka->region)
@@ -84,7 +84,7 @@
         </form>
 
         <p class="mt-6 text-center text-sm text-gray-500">
-            Už máte účet? <a href="{{ route('login') }}" class="font-medium text-primary hover:text-primary-dark">Přihlaste se</a>
+            Už máš účet? <a href="{{ route('login') }}" class="font-medium text-primary hover:text-primary-dark">Přihlas se</a>
         </p>
     </div>
 </x-layouts.app>

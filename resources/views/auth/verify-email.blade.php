@@ -4,12 +4,12 @@
 
         @if (session('status') == 'verification-link-sent')
             <div class="mb-4 rounded-lg bg-green-50 border border-green-200 p-4 text-sm text-green-700">
-                Nový ověřovací odkaz byl odeslán na váš e-mail.
+                Nový ověřovací odkaz byl odeslán na tvůj e-mail.
             </div>
         @endif
 
         <p class="mb-4 text-sm text-gray-600">
-            Děkujeme za registraci! Před pokračováním prosím ověřte svůj e-mail kliknutím na odkaz, který jsme vám zaslali.
+            Děkujeme za registraci! Před pokračováním prosím ověř svůj e-mail kliknutím na odkaz, který jsme ti zaslali.
         </p>
 
         <form method="POST" action="{{ route('verification.send') }}">

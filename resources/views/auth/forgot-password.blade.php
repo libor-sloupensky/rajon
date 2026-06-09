@@ -8,7 +8,7 @@
             </div>
         @endif
 
-        <p class="mb-4 text-sm text-gray-600">Zadejte svůj e-mail a my vám pošleme odkaz pro obnovení hesla.</p>
+        <p class="mb-4 text-sm text-gray-600">Zadej svůj e-mail a my ti pošleme odkaz pro obnovení hesla.</p>
 
         <form method="POST" action="{{ route('password.email') }}" class="space-y-4">
             @csrf

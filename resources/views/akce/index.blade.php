@@ -287,7 +287,7 @@
                             <button type="button" @click="toggleRezervace"
                                 :class="rezervovano ? 'bg-red-50 text-red-700 border-red-300 hover:bg-red-100' : 'bg-white text-primary border-primary hover:bg-primary/10'"
                                 class="rounded-lg border px-3 py-1 text-xs font-medium transition"
-                                title="Vaši rezervaci uvidí i ostatní — berte ji jako ZÁVAZNOU, nebo pouze krátkodobou ve stylu ŘEŠÍM TO.">
+                                title="Tvoji rezervaci uvidí i ostatní — ber ji jako ZÁVAZNOU, nebo pouze krátkodobou ve stylu ŘEŠÍM TO.">
                                 <span x-text="rezervovano ? '✕ Zrušit rezervaci' : 'Rezervovat'"></span>
                             </button>
                         </div>
