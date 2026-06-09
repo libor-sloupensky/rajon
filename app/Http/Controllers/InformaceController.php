@@ -11,7 +11,9 @@ class InformaceController extends Controller
 {
     public function fransizanti()
     {
-        return view('informace.fransizanti');
+        return view('informace.clanek', [
+            'stranka' => \App\Models\Stranka::where('slug', 'fransizanti')->firstOrFail(),
+        ]);
     }
 
     public function faq()
@@ -21,7 +23,18 @@ class InformaceController extends Controller
 
     public function jakProdavat()
     {
-        return view('informace.jak-prodavat');
+        return view('informace.clanek', [
+            'stranka' => \App\Models\Stranka::where('slug', 'jak-prodavat')->firstOrFail(),
+        ]);
+    }
+
+    /** Uložení obsahu článku (jen admin) — z WYSIWYG editoru. */
+    public function ulozitStranku(\Illuminate\Http\Request $request, \App\Models\Stranka $stranka)
+    {
+        $data = $request->validate(['obsah' => ['nullable', 'string']]);
+        $stranka->update(['obsah' => $data['obsah']]);
+
+        return response()->json(['ok' => true]);
     }
 
     public function vybaveni()

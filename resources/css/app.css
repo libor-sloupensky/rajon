@@ -20,6 +20,36 @@ body {
     display: none !important;
 }
 
+/* Editovatelný článek (obsah z DB / Trixu) — styl jako u info stránek */
+.clanek {
+    font-size: 15px;
+    line-height: 1.65;
+    color: #374151;
+}
+.clanek > :first-child { margin-top: 0; }
+.clanek h1, .clanek h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+.clanek p { margin-bottom: 0.75rem; }
+.clanek ul { list-style-type: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+.clanek ol { list-style-type: decimal; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+.clanek li { margin-bottom: 0.4rem; }
+.clanek li::marker { color: var(--color-primary); }
+.clanek a { color: var(--color-primary); font-weight: 600; }
+.clanek a:hover { text-decoration: underline; }
+.clanek strong, .clanek b { font-weight: 700; color: #111827; }
+
+trix-editor {
+    min-height: 12rem;
+    background: #fff;
+    border-radius: 0.5rem;
+}
+
+
 main a:hover,
 footer a:hover {
     text-decoration: underline;

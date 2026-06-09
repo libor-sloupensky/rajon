@@ -97,4 +97,7 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\VyzadovatAdresu::cla
     Route::post('/soubory', [SouboryController::class, 'store'])->name('soubory.store');
     Route::put('/soubory/{soubor}', [SouboryController::class, 'update'])->name('soubory.update');
     Route::delete('/soubory/{soubor}', [SouboryController::class, 'destroy'])->name('soubory.destroy');
+
+    // Editace článků (Franšízanti, Jak prodávat) — uložení z WYSIWYG
+    Route::put('/stranky/{stranka}', [InformaceController::class, 'ulozitStranku'])->name('stranky.ulozit');
 });
