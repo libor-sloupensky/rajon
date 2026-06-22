@@ -128,3 +128,29 @@
         </div>
     @endforeach
 </div>
+
+{{-- Zdroje informací — katalogy a odkazy na akci, ze kterých máme data --}}
+@if($a->akceZdroje->isNotEmpty())
+    <div class="mt-3 border-t border-gray-100 pt-2 text-sm">
+        <div class="text-xs text-gray-500 mb-1">Zdroje informací ({{ $a->akceZdroje->count() }})</div>
+        <ul class="space-y-1">
+            @foreach($a->akceZdroje as $az)
+                <li class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                    @if($az->zdroj?->url)
+                        <a href="{{ $az->zdroj->url }}" target="_blank" rel="noopener"
+                           class="font-medium text-primary hover:underline">{{ $az->zdroj?->nazev ?? 'Katalog' }}</a>
+                    @else
+                        <span class="font-medium text-gray-700">{{ $az->zdroj?->nazev ?? 'Katalog' }}</span>
+                    @endif
+                    @if($az->url)
+                        <a href="{{ $az->url }}" target="_blank" rel="noopener"
+                           class="text-xs text-primary hover:underline">→ odkaz na akci</a>
+                    @endif
+                    @if($az->posledni_ziskani)
+                        <span class="text-xs text-gray-400">({{ $az->posledni_ziskani->diffForHumans() }})</span>
+                    @endif
+                </li>
+            @endforeach
+        </ul>
+    </div>
+@endif

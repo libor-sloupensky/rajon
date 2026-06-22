@@ -154,7 +154,11 @@ class AkceController extends Controller
         }
 
         // Eager load rezervace s uživateli (pro zobrazení "Rezervováno: Jan Novák")
-        $query->with(['rezervace' => fn ($q) => $q->where('stav', '!=', 'zrusena')->with('uzivatel:id,jmeno,prijmeni')]);
+        // + zdroje akce s katalogem (pro sekci "Zdroje informací" v detailu)
+        $query->with([
+            'rezervace' => fn ($q) => $q->where('stav', '!=', 'zrusena')->with('uzivatel:id,jmeno,prijmeni'),
+            'akceZdroje.zdroj',
+        ]);
 
         $akce = $query->paginate(30)->withQueryString();
 
