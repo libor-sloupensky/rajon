@@ -217,13 +217,10 @@
                 <div class="space-y-2 text-sm">
                     @foreach($akce->akceZdroje as $az)
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                            @if($az->zdroj?->url)
-                                <a href="{{ $az->zdroj->url }}" target="_blank" rel="noopener" class="font-medium text-primary hover:underline">{{ $az->zdroj?->nazev ?? '?' }}</a>
+                            @if($az->url)
+                                <a href="{{ $az->url }}" target="_blank" rel="noopener" class="font-medium text-primary hover:underline">{{ $az->zdroj?->nazev ?? '?' }}</a>
                             @else
                                 <span class="font-medium text-gray-700">{{ $az->zdroj?->nazev ?? '?' }}</span>
-                            @endif
-                            @if($az->url)
-                                <a href="{{ $az->url }}" target="_blank" rel="noopener" class="text-xs text-primary hover:underline">→ odkaz na akci</a>
                             @endif
                             <span class="ml-auto text-xs text-gray-500">{{ $az->posledni_ziskani?->diffForHumans() }}</span>
                         </div>
