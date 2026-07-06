@@ -28,6 +28,13 @@ class InformaceController extends Controller
         ]);
     }
 
+    public function slovenskyTrh()
+    {
+        return view('informace.clanek', [
+            'stranka' => \App\Models\Stranka::where('slug', 'slovensky-trh')->firstOrFail(),
+        ]);
+    }
+
     /** Uložení obsahu článku (jen admin) — z WYSIWYG editoru. */
     public function ulozitStranku(\Illuminate\Http\Request $request, \App\Models\Stranka $stranka)
     {

@@ -36,6 +36,7 @@
                 <div class="rj-sidebar-section-body" style="max-height: 24rem;">
                     <a href="{{ url('/informace/fransizanti') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/fransizanti') ? 'active' : '' }}">Informace pro franšízanty</a>
                     <a href="{{ url('/informace/jak-prodavat') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/jak-prodavat') ? 'active' : '' }}">Jak prodávat jedlý hmyz</a>
+                    <a href="{{ url('/informace/slovensky-trh') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/slovensky-trh') ? 'active' : '' }}">Slovenský trh</a>
                     <a href="{{ url('/informace/vybaveni') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/vybaveni') ? 'active' : '' }}">Vybavení na akci</a>
                     <a href="{{ url('/informace/faq') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/faq') ? 'active' : '' }}">Časté dotazy (FAQ)</a>
                     <a href="{{ url('/informace/ke-stazeni') }}" class="block px-3 py-1.5 text-sm text-gray-600 rounded {{ request()->is('informace/ke-stazeni') ? 'active' : '' }}">Soubory ke stažení</a>

@@ -54,6 +54,7 @@ body {
 .clanek a { color: var(--color-primary); font-weight: 600; }
 .clanek a:hover { text-decoration: underline; }
 .clanek strong, .clanek b { font-weight: 700; color: #111827; }
+.clanek em { color: #6b7280; font-style: italic; }
 
 trix-editor {
     min-height: 12rem;
