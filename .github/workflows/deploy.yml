@@ -265,6 +265,15 @@ jobs:
           LFTP_SCRIPT="${LFTP_SCRIPT} put public/deploy-hook.php -o ${{ env.PUBLIC_DIR }}/deploy-hook.php;"
           LFTP_SCRIPT="${LFTP_SCRIPT} put public/.htaccess -o ${{ env.PUBLIC_DIR }}/.htaccess;"
           LFTP_SCRIPT="${LFTP_SCRIPT} put .env -o ${{ env.APP_DIR }}/.env;"
+
+          # Zapisovatelné adresáře Laravelu. Archiv nese jen soubory, takže
+          # prázdné adresáře (typicky storage/framework/sessions) by na serveru
+          # nevznikly a aplikace by spadla na "Failed to open stream".
+          for d in storage/framework/sessions storage/framework/views \
+                   storage/framework/cache/data storage/logs \
+                   storage/app/public bootstrap/cache; do
+            LFTP_SCRIPT="${LFTP_SCRIPT} mkdir -pf ${{ env.APP_DIR }}/$d;"
+          done
           for f in app.tar.gz public.tar.gz delete-app.txt delete-public.txt; do
             if [ -s "/tmp/deploy/$f" ]; then
               LFTP_SCRIPT="${LFTP_SCRIPT} put -O ${{ env.APP_DIR }}/_deploy/ /tmp/deploy/$f;"
