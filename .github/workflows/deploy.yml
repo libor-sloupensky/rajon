@@ -137,7 +137,7 @@ jobs:
           MAIL_HOST=${{ env.PROD_MAIL_HOST }}
           MAIL_PORT=587
           MAIL_USERNAME=${{ env.PROD_MAIL_USER }}
-          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD_FESTIVALY }}
+          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD_INFO }}
           MAIL_ENCRYPTION=tls
           MAIL_FROM_ADDRESS=${{ env.PROD_MAIL_USER }}
           MAIL_FROM_NAME="Rajón"
