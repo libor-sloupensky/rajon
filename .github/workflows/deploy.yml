@@ -256,7 +256,15 @@ jobs:
 
           # Sestavit seznam put příkazů jen pro existující soubory.
           # Archivy i delete-listy jdou do APP_DIR/_deploy/ (odtud je čte extract.php).
+          # Rozbalovací skripty se nahrávají přímo, ne v archivu — archiv bez
+          # nich rozbalit nejde, takže na čerstvém serveru by deploy nikdy
+          # nezačal (404 na extract.php). Zároveň tím zůstávají aktuální.
           LFTP_SCRIPT="mkdir -pf ${{ env.APP_DIR }}/_deploy;"
+          LFTP_SCRIPT="${LFTP_SCRIPT} mkdir -pf ${{ env.PUBLIC_DIR }};"
+          LFTP_SCRIPT="${LFTP_SCRIPT} put public/extract.php -o ${{ env.PUBLIC_DIR }}/extract.php;"
+          LFTP_SCRIPT="${LFTP_SCRIPT} put public/deploy-hook.php -o ${{ env.PUBLIC_DIR }}/deploy-hook.php;"
+          LFTP_SCRIPT="${LFTP_SCRIPT} put public/.htaccess -o ${{ env.PUBLIC_DIR }}/.htaccess;"
+          LFTP_SCRIPT="${LFTP_SCRIPT} put .env -o ${{ env.APP_DIR }}/.env;"
           for f in app.tar.gz public.tar.gz delete-app.txt delete-public.txt; do
             if [ -s "/tmp/deploy/$f" ]; then
               LFTP_SCRIPT="${LFTP_SCRIPT} put -O ${{ env.APP_DIR }}/_deploy/ /tmp/deploy/$f;"
