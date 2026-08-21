@@ -12,9 +12,22 @@ concurrency:
   group: deploy-main
   cancel-in-progress: false
 
+# Nastavení serveru. Vše je přepsatelné bez commitu přes
+# GitHub → Settings → Secrets and variables → Actions → Variables.
 env:
-  APP_DIR: /tuptudu.cz/rajon
-  PUBLIC_DIR: /tuptudu.cz/_sub/rajon
+  SFTP_HOST: ${{ vars.SFTP_HOST || 'irene.thinline.cz' }}
+  SFTP_USER: ${{ vars.SFTP_USER || 'tuptudu_cz' }}
+  SFTP_PORT: ${{ vars.SFTP_PORT || '22' }}
+  # DocumentRoot subdomény je posunutý na podadresář public, takže kořen
+  # Laravelu je adresář subdomény — .env ani vendor/ nejsou z webu dostupné.
+  APP_DIR: ${{ vars.REMOTE_APP || '/rajon.tuptudu.cz' }}
+  PUBLIC_DIR: ${{ vars.REMOTE_PUB || '/rajon.tuptudu.cz/public' }}
+  SITE_URL: ${{ vars.APP_URL || 'https://rajon.tuptudu.cz' }}
+  PROD_DB_HOST: ${{ vars.DB_HOST || '127.0.0.1' }}
+  PROD_DB_NAME: ${{ vars.DB_NAME || 'tuptuducz01' }}
+  PROD_DB_USER: ${{ vars.DB_USER || 'tuptuducz001' }}
+  PROD_MAIL_HOST: ${{ vars.MAIL_HOST || 'smtp.cesky-hosting.cz' }}
+  PROD_MAIL_USER: ${{ vars.MAIL_USER || 'festivaly@wormup.com' }}
 
 jobs:
   deploy:
@@ -101,10 +114,10 @@ jobs:
           LOG_DEPRECATIONS_CHANNEL=null
           LOG_LEVEL=error
           DB_CONNECTION=mysql
-          DB_HOST=db.dw328.webglobe.com
+          DB_HOST=${{ env.PROD_DB_HOST }}
           DB_PORT=3306
-          DB_DATABASE=${{ secrets.DB_DATABASE }}
-          DB_USERNAME=${{ secrets.DB_USERNAME }}
+          DB_DATABASE=${{ env.PROD_DB_NAME }}
+          DB_USERNAME=${{ env.PROD_DB_USER }}
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
           DB_CHARSET=utf8mb4
           DB_COLLATION=utf8mb4_unicode_ci
@@ -117,13 +130,16 @@ jobs:
           FILESYSTEM_DISK=local
           QUEUE_CONNECTION=sync
           CACHE_STORE=file
-          MAIL_MAILER=smtp
-          MAIL_HOST=mail.webglobe.cz
+          # Hosting blokuje odchozí SMTP na všech portech a zakazuje proc_open,
+          # takže nefunguje ani sendmail transport. Jediná cesta ven je mail(),
+          # pro kterou má aplikace vlastní transport (App\Mail\Transport).
+          MAIL_MAILER=${{ vars.MAIL_MAILER || 'php_mail' }}
+          MAIL_HOST=${{ env.PROD_MAIL_HOST }}
           MAIL_PORT=587
-          MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
-          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+          MAIL_USERNAME=${{ env.PROD_MAIL_USER }}
+          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD_FESTIVALY }}
           MAIL_ENCRYPTION=tls
-          MAIL_FROM_ADDRESS=festivaly@wormup.com
+          MAIL_FROM_ADDRESS=${{ env.PROD_MAIL_USER }}
           MAIL_FROM_NAME="Rajón"
           GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
@@ -228,10 +244,15 @@ jobs:
           echo "--- obsah /tmp/deploy ---"
           ls -la /tmp/deploy/
 
-      - name: Upload archives via lftp FTP
+      - name: Upload archives via lftp SFTP
         timeout-minutes: 12
+        env:
+          SFTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
           sudo apt-get install -y lftp > /dev/null 2>&1
+
+          # Heslo jde do URL, takže musí být URL-encoded (může obsahovat @, /, : …)
+          SFTP_PASS_ENC=$(printf %s "$SFTP_PASSWORD" | jq -sRr @uri)
 
           # Sestavit seznam put příkazů jen pro existující soubory.
           # Archivy i delete-listy jdou do APP_DIR/_deploy/ (odtud je čte extract.php).
@@ -249,12 +270,12 @@ jobs:
           for attempt in $(seq 1 10); do
             echo ">>> upload archivů, pokus $attempt/10"
             if timeout 120 lftp -e "
-              set ftp:ssl-allow no;
+              set sftp:connect-program 'ssh -o StrictHostKeyChecking=no -o ConnectTimeout=20 -p $SFTP_PORT';
               set xfer:clobber on;
               set net:timeout 15;
               set net:max-retries 1;
               set net:reconnect-interval-base 3;
-              open ftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@ftp.tuptudu.cz;
+              open sftp://$SFTP_USER:$SFTP_PASS_ENC@$SFTP_HOST;
               ${LFTP_SCRIPT}
               quit
             "; then
@@ -271,13 +292,17 @@ jobs:
         run: |
           TOKEN="${{ secrets.MIGRATE_TOKEN }}"
 
-          # Pomocná funkce: zavolat URL s retry (firewall blokuje i HTTP z runneru)
+          # Pomocná funkce: zavolat URL s retry. Zkouší i http — než se po
+          # přepnutí DNS vydá certifikát, https ještě neexistuje.
           call() {
-            local url="$1" label="$2"
+            local cesta="$1" label="$2"
             for attempt in $(seq 1 8); do
               echo ">>> ${label}, pokus $attempt/8"
-              if curl -fsSL --max-time 90 "$url"; then
+              if curl -fsSLk --max-time 90 "${SITE_URL}${cesta}"; then
                 echo ">>> ${label} OK"; return 0
+              fi
+              if curl -fsSL --max-time 90 "http://${SITE_URL#https://}${cesta}"; then
+                echo ">>> ${label} OK (přes http)"; return 0
               fi
               echo ">>> ${label} pokus $attempt selhal, čekám 5 s…"; sleep 5
             done
@@ -285,11 +310,11 @@ jobs:
           }
 
           if [ "${{ steps.archives.outputs.app_has }}" = "true" ]; then
-            call "https://rajon.tuptudu.cz/extract.php?token=${TOKEN}&target=app" "extract app" || exit 1
+            call "/extract.php?token=${TOKEN}&target=app" "extract app" || exit 1
           fi
           if [ "${{ steps.archives.outputs.pub_has }}" = "true" ]; then
-            call "https://rajon.tuptudu.cz/extract.php?token=${TOKEN}&target=public" "extract public" || exit 1
+            call "/extract.php?token=${TOKEN}&target=public" "extract public" || exit 1
           fi
 
           # Cache clear + migrace
-          call "https://rajon.tuptudu.cz/deploy-hook.php?token=${TOKEN}&migrate" "deploy hook" || exit 1
+          call "/deploy-hook.php?token=${TOKEN}&migrate" "deploy hook" || exit 1

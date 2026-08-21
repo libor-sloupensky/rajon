@@ -6,7 +6,7 @@
  *
  * Struktura serveru:
  *   /tuptudu.cz/rajon/       — Laravel app
- *   /tuptudu.cz/_sub/rajon/  — public (tento soubor)
+ *   /rajon.tuptudu.cz/public/  — public (tento soubor)
  *
  * URL parametry:
  *   ?token=...           — povinné, MIGRATE_TOKEN z .env

@@ -11,11 +11,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Na serveru: public je v /tuptudu.cz/_sub/rajon/, app je v /tuptudu.cz/rajon/
-        $serverPublicPath = dirname(base_path()) . '/_sub/rajon';
-        if (is_dir($serverPublicPath)) {
-            $this->app->usePublicPath($serverPublicPath);
-        }
+        // Na Českém hostingu je rozložení standardní — public/ je podadresář
+        // kořene aplikace (DocumentRoot subdomény je posunutý na /public),
+        // takže se výchozí cesta Laravelu přepisovat nemusí. Dřív to bylo
+        // potřeba kvůli Webglobe, kde public leželo v /tuptudu.cz/_sub/rajon/.
     }
 
     /**
@@ -23,6 +22,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Hosting blokuje odchozí SMTP a zakazuje proc_open, takže jediná cesta
+        // ven je PHP mail() — viz App\Mail\Transport\PhpMailTransport
+        \Illuminate\Support\Facades\Mail::extend(
+            'php_mail',
+            fn (array $config) => new \App\Mail\Transport\PhpMailTransport()
+        );
+
         // Login tracking — zaznamenat čas posledního přihlášení uživatele
         \Illuminate\Support\Facades\Event::listen(
             \Illuminate\Auth\Events\Login::class,

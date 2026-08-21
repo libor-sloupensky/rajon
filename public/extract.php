@@ -8,9 +8,9 @@
  * endpoint ho rozbalí přímo na serveru přes PharData.
  *
  * Struktura serveru:
- *   /tuptudu.cz/rajon/          — Laravel app (cíl pro target=app)
- *   /tuptudu.cz/_sub/rajon/     — public (cíl pro target=public, zde leží tento soubor)
- *   /tuptudu.cz/rajon/_deploy/  — sem se nahrávají archivy a delete-listy
+ *   /rajon.tuptudu.cz/          — Laravel app (cíl pro target=app)
+ *   /rajon.tuptudu.cz/public/   — public (cíl pro target=public, zde leží tento soubor)
+ *   /rajon.tuptudu.cz/_deploy/  — sem se nahrávají archivy a delete-listy
  *
  * URL parametry:
  *   ?token=...        — povinné, MIGRATE_TOKEN z .env

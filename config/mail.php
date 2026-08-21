@@ -79,6 +79,12 @@ return [
             'transport' => 'array',
         ],
 
+        // Odesílání přes PHP mail() — jediná cesta na hostinzích, které blokují
+        // odchozí SMTP a zakazují proc_open. Registruje AppServiceProvider.
+        'php_mail' => [
+            'transport' => 'php_mail',
+        ],
+
         'failover' => [
             'transport' => 'failover',
             'mailers' => [
